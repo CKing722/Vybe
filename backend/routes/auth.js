@@ -1,8 +1,10 @@
 const express = require('express');
+const { body, cookie } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const { env } = require('../config/env');
 const { loginLimiter } = require('../middleware/rateLimiter');
 const { signAccessToken, signRefreshToken } = require('../middleware/auth');
+const { validate } = require('../middleware/validator');
 const { loginUser, registerUser } = require('../services/authService');
 const { unauthorized } = require('../utils/errors');
 
@@ -24,12 +26,41 @@ function authResponse(res, user) {
   return res.status(200).json({ user, accessToken, expiresInSeconds: 15 * 60 });
 }
 
-router.post('/register', async (req, res, next) => {
+const registerValidation = validate([
+  body('email').isEmail().withMessage('email must be a valid email').normalizeEmail(),
+  body('password')
+    .isString()
+    .withMessage('password must be a string')
+    .isLength({ min: 8, max: 72 })
+    .withMessage('password must be 8-72 characters'),
+  body('display_name')
+    .customSanitizer((value, { req }) => value ?? req.body.displayName ?? req.body.name)
+    .isString()
+    .withMessage('display_name must be a string')
+    .trim()
+    .isLength({ min: 2, max: 32 })
+    .withMessage('display_name must be 2-32 characters'),
+  body('role')
+    .optional()
+    .isIn(['viewer', 'performer'])
+    .withMessage('role must be viewer or performer'),
+]);
+
+const loginValidation = validate([
+  body('email').isEmail().withMessage('email must be a valid email').normalizeEmail(),
+  body('password').isString().withMessage('password must be a string'),
+]);
+
+const refreshValidation = validate([
+  cookie('vybe_refresh').exists().withMessage('Refresh token cookie missing'),
+]);
+
+router.post('/register', registerValidation, async (req, res, next) => {
   try {
     const user = await registerUser({
       email: req.body.email,
       password: req.body.password,
-      displayName: req.body.display_name || req.body.displayName || req.body.name,
+      displayName: req.body.display_name,
       role: req.body.role || 'viewer',
     });
     return authResponse(res, user);
@@ -38,7 +69,7 @@ router.post('/register', async (req, res, next) => {
   }
 });
 
-router.post('/login', loginLimiter, async (req, res, next) => {
+router.post('/login', loginLimiter, loginValidation, async (req, res, next) => {
   try {
     const user = await loginUser(req.body);
     return authResponse(res, user);
@@ -47,7 +78,7 @@ router.post('/login', loginLimiter, async (req, res, next) => {
   }
 });
 
-router.post('/refresh', (req, res, next) => {
+router.post('/refresh', refreshValidation, (req, res, next) => {
   try {
     const token = req.cookies.vybe_refresh;
     if (!token) throw unauthorized('Refresh token missing');

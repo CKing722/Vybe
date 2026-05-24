@@ -1,5 +1,7 @@
 const express = require('express');
+const { body } = require('express-validator');
 const { requireAuth } = require('../middleware/auth');
+const { validate } = require('../middleware/validator');
 const { listGiftTypes } = require('../services/giftCatalog');
 const { sendGift } = require('../services/sparkEngine');
 const { recordGiftForStorm } = require('../services/stormService');
@@ -36,13 +38,37 @@ router.get('/types', async (req, res, next) => {
   }
 });
 
-router.post('/send', requireAuth, async (req, res, next) => {
+const sendValidation = validate([
+  body('performer_id')
+    .customSanitizer((value, { req }) => value ?? req.body.performerId)
+    .isString()
+    .withMessage('performer_id must be a string')
+    .trim()
+    .notEmpty()
+    .withMessage('performer_id is required'),
+  body('gift_type_id')
+    .customSanitizer((value, { req }) => value ?? req.body.giftTypeId)
+    .isString()
+    .withMessage('gift_type_id must be a string')
+    .trim()
+    .notEmpty()
+    .withMessage('gift_type_id is required'),
+  body('room_id')
+    .customSanitizer((value, { req }) => value ?? req.body.roomId)
+    .isString()
+    .withMessage('room_id must be a string')
+    .trim()
+    .notEmpty()
+    .withMessage('room_id is required'),
+]);
+
+router.post('/send', requireAuth, sendValidation, async (req, res, next) => {
   try {
     const result = await sendGift({
       senderId: req.user.sub,
-      performerId: req.body.performer_id || req.body.performerId,
-      giftTypeId: req.body.gift_type_id || req.body.giftTypeId,
-      roomId: req.body.room_id || req.body.roomId,
+      performerId: req.body.performer_id,
+      giftTypeId: req.body.gift_type_id,
+      roomId: req.body.room_id,
     });
 
     emitGiftEvents(req.app.get('io'), result);

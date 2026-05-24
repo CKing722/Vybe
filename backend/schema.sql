@@ -328,7 +328,8 @@ CREATE INDEX idx_chat_room ON chat_messages(room_id, created_at DESC);
 CREATE INDEX idx_dm_recipient ON direct_messages(recipient_id, is_read, created_at DESC);
 CREATE INDEX idx_subs_performer ON subscriptions(performer_id, status);
 CREATE INDEX idx_viewer_history ON viewer_performer_history(viewer_id);
-CREATE INDEX idx_banners_active ON platform_banners(expires_at) WHERE expires_at > NOW();
+CREATE INDEX idx_banners_expires_at ON platform_banners(expires_at);
+CREATE INDEX idx_banners_type_created ON platform_banners(type, created_at DESC);
 CREATE INDEX idx_perf_live ON performer_profiles(is_live) WHERE is_live = TRUE;
 
 -- ═══ SEED: Gift Types ═══

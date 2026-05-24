@@ -4,6 +4,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
+    "test": "node --test",
+    "check": "node --check server.js && node --test",
     "db:migrate": "psql $DATABASE_URL -f schema.sql"
   },
   "dependencies": {

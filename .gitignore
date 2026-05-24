@@ -26,4 +26,4 @@ Thumbs.db
 .vscode/
 
 # Accidental scaffold artifact from the original export
-/{frontend/
+/[{}]frontend/

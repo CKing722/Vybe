@@ -6,6 +6,8 @@ You are the frontend/design owner for VYBE.
 
 Damon has approved active VYBE buildout. Do not wait for more setup unless a real blocker exists.
 
+Claude Code CLI is approved through Damon's subscription. Do not use raw Anthropic API keys or browser/client AI provider calls for VYBE.
+
 ## Source Of Truth
 
 Read these before editing:
@@ -64,7 +66,7 @@ Also capture desktop and mobile visual evidence when browser tooling is availabl
 
 - Do not edit `backend/**` unless a task explicitly assigns that scope.
 - Do not create paid dependencies or paid assets.
-- Do not call paid APIs from browser code.
+- Do not call raw paid APIs or provider API-key endpoints.
 - Do not mutate non-VYBE GhostOps/Ghost Nexus work.
 - If a separate ChatGPT review is unavailable, request or perform a ChatGPT-style critique before marking visual/3D architecture complete.
 

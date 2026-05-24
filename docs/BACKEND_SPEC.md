@@ -44,7 +44,7 @@ backend/
 │   ├── sparkEngine.js  # spark transactions with balance checks
 │   ├── loyaltyEngine.js # tier calculations, sparkback rates
 │   ├── bannerService.js # platform-wide gift banners
-│   └── aiQuestions.js  # Anthropic API for game questions
+│   └── aiQuestions.js  # local/mock game questions; no raw provider APIs
 └── config/
     ├── db.js           # PostgreSQL connection pool (pg)
     ├── redis.js        # Redis client
@@ -137,7 +137,7 @@ GET    /api/content/feed/:performerId
 POST   /api/content/:id/purchase
 
 GET    /api/games/leaderboard/:performerId
-POST   /api/games/questions       (AI-generated via Anthropic)
+POST   /api/games/questions       (local/mock question generation; no raw provider APIs)
 
 GET    /api/chat/conversations    (DM list)
 GET    /api/chat/:userId          (messages with user)
@@ -159,7 +159,7 @@ R2_SECRET_KEY=...
 R2_BUCKET=vybe-media
 CCBILL_MERCHANT_ID=...
 CCBILL_SUB_ACCOUNT=...
-ANTHROPIC_API_KEY=... (for AI questions)
+# Raw provider APIs are disabled for VYBE product features.
 FRONTEND_URL=https://vybe.app
 NODE_ENV=production
 ```

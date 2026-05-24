@@ -23,6 +23,7 @@ This repository is the shared VYBE product workspace. Keep work divided by owner
 ## No-Spend Rule
 
 - Do not create paid accounts, upgrade plans, provision paid infrastructure, buy assets, or call paid APIs without explicit Damon approval.
+- Claude Code CLI via Damon's subscription is an approved team tool path. Do not use raw Anthropic/OpenAI/API-key provider calls for VYBE unless Damon explicitly changes this rule.
 - Prefer open-source and self-hosted tools first.
 - Build internal tooling when it avoids recurring cost and is realistic for the project.
 - If a paid provider is eventually required for legal/compliance/payment/production reasons, document the blocker and keep a mock/local implementation moving.
@@ -93,6 +94,7 @@ Every Linear issue must include:
 - Visual work must include desktop and mobile screenshots once Playwright is available.
 - Schema changes must be runnable against PostgreSQL and must avoid non-immutable partial index predicates.
 - AI provider calls must run through backend endpoints, not directly from browser code.
+- Current AI/game-question behavior must use local or self-hosted mocks only; do not enable raw provider APIs.
 
 ## First Vertical Slice
 

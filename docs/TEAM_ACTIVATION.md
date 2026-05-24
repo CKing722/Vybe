@@ -20,6 +20,7 @@ Damon has approved moving from setup into active buildout. The team should opera
 - Task: `VYBE-GHO-001: Frontend - Build Gift Spectacle Runtime`
 - Scope: `frontend/src/**`, frontend-only docs
 - Start from: `CLAUDE.md`, `docs/BACKEND_API_CONTRACTS.md`
+- Tool path: Claude Code CLI through Damon's subscription. Do not use raw Anthropic API keys.
 
 ### Codex
 
@@ -45,7 +46,7 @@ Damon has approved moving from setup into active buildout. The team should opera
 
 ## Non-Negotiables
 
-- No paid services, paid APIs, paid assets, or paid infrastructure without Damon approval.
+- Claude Code CLI subscription is approved. No raw paid APIs, API-key provider calls, paid assets, or paid infrastructure without Damon approval.
 - No secrets in docs, logs, screenshots, Linear, or GitHub.
 - Do not mutate non-VYBE GhostOps/Ghost Nexus issues for VYBE work.
 - Research current official sources before major 3D/web animation architecture decisions.

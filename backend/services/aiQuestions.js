@@ -37,49 +37,11 @@ function rotateQuestions(seed = '', count = 5) {
 }
 
 async function generateGameQuestions({ theme = 'vybe', count = 5 } = {}) {
-  if (!env.enablePaidAi) {
-    return {
-      provider: 'local',
-      paidProviderUsed: false,
-      questions: rotateQuestions(theme, count),
-    };
-  }
-
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': env.anthropicApiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: process.env.ANTHROPIC_MODEL || 'claude-3-5-haiku-latest',
-      max_tokens: 900,
-      messages: [
-        {
-          role: 'user',
-          content:
-            'Generate playful, suggestive but non-explicit live-game trivia. Return only JSON with q, opts, ans fields.',
-        },
-      ],
-    }),
-  });
-
-  if (!response.ok) {
-    return {
-      provider: 'local',
-      paidProviderUsed: false,
-      fallbackReason: `Anthropic returned ${response.status}`,
-      questions: rotateQuestions(theme, count),
-    };
-  }
-
-  const body = await response.json();
-  const text = body.content?.map((item) => item.text || '').join('\n') || '[]';
   return {
-    provider: 'anthropic',
-    paidProviderUsed: true,
-    questions: JSON.parse(text).slice(0, count),
+    provider: 'local',
+    paidProviderUsed: false,
+    rawProviderApisEnabled: env.enablePaidAi,
+    questions: rotateQuestions(theme, count),
   };
 }
 

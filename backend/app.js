@@ -8,6 +8,9 @@ const bannerRoutes = require('./routes/banners');
 const gamesRoutes = require('./routes/games');
 const giftRoutes = require('./routes/gifts').router;
 const healthRoutes = require('./routes/health');
+const performerRoutes = require('./routes/performers');
+const sparkRoutes = require('./routes/sparks');
+const userRoutes = require('./routes/users');
 
 function createApp() {
   const app = express();
@@ -20,8 +23,11 @@ function createApp() {
   app.use('/health', healthRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/banners', bannerRoutes);
+  app.use('/api', userRoutes);
   app.use('/api/games', gamesRoutes);
   app.use('/api/gifts', giftRoutes);
+  app.use('/api/performers', performerRoutes);
+  app.use('/api/sparks', sparkRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

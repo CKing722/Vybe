@@ -1,6 +1,7 @@
 process.env.NODE_ENV = 'test';
 
 const assert = require('node:assert/strict');
+const http = require('node:http');
 const test = require('node:test');
 const { createApp } = require('../app');
 const { MEMORY_IDS, resetMemoryStore, snapshotMemoryStore } = require('../services/memoryStore');
@@ -49,4 +50,50 @@ test('gift engine skips platform banner for subtle low-tier gifts', async () => 
 test('app factory exposes health route without a database', async () => {
   const app = createApp();
   assert.equal(typeof app.listen, 'function');
+});
+
+test('demo API exposes viewer, performer, and spark contracts for frontend integration', async () => {
+  resetMemoryStore();
+  const app = createApp();
+  const server = http.createServer(app);
+
+  await new Promise((resolve) => server.listen(0, resolve));
+  const { port } = server.address();
+  const baseUrl = `http://127.0.0.1:${port}`;
+
+  try {
+    const loginResponse = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: 'viewer@vybe.local', password: 'vybe-demo' }),
+    });
+    assert.equal(loginResponse.status, 200);
+    const login = await loginResponse.json();
+    const headers = { authorization: `Bearer ${login.accessToken}` };
+
+    const meResponse = await fetch(`${baseUrl}/api/me`, { headers });
+    assert.equal(meResponse.status, 200);
+    const me = await meResponse.json();
+    assert.equal(me.user.displayName, 'VelvetKing');
+    assert.equal(me.viewer.sparks, 10000);
+
+    const performersResponse = await fetch(`${baseUrl}/api/performers?live=true`);
+    assert.equal(performersResponse.status, 200);
+    const performers = await performersResponse.json();
+    assert.ok(performers.performers.length >= 1);
+    assert.equal(performers.performers[0].isLive, true);
+
+    const performerResponse = await fetch(`${baseUrl}/api/performers/luna`);
+    assert.equal(performerResponse.status, 200);
+    const performer = await performerResponse.json();
+    assert.equal(performer.performer.name, 'Luna Voss');
+
+    const balanceResponse = await fetch(`${baseUrl}/api/sparks/balance`, { headers });
+    assert.equal(balanceResponse.status, 200);
+    const balance = await balanceResponse.json();
+    assert.equal(balance.sparks, 10000);
+    assert.equal(balance.loyalty.name, 'Bronze');
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+  }
 });

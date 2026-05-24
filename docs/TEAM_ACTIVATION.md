@@ -37,6 +37,12 @@ Damon has approved moving from setup into active buildout. The team should opera
 - Task: `VYBE-GHO-003: Research - Live Video, Verification, Payment, Compliance`
 - Scope: `docs/research/**`, `docs/compliance/**`
 - Notification sent through Hermes Telegram home channel on 2026-05-24.
+- Completed artifacts:
+  - `docs/research/vybe-gho-003-live-video-compliance.md`
+  - `docs/research/vybe-gho-007-3d-gift-pipeline.md`
+  - `docs/qa/vybe-gho-008-gift-spectacle-qa.md`
+- Hermes board: `vybe-platform`
+- ID note: `VYBE-GHO-006` remains GitHub SSH bootstrap; 3D research is `VYBE-GHO-007`; gift QA is `VYBE-GHO-008`.
 
 ### ChatGPT
 

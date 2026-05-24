@@ -137,8 +137,18 @@ Read-only inspection on May 24, 2026 found:
 - A separate Linux user exists: `hermes`.
 - Hermes Agent is installed under `/home/hermes/.hermes/hermes-agent`.
 - Hermes reports `Hermes Agent v0.14.0 (2026.5.16)` via:
-  - `sudo -n -u hermes python3 /home/hermes/.hermes/hermes-agent/hermes_cli/main.py --version`
+  - `sudo -n -u hermes /home/hermes/.hermes/hermes-agent/venv/bin/python /home/hermes/.hermes/hermes-agent/hermes_cli/main.py --version`
 - Hermes gateway state says Telegram is connected.
+- VYBE has an isolated Hermes board: `vybe-platform`.
+- Completed VYBE Hermes tasks:
+  - `VYBE-GHO-003` live video, verification, payment, and compliance research
+  - `VYBE-GHO-007` no-cost 3D gift spectacle pipeline research
+  - `VYBE-GHO-008` gift spectacle smoke QA checklist
+- Repo artifacts:
+  - `docs/research/vybe-gho-003-live-video-compliance.md`
+  - `docs/research/vybe-gho-007-3d-gift-pipeline.md`
+  - `docs/qa/vybe-gho-008-gift-spectacle-qa.md`
+- ID correction: `VYBE-GHO-006` is reserved for GitHub SSH bootstrap. Do not reuse it for Hermes 3D research.
 - The `hermes` command is not currently on PATH for the checked non-interactive shell.
 - OpenClaw runtime exists under `/home/claw/.openclaw`, but `openclaw` is not on PATH and `openclaw-gateway` reported inactive.
 - Do not restart OpenClaw or Hermes services without explicit approval.
@@ -146,8 +156,9 @@ Read-only inspection on May 24, 2026 found:
 Recommended Hermes invocation pattern for read-only diagnostics:
 
 ```bash
-sudo -n -u hermes python3 /home/hermes/.hermes/hermes-agent/hermes_cli/main.py status
-sudo -n -u hermes python3 /home/hermes/.hermes/hermes-agent/hermes_cli/main.py doctor
+sudo -n -u hermes /home/hermes/.hermes/hermes-agent/venv/bin/python /home/hermes/.hermes/hermes-agent/hermes_cli/main.py status
+sudo -n -u hermes /home/hermes/.hermes/hermes-agent/venv/bin/python /home/hermes/.hermes/hermes-agent/hermes_cli/main.py doctor
+sudo -n -u hermes /home/hermes/.hermes/hermes-agent/venv/bin/python /home/hermes/.hermes/hermes-agent/hermes_cli/main.py kanban --board vybe-platform list
 ```
 
 ## Linear Issue Template

@@ -107,6 +107,13 @@ The first coordinated buildout is:
 
 The goal is a demoable live room where a high-tier gift creates a platform-visible event and the backend contract is real enough for autonomous agents to extend safely.
 
+Current Hermes artifacts:
+
+- `VYBE-GHO-003`: `docs/research/vybe-gho-003-live-video-compliance.md`
+- `VYBE-GHO-007`: `docs/research/vybe-gho-007-3d-gift-pipeline.md`
+- `VYBE-GHO-008`: `docs/qa/vybe-gho-008-gift-spectacle-qa.md`
+- `VYBE-GHO-006` is reserved for GitHub SSH bootstrap; do not reuse it for 3D research.
+
 ## 3D And Animation Standard
 
 - VYBE gift spectacle should target high-end 2026 web animation standards: GPU-first rendering, graceful fallbacks, mobile performance budgets, asset pipelines, and designer-editable effect definitions.

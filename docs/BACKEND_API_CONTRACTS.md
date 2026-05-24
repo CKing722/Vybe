@@ -181,7 +181,7 @@ Returns active platform-wide banners.
 
 This endpoint is the frontend-safe replacement for direct browser AI calls.
 
-By default it uses local no-cost questions. Paid AI is disabled unless `ENABLE_PAID_AI=true` and `ANTHROPIC_API_KEY` is configured with explicit approval.
+It uses local no-cost questions. Raw provider API calls are disabled for VYBE under the current no-API rule.
 
 Request:
 

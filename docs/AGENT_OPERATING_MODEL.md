@@ -25,6 +25,7 @@ The default answer to cost is: build locally, self-host, use open-source, or moc
 
 Allowed without Damon approval:
 
+- Claude Code CLI usage through Damon's subscription
 - local development servers
 - open-source packages
 - local PostgreSQL/Redis-compatible development
@@ -37,7 +38,7 @@ Not allowed without Damon approval:
 
 - paid GitHub/Linear upgrades
 - paid video infrastructure
-- paid AI API usage beyond already-approved local/session tooling
+- raw Anthropic/OpenAI/provider API-key calls
 - paid asset marketplaces
 - paid payment/age-verification setup
 - paid hosting, storage, CDN, or monitoring services
@@ -60,6 +61,8 @@ VYBE lives in the existing GhostNexus Linear team so final issue IDs use the nor
 ### Claude
 
 Claude owns the frontend product layer. That includes the luxury visual system, component architecture, gift animation runtime, Canvas/WebGL/Pixi/Three effects, micro-interactions, and visual QA.
+
+Claude should be activated through Claude Code CLI using Damon's subscription, not raw API keys.
 
 Claude should start with the gift spectacle vertical slice and split the current single-file React prototype into maintainable modules.
 

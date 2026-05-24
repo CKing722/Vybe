@@ -103,7 +103,7 @@
 - [ ] Dare Ladder — 5 rungs, climb or bank, escalating
 - [ ] Buzz Battle — reaction time, visual signal
 - [ ] All-In Jackpot — 3 lives, 10-streak = free session
-- [ ] AI question generation via Anthropic API
+- [ ] Local/mock AI-style question generation; no raw provider APIs
 - [ ] Unique visual identity per game mode
 - [ ] Game result → viewer stats update
 

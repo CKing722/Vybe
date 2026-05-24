@@ -21,9 +21,7 @@ const env = {
     process.env.JWT_REFRESH_SECRET || 'vybe-local-refresh-secret-change-before-production',
   bcryptRounds: Number(process.env.BCRYPT_ROUNDS || 12),
   useMemoryStore: !databaseUrl && !isProduction,
-  enablePaidAi:
-    process.env.ENABLE_PAID_AI === 'true' && Boolean(process.env.ANTHROPIC_API_KEY),
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
+  enablePaidAi: false,
 };
 
 if (isProduction) {

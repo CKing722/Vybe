@@ -4,6 +4,44 @@
 
 VYBE needs autonomous buildouts without agents colliding. This model defines who owns what, how work enters the system, and what "done" means.
 
+## Hands-Off Operating Mode
+
+Damon should not need to babysit implementation. The agent team should continue from the highest-priority unblocked work until VYBE meets the expectations captured in the repo and Linear.
+
+Escalate to Damon only for:
+
+- spending money or upgrading a paid service
+- secrets/API keys/account credentials
+- legal/compliance business decisions
+- production service restarts or destructive infrastructure actions
+- ambiguous brand/product decisions that cannot be resolved from the VYBE docs
+- approval to accept a material scope reduction
+
+Do not escalate for normal engineering judgment, research, local mocks, open-source choices, code structure, test creation, refactors inside assigned scope, or documentation updates.
+
+## No-Spend Build Rule
+
+The default answer to cost is: build locally, self-host, use open-source, or mock the paid integration until Damon approves spend.
+
+Allowed without Damon approval:
+
+- local development servers
+- open-source packages
+- local PostgreSQL/Redis-compatible development
+- free documentation research
+- self-hostable tools
+- generated internal assets created in-repo
+- mock payment/age-verification/live-video adapters
+
+Not allowed without Damon approval:
+
+- paid GitHub/Linear upgrades
+- paid video infrastructure
+- paid AI API usage beyond already-approved local/session tooling
+- paid asset marketplaces
+- paid payment/age-verification setup
+- paid hosting, storage, CDN, or monitoring services
+
 ## Agent Roles
 
 ### Claude
@@ -39,6 +77,24 @@ Good Hermes tasks:
 - Playwright smoke-test checklist
 - Accessibility and mobile QA notes
 - PR review checklists
+- open-source 3D animation and web rendering research
+- no-cost alternatives for paid infrastructure dependencies
+
+## Unified Agent Loop
+
+Each autonomous pass should:
+
+1. Read `AGENTS.md`, this document, and the active Linear project docs.
+2. Identify the highest-priority unblocked task.
+3. Respect ownership boundaries.
+4. If the task is backend/infra, Codex implements or prepares the branch.
+5. If the task is frontend/design, Claude owns the patch; Codex can prepare contracts/docs without editing Claude-owned files.
+6. If the task is research/QA, Hermes owns the report/checklist.
+7. Run validation.
+8. Record artifacts and blockers.
+9. Continue to the next unblocked task.
+
+The loop stops only for Damon-gated blockers, unavailable required access, or project completion.
 
 ## Current Hermes/VPS Findings
 
@@ -86,6 +142,22 @@ Blockers:
 - Keep branch scope aligned with owner.
 - Do not mix frontend spectacle work with backend infrastructure work in one PR.
 - PRs must include validation output.
+
+## 3D And Gift Spectacle Research Standard
+
+VYBE should not settle for basic particle effects. Every major visual architecture decision should be informed by current research into:
+
+- WebGPU and WebGL browser support
+- Three.js and Babylon.js renderer capabilities
+- PixiJS or similar 2D GPU particle engines
+- Blender-to-web asset pipelines
+- glTF/GLB model delivery
+- shader/material authoring
+- mobile GPU budgets and fallbacks
+- designer-authored JSON effect definitions
+- future spatial/AR readiness
+
+No paid asset or tool is required by default. If a premium-quality effect requires a tool we do not have, first design an internal open-source workflow using Blender, code-generated geometry, procedural materials, and reusable effect definitions.
 
 ## Initial Autonomous Queue
 

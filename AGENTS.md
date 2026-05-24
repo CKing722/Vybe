@@ -9,6 +9,22 @@ This repository is the shared VYBE product workspace. Keep work divided by owner
 - Every change goes through a feature branch and pull request.
 - Linear is the source of truth for work status, acceptance criteria, and owner.
 
+## Autonomy Mandate
+
+- Damon should be hands-off unless an issue requires money, secrets, legal approval, account ownership, production-risk approval, or a business decision only he can make.
+- Agents keep working from the highest-priority unblocked VYBE task until the project meets the expectations captured in docs and Linear.
+- If output does not meet the stated VYBE standard, agents treat that as unfinished work, not as a completed task.
+- Agents must coordinate through Linear/project docs, branch scopes, and PR notes so the work behaves like one unified team.
+- Do not ask Damon for preference questions that can be answered by the repo, docs, research, or conservative product judgment.
+
+## No-Spend Rule
+
+- Do not create paid accounts, upgrade plans, provision paid infrastructure, buy assets, or call paid APIs without explicit Damon approval.
+- Prefer open-source and self-hosted tools first.
+- Build internal tooling when it avoids recurring cost and is realistic for the project.
+- If a paid provider is eventually required for legal/compliance/payment/production reasons, document the blocker and keep a mock/local implementation moving.
+- Secrets, API keys, payment credentials, and age-verification credentials are Damon-gated and must not be invented or requested unless the current task truly needs them.
+
 ## Ownership
 
 - Claude owns frontend product experience:
@@ -74,3 +90,11 @@ The first coordinated buildout is:
 3. Hermes: LiveKit vs Cloudflare Stream research, CCBill requirements, Yoti SDK requirements, compliance checklist.
 
 The goal is a demoable live room where a high-tier gift creates a platform-visible event and the backend contract is real enough for autonomous agents to extend safely.
+
+## 3D And Animation Standard
+
+- VYBE gift spectacle should target high-end 2026 web animation standards: GPU-first rendering, graceful fallbacks, mobile performance budgets, asset pipelines, and designer-editable effect definitions.
+- Research modern 3D/web animation options before locking architecture.
+- Prefer open-source engines and formats: Three.js, Babylon.js, WebGPU/WebGL, glTF/GLB, Blender, Rive/Lottie where appropriate, shader pipelines, and JSON effect definitions.
+- Build a VYBE effect DSL/runtime before building a full proprietary 3D design suite.
+- A proprietary design tool is allowed only after the runtime proves what designers need to author, preview, version, and ship premium gift effects.

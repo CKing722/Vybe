@@ -44,12 +44,14 @@ Not allowed without Damon approval:
 
 ## Linear Project Separation
 
-VYBE must remain cleanly separated from GhostOps, Ghost Nexus Prompt Library, and other GhostNexus-team projects.
+VYBE lives in the existing GhostNexus Linear team so final issue IDs use the normal `GHO-*` sequence, but VYBE must remain clearly separated from GhostOps, Ghost Nexus Prompt Library, and other non-VYBE work.
 
+- Linear team: `GhostNexus`
 - Canonical Linear project: `VYBE Platform`
-- Required future issue boundary label: `Project: VYBE`
+- Required future issue labels: `VYBE` and `Project: VYBE`
 - Required future workstream label: one child under `VYBE Workstream`
-- Do not create VYBE placeholder issues in GhostOps or Ghost Nexus projects.
+- Final Linear issue IDs are assigned by the GhostNexus team as `GHO-*`.
+- If issue creation is blocked, use the `GhostNexus VYBE Task Ledger` project document with provisional `VYBE-GHO-###` IDs.
 - If Linear issue creation is blocked, keep tasks in VYBE project documents and local repo commits until issue capacity is available.
 - VYBE docs in Linear should stay attached to the `VYBE Platform` project.
 
@@ -153,7 +155,7 @@ Goal:
 Owner:
 
 Project Boundary:
-VYBE Platform / Project: VYBE
+GhostNexus team / VYBE Platform / VYBE / Project: VYBE
 
 Scope:
 

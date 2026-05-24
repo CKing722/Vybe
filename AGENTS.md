@@ -8,8 +8,9 @@ This repository is the shared VYBE product workspace. Keep work divided by owner
 - `main` is protected. No direct pushes to `main`.
 - Every change goes through a feature branch and pull request.
 - Linear is the source of truth for work status, acceptance criteria, and owner.
-- Linear project boundary: VYBE work belongs only in the `VYBE Platform` project. Do not create VYBE placeholder work in GhostOps or Ghost Nexus projects.
-- Future VYBE Linear issues must carry `Project: VYBE` plus one `VYBE Workstream` label.
+- Linear team placement: VYBE work lives in the existing `GhostNexus` team so final issue IDs use the normal `GHO-*` sequence.
+- Linear project boundary: VYBE work belongs in the `VYBE Platform` project and must be labeled clearly as VYBE.
+- Future VYBE Linear issues must carry `VYBE`, `Project: VYBE`, plus exactly one `VYBE Workstream` label.
 
 ## Autonomy Mandate
 
@@ -78,7 +79,7 @@ Every Linear issue must include:
 
 - Goal: the user-visible outcome
 - Owner: Claude, Codex, Hermes, ChatGPT, or human
-- Project boundary: `VYBE Platform` / `Project: VYBE`
+- Project boundary: GhostNexus team / `VYBE Platform` / `VYBE` / `Project: VYBE`
 - Scope: exact directories/files the owner may edit
 - Acceptance criteria: observable behavior
 - Validation: commands, screenshots, or checks required

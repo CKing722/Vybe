@@ -22,26 +22,49 @@ function KnownHosts-HasGitHubKey {
   return [bool](Select-String -Path $knownHostsPath -Pattern "^github\.com\s" -ErrorAction SilentlyContinue)
 }
 
-if (-not (KnownHosts-HasGitHubKey)) {
-  Write-Host "Adding github.com host key to $knownHostsPath"
+function Add-GitHubHostKeyViaKeyscan {
+  if (-not (Get-Command ssh-keyscan -ErrorAction SilentlyContinue)) { return $false }
 
   $keys = @()
-  if (Get-Command ssh-keyscan -ErrorAction SilentlyContinue) {
-    try {
-      $keys = ssh-keyscan -t ed25519 github.com 2>$null
-      if (-not $keys) {
-        $keys = ssh-keyscan github.com 2>$null
-      }
-    } catch {
-      $keys = @()
+  try {
+    $keys = ssh-keyscan -T 10 -t ed25519 github.com 2>$null
+    if (-not $keys) {
+      $keys = ssh-keyscan -T 10 github.com 2>$null
     }
+  } catch {
+    $keys = @()
   }
 
-  if (-not $keys) {
-    Write-Warning "ssh-keyscan not available or returned no keys. If you run 'ssh -T git@github.com', OpenSSH will prompt to trust the host key interactively."
+  if (-not $keys) { return $false }
+
+  Add-Content -Path $knownHostsPath -Value $keys
+  return $true
+}
+
+function Add-GitHubHostKeyViaSshAcceptNew {
+  try {
+    # On some Windows OpenSSH builds, `ssh-keyscan` can fail negotiating modern KEX with github.com.
+    # `StrictHostKeyChecking=accept-new` adds the host key safely without interactive prompts.
+    ssh -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new -o KexAlgorithms=curve25519-sha256 -T git@github.com 2>$null | Out-Null
+  } catch {
+    # Auth can fail (Permission denied) and that's OK; the goal is host key bootstrapping.
+  }
+
+  return (KnownHosts-HasGitHubKey)
+}
+
+if (-not (KnownHosts-HasGitHubKey)) {
+  Write-Host "Bootstrapping github.com host key in $knownHostsPath"
+
+  $added = Add-GitHubHostKeyViaKeyscan
+  if (-not $added) {
+    $added = Add-GitHubHostKeyViaSshAcceptNew
+  }
+
+  if ($added) {
+    Write-Host "Host key present."
   } else {
-    Add-Content -Path $knownHostsPath -Value $keys
-    Write-Host "Host key added."
+    Write-Warning "Unable to add github.com host key automatically. If you run 'ssh -T git@github.com', OpenSSH may prompt to trust the host key interactively."
   }
 } else {
   Write-Host "github.com host key already present in $knownHostsPath"
@@ -50,7 +73,7 @@ if (-not (KnownHosts-HasGitHubKey)) {
 if ($Verify) {
   Write-Host "Verifying SSH connectivity to github.com (this checks transport + host key; auth may still fail if keys aren't configured)..."
   try {
-    ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -T git@github.com 2>$null | Out-Null
+    ssh -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=yes -T git@github.com 2>$null | Out-Null
     Write-Host "SSH handshake completed."
   } catch {
     Write-Warning "SSH verification failed. If this is an auth failure, confirm your SSH key is loaded and has access to the repo."

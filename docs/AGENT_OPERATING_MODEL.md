@@ -42,6 +42,17 @@ Not allowed without Damon approval:
 - paid payment/age-verification setup
 - paid hosting, storage, CDN, or monitoring services
 
+## Linear Project Separation
+
+VYBE must remain cleanly separated from GhostOps, Ghost Nexus Prompt Library, and other GhostNexus-team projects.
+
+- Canonical Linear project: `VYBE Platform`
+- Required future issue boundary label: `Project: VYBE`
+- Required future workstream label: one child under `VYBE Workstream`
+- Do not create VYBE placeholder issues in GhostOps or Ghost Nexus projects.
+- If Linear issue creation is blocked, keep tasks in VYBE project documents and local repo commits until issue capacity is available.
+- VYBE docs in Linear should stay attached to the `VYBE Platform` project.
+
 ## Agent Roles
 
 ### Claude
@@ -80,6 +91,22 @@ Good Hermes tasks:
 - open-source 3D animation and web rendering research
 - no-cost alternatives for paid infrastructure dependencies
 
+### ChatGPT
+
+ChatGPT owns review and synthesis support. It should not edit repo files by default. It should produce critique, copy, prompts, acceptance gaps, and pass/fail recommendations that the owning agent implements.
+
+Good ChatGPT tasks:
+
+- luxury product/design critique
+- 2026 web interaction and animation review
+- 3D/WebGPU/WebGL architecture critique
+- gift spectacle expectation checks
+- marketing copy and UX microcopy
+- prompt packs for AI question generation and agent workflows
+- red-team review of whether a build meets Damon's stated expectations
+
+Use the Linear label `Review: ChatGPT` when this lane is required. If no separate ChatGPT connector or UI is available during an autonomous run, Codex may perform a ChatGPT-style review in the current OpenAI session and record it in artifacts.
+
 ## Unified Agent Loop
 
 Each autonomous pass should:
@@ -90,9 +117,10 @@ Each autonomous pass should:
 4. If the task is backend/infra, Codex implements or prepares the branch.
 5. If the task is frontend/design, Claude owns the patch; Codex can prepare contracts/docs without editing Claude-owned files.
 6. If the task is research/QA, Hermes owns the report/checklist.
-7. Run validation.
-8. Record artifacts and blockers.
-9. Continue to the next unblocked task.
+7. If the task has `Review: ChatGPT`, run a ChatGPT-style review before completion and record findings.
+8. Run validation.
+9. Record artifacts and blockers.
+10. Continue to the next unblocked task.
 
 The loop stops only for Damon-gated blockers, unavailable required access, or project completion.
 
@@ -123,6 +151,9 @@ sudo -n -u hermes python3 /home/hermes/.hermes/hermes-agent/hermes_cli/main.py d
 Goal:
 
 Owner:
+
+Project Boundary:
+VYBE Platform / Project: VYBE
 
 Scope:
 
@@ -215,3 +246,22 @@ Deliverables:
 - CCBill implementation notes
 - 2257 and moderation checklist
 - risks and unanswered questions
+
+### ChatGPT
+
+Branch: `research/chatgpt-review-lane`
+
+Scope:
+
+- Linear docs
+- `docs/AGENT_OPERATING_MODEL.md`
+- `AGENTS.md`
+- optional review prompt docs
+
+Deliverables:
+
+- `Review: ChatGPT` label
+- ChatGPT review prompt pack in Linear
+- product/design review lane
+- 3D/gift architecture review lane
+- copy and prompt support lane

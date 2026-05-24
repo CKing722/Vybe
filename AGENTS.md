@@ -8,6 +8,8 @@ This repository is the shared VYBE product workspace. Keep work divided by owner
 - `main` is protected. No direct pushes to `main`.
 - Every change goes through a feature branch and pull request.
 - Linear is the source of truth for work status, acceptance criteria, and owner.
+- Linear project boundary: VYBE work belongs only in the `VYBE Platform` project. Do not create VYBE placeholder work in GhostOps or Ghost Nexus projects.
+- Future VYBE Linear issues must carry `Project: VYBE` plus one `VYBE Workstream` label.
 
 ## Autonomy Mandate
 
@@ -53,12 +55,21 @@ This repository is the shared VYBE product workspace. Keep work divided by owner
   - docs updates
   - no edits to Claude-owned or Codex-owned implementation files unless the Linear issue explicitly assigns that scope
 
+- ChatGPT owns review and synthesis support:
+  - product/design second opinions
+  - luxury visual critique
+  - copy, prompt, and microcopy support
+  - 3D/WebGPU/WebGL architecture critique
+  - final expectation checks against the VYBE standard
+  - no repo file ownership unless a Linear task explicitly assigns a scope
+
 ## Branch Naming
 
 - `frontend/<short-task>` for Claude-led frontend work
 - `backend/<short-task>` for Codex-led backend work
 - `infra/<short-task>` for CI, deployment, GitHub, and environment work
 - `research/<short-task>` for Hermes research and docs
+- `research/<short-task>` for ChatGPT review synthesis when no repo files are edited
 - `qa/<short-task>` for test and verification work
 
 ## Autonomous Work Contract
@@ -66,7 +77,8 @@ This repository is the shared VYBE product workspace. Keep work divided by owner
 Every Linear issue must include:
 
 - Goal: the user-visible outcome
-- Owner: Claude, Codex, Hermes, or human
+- Owner: Claude, Codex, Hermes, ChatGPT, or human
+- Project boundary: `VYBE Platform` / `Project: VYBE`
 - Scope: exact directories/files the owner may edit
 - Acceptance criteria: observable behavior
 - Validation: commands, screenshots, or checks required
@@ -88,6 +100,7 @@ The first coordinated buildout is:
 1. Claude: gift spectacle frontend runtime and component split.
 2. Codex: Express server, auth foundation, WebSocket setup, gift event contract, `/api/games/questions`.
 3. Hermes: LiveKit vs Cloudflare Stream research, CCBill requirements, Yoti SDK requirements, compliance checklist.
+4. ChatGPT: design/product/copy/3D architecture review using the `Review: ChatGPT` Linear label and prompt pack.
 
 The goal is a demoable live room where a high-tier gift creates a platform-visible event and the backend contract is real enough for autonomous agents to extend safely.
 

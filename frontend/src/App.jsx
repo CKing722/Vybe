@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import GiftSpectacleOverlay from "./gifts/GiftSpectacleOverlay.jsx";
 import PlatformBanner from "./gifts/PlatformBanner.jsx";
 import SparkStormShell from "./gifts/SparkStormShell.jsx";
+import GiftEffectPreviewControls from "./gifts/GiftEffectPreviewControls.jsx";
 
 /* ═══ ICONS — 40+ custom SVGs, zero emojis ═══ */
 function I({n,s=20,c="currentColor",st={}}){const p={width:s,height:s,flexShrink:0,display:"inline-block",verticalAlign:"middle",...st};const d={
@@ -887,6 +888,6 @@ export default function App(){
     <GiftSpectacleOverlay giftId={demoGift.giftId} sender={demoGift.sender} visible={demoGift.visible} onDone={()=>setDemoGift(g=>({...g,visible:false}))}/>
     <PlatformBanner giftId={demoGift.giftId} sender={demoGift.sender} visible={demoGift.visible} onDone={()=>{}}/>
     <SparkStormShell events={giftEvents} stormThreshold={3}/>
-    {authed&&ok&&vw==="room"&&<button onClick={fireDemoGift} style={{position:"fixed",bottom:"16px",left:"50%",transform:"translateX(-50%)",zIndex:4000,padding:"7px 18px",borderRadius:"20px",border:"1px solid #ff2d7888",background:"rgba(20,14,28,0.9)",color:"#ff2d78",fontSize:"12px",fontWeight:700,letterSpacing:"0.1em",cursor:"pointer",userSelect:"none"}}>&#9889; Send Demo Gift</button>}
+    {authed&&ok&&vw==="room"&&<GiftEffectPreviewControls onPreview={id=>{const ev={id:Date.now(),giftId:id,sender:"DemoUser",timestamp:Date.now()};setGiftEvents(p=>[ev,...p].slice(0,20));setDemoGift({giftId:id,sender:"DemoUser",visible:true});}}/>}
   </>;
 }

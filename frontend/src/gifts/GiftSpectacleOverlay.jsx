@@ -80,6 +80,7 @@ export default function GiftSpectacleOverlay({ giftId, sender = "Someone", recip
 function LowTierToast({ effect, pal, typo, sender, phase, reducedMotion }) {
   const entering = !reducedMotion && phase === "entry";
   const exiting = !reducedMotion && phase === "exit";
+  const holding = !reducedMotion && phase === "hold";
 
   const s = {
     position: "fixed",
@@ -113,10 +114,14 @@ function LowTierToast({ effect, pal, typo, sender, phase, reducedMotion }) {
     background: pal.primary,
     boxShadow: "0 0 6px " + pal.primary,
     flexShrink: 0,
+    animation: holding ? "vybe-toast-dot-pulse 1.1s ease-in-out infinite" : "none",
   };
 
   return (
     <div style={s} aria-live="polite" aria-label={sender + " sent " + effect.displayName}>
+      {holding && (
+        <style>{`@keyframes vybe-toast-dot-pulse{0%,100%{box-shadow:0 0 6px ${pal.primary};transform:scale(1)}50%{box-shadow:0 0 14px ${pal.primary},0 0 26px ${pal.primary}55;transform:scale(1.3)}}`}</style>
+      )}
       <span style={dot} />
       <span style={{ color: pal.primary, fontWeight: 600 }}>{sender}</span>
       <span style={{ opacity: 0.75 }}>sent</span>

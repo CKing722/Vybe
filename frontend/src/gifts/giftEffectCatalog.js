@@ -233,6 +233,22 @@ export function getPlatformBannerGifts() {
 }
 
 /**
+ * Returns the highest-cost catalog effect whose sparkCost is <= the given amount.
+ * Falls back to the lowest-cost catalog entry if none match.
+ * Useful for mapping arbitrary spark amounts to the correct spectacle tier.
+ * @param {number} sparks
+ * @returns {GiftEffect}
+ */
+export function getEffectForCost(sparks) {
+  const sorted = [...GIFT_EFFECT_CATALOG].sort((a, b) => a.sparkCost - b.sparkCost);
+  let best = sorted[0];
+  for (const g of sorted) {
+    if (g.sparkCost <= sparks) best = g;
+  }
+  return best;
+}
+
+/**
  * @typedef {Object} ParticleBudget
  * @property {number} count
  * @property {number} maxRadius

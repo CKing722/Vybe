@@ -5,6 +5,7 @@ import SparkStormShell from "./gifts/SparkStormShell.jsx";
 import GiftEffectPreviewControls from "./gifts/GiftEffectPreviewControls.jsx";
 import VybeLuxuryPreview from "./gifts/VybeLuxuryPreview.jsx";
 import useGiftQueue from "./gifts/useGiftQueue.js";
+import { getEffectForCost } from "./gifts/giftEffectCatalog.js";
 
 /* ═══ ICONS — 40+ custom SVGs, zero emojis ═══ */
 function I({n,s=20,c="currentColor",st={}}){const p={width:s,height:s,flexShrink:0,display:"inline-block",verticalAlign:"middle",...st};const d={
@@ -516,7 +517,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const fmt=s=>`${Math.floor(s/60)}:${(s%60).toString().padStart(2,"0")}`;
   const tog=n=>{setPn(p=>p===n?null:n);if(n)setGm(null)};
   const sg=g=>{if(user.sparks<g.cost)return;onSC(-g.cost);const id=++aid.current,x=68+Math.random()*20,y=18+Math.random()*24;
-    const effectId=g.id==="crown"?"crown_drop":g.id==="key"?"private_key":"neon_rose";
+    const effectId=getEffectForCost(g.cost).id;
     setAnims(p=>[...p,{...g,id,x,y}]);setTimeout(()=>setAnims(p=>p.filter(a=>a.id!==id)),2200);
     setCh(p=>[...p.slice(-39),{user:user.name,msg:`sent ${g.name}`,vip:true,id:Date.now()}]);onGiftSent&&onGiftSent(effectId);setPn(null)};
   const sc=()=>{if(!ci.trim())return;setCh(p=>[...p.slice(-39),{user:user.name,msg:ci,vip:true,id:Date.now()}]);setCi("")};

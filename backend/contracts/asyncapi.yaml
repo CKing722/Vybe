@@ -1,0 +1,115 @@
+asyncapi: '2.6.0'
+info:
+  title: VYBE Socket.io Events (v1)
+  version: '1.0.0'
+  description: |
+    Machine-readable Socket.io event contract for VYBE gifts, platform banners, and spark storms.
+
+    This spec is intended for frontend tooling and integration tests. It mirrors the canonical JSON Schema
+    payload definitions in `backend/contracts/socketio/v1/**`.
+
+defaultContentType: application/json
+
+servers:
+  local:
+    url: localhost:4000
+    protocol: ws
+    description: |
+      Local dev backend. Socket.io negotiates an Engine.IO WebSocket transport under `/socket.io/`.
+
+channels:
+  join_room:
+    description: Client requests to join a performer room.
+    subscribe:
+      message:
+        $ref: '#/components/messages/join_room'
+  leave_room:
+    description: Client requests to leave a performer room.
+    subscribe:
+      message:
+        $ref: '#/components/messages/leave_room'
+  send_gift:
+    description: Client sends a gift to a performer room.
+    subscribe:
+      message:
+        $ref: '#/components/messages/send_gift'
+
+  gift_animation:
+    description: Server announces an in-room gift animation event.
+    publish:
+      message:
+        $ref: '#/components/messages/gift_animation'
+  gift_error:
+    description: Server announces a gift error (insufficient balance, invalid gift, etc).
+    publish:
+      message:
+        $ref: '#/components/messages/gift_error'
+  platform_banner:
+    description: Server broadcasts a platform-wide banner for high-tier gifts.
+    publish:
+      message:
+        $ref: '#/components/messages/platform_banner'
+  spark_storm_start:
+    description: Server announces a spark storm starting.
+    publish:
+      message:
+        $ref: '#/components/messages/spark_storm_start'
+  spark_storm_update:
+    description: Server announces a spark storm progress update.
+    publish:
+      message:
+        $ref: '#/components/messages/spark_storm_update'
+  spark_storm_complete:
+    description: Server announces a spark storm completion.
+    publish:
+      message:
+        $ref: '#/components/messages/spark_storm_complete'
+
+components:
+  messages:
+    join_room:
+      name: join_room
+      title: join_room
+      payload:
+        $ref: ./socketio/v1/client-to-server/join_room.schema.json
+    leave_room:
+      name: leave_room
+      title: leave_room
+      payload:
+        $ref: ./socketio/v1/client-to-server/leave_room.schema.json
+    send_gift:
+      name: send_gift
+      title: send_gift
+      payload:
+        $ref: ./socketio/v1/client-to-server/send_gift.schema.json
+
+    gift_animation:
+      name: gift_animation
+      title: gift_animation
+      payload:
+        $ref: ./socketio/v1/server-to-client/gift_animation.schema.json
+    gift_error:
+      name: gift_error
+      title: gift_error
+      payload:
+        $ref: ./socketio/v1/server-to-client/gift_error.schema.json
+    platform_banner:
+      name: platform_banner
+      title: platform_banner
+      payload:
+        $ref: ./socketio/v1/server-to-client/platform_banner.schema.json
+    spark_storm_start:
+      name: spark_storm_start
+      title: spark_storm_start
+      payload:
+        $ref: ./socketio/v1/server-to-client/spark_storm_start.schema.json
+    spark_storm_update:
+      name: spark_storm_update
+      title: spark_storm_update
+      payload:
+        $ref: ./socketio/v1/server-to-client/spark_storm_update.schema.json
+    spark_storm_complete:
+      name: spark_storm_complete
+      title: spark_storm_complete
+      payload:
+        $ref: ./socketio/v1/server-to-client/spark_storm_complete.schema.json

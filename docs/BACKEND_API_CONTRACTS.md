@@ -2,6 +2,19 @@
 
 This is the current local contract for frontend integration. It is intentionally no-spend: if `DATABASE_URL` is empty in development, the backend serves deterministic demo data from the memory adapter.
 
+## Machine-Readable Contracts
+
+- HTTP (OpenAPI): `backend/contracts/openapi.yaml`
+- Realtime (AsyncAPI over Socket.io): `backend/contracts/asyncapi.yaml`
+- Realtime payloads (JSON Schema, canonical): `backend/contracts/socketio/v1/**`
+
+Validation:
+
+```bash
+cd backend
+npm run check
+```
+
 ## Local Backend
 
 ```bash

@@ -685,6 +685,8 @@ function PerfDash({perfData,onGoLive,onLogout}){
     {type:"post",text:"5-game win streak last night. Who's next?",time:"5d",likes:156,comments:31}];
   const tabs=[{id:"home",label:"Home",icon:"live"},{id:"content",label:"Content",icon:"eye"},{id:"inbox",label:"Inbox",icon:"chat"},{id:"store",label:"Store",icon:"gift"},{id:"analytics",label:"Analytics",icon:"trophy"},{id:"settings",label:"Settings",icon:"gear"}];
 
+  return <CreatorCenter p={p} earn={earn} fans={fans} content={content} tab={tab} setTab={setTab} onGoLive={onGoLive} onLogout={onLogout}/>;
+
   return<div style={{minHeight:"100vh",background:"var(--bg)",display:"flex"}}>
     {/* Sidebar */}
     <div style={{width:220,borderRight:"1px solid var(--bd)",padding:"16px 12px",display:"flex",flexDirection:"column",flexShrink:0,background:"var(--sf)"}}>
@@ -894,15 +896,113 @@ function PerfDash({perfData,onGoLive,onLogout}){
     </div></div>;}
 
 /* ═══ MAIN APP ═══ */
+function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
+  const nav=[
+    {id:"home",label:"Home",icon:"live"},
+    {id:"analytics",label:"Analytics",icon:"trophy"},
+    {id:"content",label:"LIVE recordings",icon:"eye"},
+    {id:"inbox",label:"Fan Club",icon:"users"},
+    {id:"store",label:"Rewards",icon:"gift"},
+    {id:"settings",label:"About me",icon:"user"},
+  ];
+  const title={home:"Studio Home",analytics:"Analytics",content:"LIVE recordings",inbox:"Fan Club",store:"Rewards",settings:"About me"}[tab]||"Studio Home";
+  const subtitle={home:"Your control room for going live, tracking audience momentum, and preparing the next session.",analytics:"Quiet metrics for understanding retention, revenue, and audience behavior.",content:"A clean archive of sessions, highlights, clips, and subscriber media.",inbox:"Your most valuable fans, their history, and the next relationship action.",store:"Mission rewards, custom menus, premium offers, and creator incentives.",settings:"How viewers see your room when they enter."}[tab];
+  const metricData=[
+    {label:"LIVE duration",value:"30:00",sub:"scheduled tonight"},
+    {label:"Views",value:p.viewers.toLocaleString(),sub:"waiting now"},
+    {label:"Diamonds",value:"2.8K",sub:"pending conversion"},
+    {label:"New followers",value:"124",sub:"last 7 days"},
+    {label:"Viewers who commented",value:"38%",sub:"engagement"},
+  ];
+  const panelStyle={border:"1px solid rgba(255,255,255,.07)",background:"#181818",borderRadius:8};
+  const sectionTitle={fontSize:".78rem",fontWeight:900,color:"#f5f5f5",letterSpacing:0};
+  const muted={color:"rgba(245,245,245,.56)",fontSize:".72rem",lineHeight:1.45};
+  const empty=(icon,msg,sub)=><div style={{minHeight:190,display:"grid",placeItems:"center",textAlign:"center",color:"rgba(255,255,255,.56)"}}><div><I n={icon} s={34} c="rgba(255,255,255,.28)"/><div style={{fontWeight:900,fontSize:".75rem",marginTop:10,color:"rgba(255,255,255,.78)"}}>{msg}</div><div style={{...muted,maxWidth:260,margin:"5px auto 0"}}>{sub}</div></div></div>;
+
+  return <div style={{minHeight:"100vh",display:"grid",gridTemplateColumns:"136px minmax(0,1fr)",background:"#101010",color:"#f5f5f5"}}>
+    <aside style={{background:"#252525",borderRight:"1px solid rgba(255,255,255,.06)",padding:"18px 8px",display:"flex",flexDirection:"column"}}>
+      <div style={{fontWeight:1000,fontSize:"1.05rem",margin:"0 8px 28px"}}>VYBE</div>
+      <div style={{fontWeight:900,fontSize:".7rem",margin:"0 8px 10px",color:"#fff"}}>Studio</div>
+      {nav.map(item=><button key={item.id} type="button" onClick={()=>setTab(item.id)} style={{display:"flex",alignItems:"center",gap:8,width:"100%",minHeight:34,padding:"0 8px",border:0,borderRadius:4,background:tab===item.id?"rgba(255,255,255,.14)":"transparent",color:tab===item.id?"#fff":"rgba(255,255,255,.64)",font:"inherit",fontSize:".72rem",fontWeight:800,textAlign:"left",cursor:"pointer",marginBottom:3}}>
+        <I n={item.icon} s={14} c="currentColor"/><span>{item.label}</span>
+      </button>)}
+      <button type="button" onClick={onLogout} style={{marginTop:"auto",display:"flex",alignItems:"center",gap:8,padding:"8px",border:0,background:"transparent",color:"rgba(255,255,255,.56)",font:"inherit",fontSize:".72rem",fontWeight:800,cursor:"pointer"}}><I n="back" s={13}/>Sign out</button>
+    </aside>
+    <main style={{display:"grid",gridTemplateRows:"52px 1fr",minWidth:0}}>
+      <div style={{background:"#222",borderBottom:"1px solid rgba(255,255,255,.06)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 26px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:30,height:30,borderRadius:"50%",background:`linear-gradient(135deg,${p.accent},#121212)`,border:"1px solid rgba(255,255,255,.16)"}}/>
+          <div><div style={{fontWeight:900,fontSize:".86rem"}}>{p.name}</div><div style={{fontSize:".65rem",color:"rgba(255,255,255,.56)"}}>Creator workspace</div></div>
+        </div>
+        <Btn small primary onClick={onGoLive}><I n="live" s={12} c="#fff" st={{marginRight:4}}/>Go Live</Btn>
+      </div>
+      <div style={{padding:"22px 28px 40px",overflowY:"auto"}}>
+        <div style={{maxWidth:1040,margin:"0 auto"}}>
+          <header style={{display:"flex",justifyContent:"space-between",alignItems:"end",gap:16,marginBottom:16}}>
+            <div><h1 style={{fontSize:"1.28rem",lineHeight:1.15,fontWeight:1000,marginBottom:5}}>{title}</h1><p style={muted}>{subtitle}</p></div>
+            <div style={{fontSize:".68rem",color:"rgba(255,255,255,.52)",fontWeight:800}}>Updated 12:30 AM CT</div>
+          </header>
+          {tab==="home"&&<div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 310px",gap:14}}>
+            <section style={{...panelStyle,padding:16,gridColumn:"1 / -1"}}>
+              <div style={{...sectionTitle,marginBottom:16}}>From last 60 days</div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:16}}>{metricData.map(m=><div key={m.label}><div style={{fontSize:"1rem",fontWeight:1000,marginBottom:4}}>{m.value}</div><div style={{fontSize:".62rem",color:"rgba(255,255,255,.68)",fontWeight:900}}>{m.label}</div><div style={{fontSize:".58rem",color:"rgba(255,255,255,.38)",marginTop:2}}>{m.sub}</div></div>)}</div>
+            </section>
+            <section style={{...panelStyle,padding:16}}>
+              <div style={sectionTitle}>Scaled LIVE rewards</div>
+              <div style={{display:"flex",gap:34,marginTop:18}}><div><div style={{...muted,fontSize:".64rem"}}>Per-LIVE mission</div><div style={{fontWeight:1000,fontSize:"1.2rem"}}>Up to 40%</div></div><div><div style={{...muted,fontSize:".64rem"}}>Weekly mission</div><div style={{fontWeight:1000,fontSize:"1.2rem"}}>Up to 13%</div></div></div>
+              <div style={{...muted,marginTop:14}}>Total diamonds: 2,847</div>
+            </section>
+            <section style={{...panelStyle,padding:16}}>
+              <div style={sectionTitle}>Viewer ranking</div>
+              {fans.slice(0,3).map((fan,i)=><div key={fan.name} style={{display:"grid",gridTemplateColumns:"24px minmax(0,1fr) auto",alignItems:"center",gap:10,padding:"10px 0",borderBottom:i<2?"1px solid rgba(255,255,255,.06)":"none"}}><strong style={{color:i===0?"var(--am)":"rgba(255,255,255,.46)"}}>{i+1}</strong><div><div style={{fontSize:".76rem",fontWeight:900}}>{fan.name}</div><div style={muted}>{fan.sessions} sessions</div></div><div style={{fontSize:".74rem",fontWeight:1000}}>{fan.sparks.toLocaleString()}</div></div>)}
+            </section>
+            <section style={{...panelStyle,padding:16}}>
+              <div style={sectionTitle}>LIVE recordings</div>
+              {empty("eye","No recordings yet","Recordings and highlights will appear here after your next live session.")}
+            </section>
+            <section style={{...panelStyle,padding:16}}>
+              <div style={sectionTitle}>Restrictions</div>
+              <div style={{...muted,marginTop:18}}>No active restrictions. Keep your room details current before going live.</div>
+            </section>
+          </div>}
+          {tab==="analytics"&&<div style={{display:"grid",gap:14}}>
+            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Key metrics</div><div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginTop:12}}>{["Viewership","Rewards","Engagement","Activity"].map((m,i)=><div key={m} style={{borderLeft:"1px solid rgba(255,255,255,.08)",padding:"4px 0 4px 12px"}}><div style={muted}>{m}</div><div style={{fontSize:"1.15rem",fontWeight:1000,marginTop:10}}>{i===0?p.viewers:i===1?"2.8K":i===2?"38%":"30m"}</div></div>)}</div></section>
+            <section style={{...panelStyle,padding:16,minHeight:230}}><div style={sectionTitle}>Audience trend</div><div style={{height:150,display:"flex",alignItems:"end",gap:8,marginTop:24}}>{[16,28,22,42,35,54,48].map((h,i)=><div key={i} style={{height:h+"%",flex:1,borderRadius:3,background:i===6?"var(--pk)":"rgba(255,255,255,.14)"}}/>)}</div></section>
+          </div>}
+          {tab==="content"&&<div style={{display:"grid",gridTemplateColumns:"1fr 310px",gap:14}}>
+            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Highlight mixes</div>{empty("eye","No highlight mixes yet","Clip your strongest moments from LIVE recordings.")}</section>
+            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Recent posts</div>{content.slice(0,3).map(c=><div key={c.text} style={{padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,.06)"}}><div style={{fontSize:".78rem",fontWeight:900}}>{c.text}</div><div style={muted}>{c.time} ago - {c.likes} likes</div></div>)}</section>
+          </div>}
+          {tab==="inbox"&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Fan Club members</div>{fans.map(f=><div key={f.name} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,.06)"}}><span style={{fontWeight:900,fontSize:".78rem"}}>{f.name}</span><span style={muted}>{f.sparks.toLocaleString()} sparks</span></div>)}</section>
+            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Their journey with you</div>{empty("users","Relationship timeline","Tags, milestones, requests, and special moments will live here.")}</section>
+          </div>}
+          {tab==="store"&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Request menu</div>{p.requests.slice(0,5).map(r=><div key={r.name} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,.06)"}}><span style={{fontWeight:900,fontSize:".78rem"}}>{r.name}</span><span style={muted}>{r.sparks.toLocaleString()} sparks</span></div>)}</section>
+            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Mission rewards</div><div style={{fontSize:"1.6rem",fontWeight:1000,marginTop:22}}>${earn.pending.toLocaleString()}</div><div style={muted}>Pending payout estimate</div></section>
+          </div>}
+          {tab==="settings"&&<section style={{...panelStyle,padding:24,maxWidth:720}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:18}}><div><h2 style={{fontSize:"1.2rem",fontWeight:1000}}>Introduce yourself and your LIVE</h2><p style={{...muted,marginTop:10}}>Add a concise intro shown when viewers join your room. This should feel polished, clear, and adult-compliant.</p></div><button type="button" style={{width:44,height:24,borderRadius:999,border:0,background:"rgba(255,255,255,.2)",position:"relative"}}><span style={{position:"absolute",left:3,top:3,width:18,height:18,borderRadius:"50%",background:"#fff"}}/></button></div>
+            <div style={{height:1,background:"rgba(255,255,255,.08)",margin:"22px 0"}}/>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:22}}><div><div style={sectionTitle}>VYBE app</div><div style={{height:124,borderRadius:8,background:`linear-gradient(135deg,${p.accent}33,rgba(255,255,255,.08)),#2a2a2a`,marginTop:12,padding:16}}><div style={{fontWeight:1000}}>{p.name}</div><p style={{...muted,color:"#fff",marginTop:8}}>Welcome to my LIVE. Come ready to play.</p></div></div><div><div style={sectionTitle}>VYBE web</div><div style={{height:124,borderRadius:8,background:"#f5f5f5",color:"#111",marginTop:12,padding:16}}><div style={{fontWeight:1000}}>{p.name}</div><p style={{fontSize:".72rem",lineHeight:1.45,marginTop:8}}>Welcome to my LIVE. Come ready to play.</p></div></div></div>
+          </section>}
+        </div>
+      </div>
+    </main>
+  </div>;
+}
+
 export default function App(){
   const searchParams=typeof window!=="undefined"?new URLSearchParams(window.location.search):new URLSearchParams();
   const visualPreview=searchParams.get("vybePreview")==="gift";
   const roomPreview=searchParams.get("vybePreview")==="room";
-  const previewMode=visualPreview||roomPreview;
+  const studioPreview=searchParams.get("vybePreview")==="studio";
+  const previewMode=visualPreview||roomPreview||studioPreview;
+  const previewView=visualPreview||roomPreview?"room":"lobby";
   const giftDebug=searchParams.get("giftDebug")==="1";
-  const [authed,setAuthed]=useState(previewMode);const [authUser,setAuthUser]=useState(previewMode?{email:"preview@vybe.local",name:"VelvetKing",role:"viewer"}:null);
-  const [ok,setOk]=useState(previewMode);const [ck,setCk]=useState(previewMode);const [vw,setVw]=useState(previewMode?"room":"lobby");
-  const [pf,setPf]=useState(previewMode?PERFS[0]:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
+  const [authed,setAuthed]=useState(previewMode);const [authUser,setAuthUser]=useState(previewMode?{email:"preview@vybe.local",name:"VelvetKing",role:studioPreview?"performer":"viewer"}:null);
+  const [ok,setOk]=useState(previewMode);const [ck,setCk]=useState(previewMode);const [vw,setVw]=useState(previewMode?previewView:"lobby");
+  const [pf,setPf]=useState((visualPreview||roomPreview)?PERFS[0]:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
   const [user,setUser]=useState({name:"VelvetKing",sparks:2500,spent:450,gamesPlayed:87,winRate:72,sparksEarned:1240,totalSessions:23,topStreak:8,perfCount:4,
     badges:["First Win","5-Game Streak","100 Games","Luna's Top 10","Crown Sender"],
     favPerfs:["luna","jade","raven"],

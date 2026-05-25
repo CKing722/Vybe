@@ -132,6 +132,18 @@ test('demo API exposes viewer, performer, and spark contracts for frontend integ
     assert.equal(giftSend.animation.animationType, 'descend');
     assert.equal(giftSend.banner.giftName, 'Crown Drop');
 
+    const transactionsResponse = await fetch(`${baseUrl}/api/sparks/transactions?limit=10`, {
+      headers,
+    });
+    assert.equal(transactionsResponse.status, 200);
+    const transactions = await transactionsResponse.json();
+    assert.ok(Array.isArray(transactions.transactions));
+    assert.ok(
+      transactions.transactions.some(
+        (entry) => entry.type === 'gift_sent' && entry.amount < 0 && entry.balanceAfter === 9500
+      )
+    );
+
     const bannersResponse = await fetch(`${baseUrl}/api/banners/active`);
     assert.equal(bannersResponse.status, 200);
     const banners = await bannersResponse.json();

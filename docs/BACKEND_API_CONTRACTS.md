@@ -2,6 +2,10 @@
 
 This is the current local contract for frontend integration. It is intentionally no-spend: if `DATABASE_URL` is empty in development, the backend serves deterministic demo data from the memory adapter.
 
+Machine-readable contract:
+
+- `backend/contracts/openapi.yaml`
+
 ## Local Backend
 
 ```bash

@@ -62,7 +62,7 @@ export default function GiftSpectacleOverlay({ giftId, sender = "Someone", visib
 }
 
 /* -----------------------------------------------------------------------
-   Low-tier: subtle corner toast — does not interrupt room content
+   Low-tier: subtle corner toast - does not interrupt room content
    ----------------------------------------------------------------------- */
 function LowTierToast({ effect, pal, typo, sender, phase }) {
   const entering = phase === "entry";
@@ -236,13 +236,13 @@ function HighTierOverlay({ effect, pal, typo, headline, isBanner, phase }) {
 }
 
 /* -----------------------------------------------------------------------
-   ParticleBurst — CSS-only particle system, no canvas dependency
+   ParticleBurst - CSS-only particle system, no canvas dependency
    Budget-capped, tier-aware. Renders only during active phases.
    ----------------------------------------------------------------------- */
 function ParticleBurst({ pal, budget, phase }) {
   if (!budget || phase === "exit") return null;
 
-  const count = Math.min(budget.count, 24); // DOM cap — canvas handles full budget in renderer
+  const count = Math.min(budget.count, 24); // DOM cap - canvas handles full budget in renderer
   const spread = budget.spread || "radial-tight";
 
   const particles = Array.from({ length: count }, (_, i) => {

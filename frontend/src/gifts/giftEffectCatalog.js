@@ -1,11 +1,11 @@
 /**
  * VYBE Gift Effect Catalog
- * Designer-editable definitions. Each entry is a pure data contract —
+ * Designer-editable definitions. Each entry is a pure data contract -
  * no runtime imports required. Integrate via giftEffectCatalog[id].
  *
  * Tiers: low | mid | high
  * audienceScope: sender | room | platform
- * platformWideBanner: true → eligible for 500+ spark full-room banner overlay
+ * platformWideBanner: true -> eligible for 500+ spark full-room banner overlay
  */
 
 export const PLATFORM_BANNER_THRESHOLD_SPARKS = 500;
@@ -38,7 +38,7 @@ export const GIFT_EFFECT_CATALOG = [
     typography: {
       displayFont: "inherit",
       weight: 500,
-      size: "sm",           // restrained — not dominant
+      size: "sm",           // restrained - not dominant
       letterSpacing: "0.04em",
       casing: "none",
       showSenderLabel: true,
@@ -175,7 +175,7 @@ export const GIFT_EFFECT_CATALOG = [
       showSenderLabel: true,
       showSparkCount: true,
       bannerHeadline: "{sender} unlocked the room",
-      subline: "Private Key — Exclusive Access",
+      subline: "Private Key - Exclusive Access",
     },
 
     effectPhases: [

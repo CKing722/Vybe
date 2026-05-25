@@ -65,6 +65,45 @@ Use the access token as:
 Authorization: Bearer <accessToken>
 ```
 
+### `POST /api/auth/2fa/setup`
+
+Requires auth.
+
+Returns a new TOTP secret + `otpauth://` URL for QR setup. This does not enable 2FA until verified.
+
+Response:
+
+```json
+{
+  "issuer": "VYBE",
+  "label": "viewer@vybe.local",
+  "otpauthUrl": "otpauth://totp/...",
+  "secret": "BASE32..."
+}
+```
+
+### `POST /api/auth/2fa/verify`
+
+Requires auth.
+
+Request:
+
+```json
+{
+  "token": "123456"
+}
+```
+
+After verification, `POST /api/auth/login` requires a 2FA token for accounts with 2FA enabled:
+
+```json
+{
+  "email": "viewer@vybe.local",
+  "password": "vybe-demo",
+  "twoFactorToken": "123456"
+}
+```
+
 ## Viewer
 
 ### `GET /api/me`

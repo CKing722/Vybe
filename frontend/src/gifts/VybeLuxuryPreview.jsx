@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { GIFT_EFFECT_CATALOG } from "./giftEffectCatalog.js";
 
-const giftCatalog = [
-  { id: "neon_rose", name: "Neon Rose", sparks: 5, tone: "#ff2d78" },
-  { id: "crown_drop", name: "Crown Drop", sparks: 500, tone: "#ffd166" },
-  { id: "private_key", name: "Private Key", sparks: 5000, tone: "#00ffb2" },
-];
+// Map canonical catalog entries to the shape used by this preview component.
+const giftCatalog = GIFT_EFFECT_CATALOG.map((g) => ({
+  id: g.id,
+  name: g.displayName,
+  sparks: g.sparkCost,
+  tone: g.palette.primary,
+}));
 
 export default function VybeLuxuryPreview() {
   const [gift, setGift] = useState(giftCatalog[1]);

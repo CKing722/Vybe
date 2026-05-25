@@ -1,3 +1,4 @@
+const crypto = require('node:crypto');
 const express = require('express');
 const { body, cookie } = require('express-validator');
 const jwt = require('jsonwebtoken');
@@ -6,6 +7,11 @@ const { loginLimiter } = require('../middleware/rateLimiter');
 const { requireAuth, signAccessToken, signRefreshToken } = require('../middleware/auth');
 const { validate } = require('../middleware/validator');
 const { loginUser, registerUser, startTwoFactorSetup, verifyTwoFactorSetup } = require('../services/authService');
+const {
+  getActiveRefreshTokenId,
+  revokeRefreshTokens,
+  setActiveRefreshTokenId,
+} = require('../services/refreshTokenStore');
 const { unauthorized } = require('../utils/errors');
 
 const router = express.Router();
@@ -21,7 +27,9 @@ function setRefreshCookie(res, token) {
 
 function authResponse(res, user) {
   const accessToken = signAccessToken(user);
-  const refreshToken = signRefreshToken(user);
+  const refreshTokenId = crypto.randomUUID();
+  setActiveRefreshTokenId(user.id, refreshTokenId);
+  const refreshToken = signRefreshToken(user, { tokenId: refreshTokenId });
   setRefreshCookie(res, refreshToken);
   return res.status(200).json({ user, accessToken, expiresInSeconds: 15 * 60 });
 }
@@ -113,22 +121,45 @@ router.post('/refresh', refreshValidation, (req, res, next) => {
     if (payload.token_use !== 'refresh') {
       throw unauthorized('Invalid refresh token');
     }
+    if (!payload.jti) {
+      throw unauthorized('Invalid refresh token');
+    }
+
+    const expectedTokenId = getActiveRefreshTokenId(payload.sub);
+    if (!expectedTokenId || expectedTokenId !== payload.jti) {
+      throw unauthorized('Invalid or rotated refresh token');
+    }
 
     const user = {
       id: payload.sub,
       role: payload.role,
       display_name: payload.display_name || '',
     };
+
+    const rotatedTokenId = crypto.randomUUID();
+    setActiveRefreshTokenId(user.id, rotatedTokenId);
+    setRefreshCookie(res, signRefreshToken(user, { tokenId: rotatedTokenId }));
+
     return res.status(200).json({
       accessToken: signAccessToken(user),
       expiresInSeconds: 15 * 60,
     });
   } catch (error) {
+    res.clearCookie('vybe_refresh');
     return next(unauthorized('Invalid or expired refresh token'));
   }
 });
 
 router.post('/logout', (req, res) => {
+  const token = req.cookies.vybe_refresh;
+  if (token) {
+    try {
+      const payload = jwt.verify(token, env.jwtRefreshSecret);
+      revokeRefreshTokens(payload.sub);
+    } catch (error) {
+      // ignore
+    }
+  }
   res.clearCookie('vybe_refresh');
   res.status(204).end();
 });

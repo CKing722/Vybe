@@ -14,13 +14,14 @@ function signAccessToken(user) {
   );
 }
 
-function signRefreshToken(user) {
+function signRefreshToken(user, { tokenId } = {}) {
   return jwt.sign(
     {
       sub: user.id,
       role: user.role,
       display_name: user.display_name,
       token_use: 'refresh',
+      jti: tokenId,
     },
     env.jwtRefreshSecret,
     { expiresIn: '7d' }

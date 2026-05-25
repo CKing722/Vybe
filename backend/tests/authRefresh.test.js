@@ -34,9 +34,21 @@ test('refresh endpoint rotates refresh tokens and rejects replays', async () => 
     const originalCookie = cookieValue(loginResponse.headers.get('set-cookie'));
     assert.ok(originalCookie && originalCookie.startsWith('vybe_refresh='));
 
+    const csrfResponse = await fetch(`${baseUrl}/api/auth/csrf`);
+    assert.equal(csrfResponse.status, 200);
+
+    const csrfCookie = cookieValue(csrfResponse.headers.get('set-cookie'));
+    assert.ok(csrfCookie && csrfCookie.startsWith('vybe_csrf='));
+
+    const csrfJson = await csrfResponse.json();
+    assert.ok(csrfJson && csrfJson.csrfToken);
+    const csrfHeaderName = csrfJson.headerName || 'x-vybe-csrf';
+
+    const cookieHeader = `${originalCookie}; ${csrfCookie}`;
+
     const firstRefresh = await fetch(`${baseUrl}/api/auth/refresh`, {
       method: 'POST',
-      headers: { cookie: originalCookie },
+      headers: { cookie: cookieHeader, [csrfHeaderName]: csrfJson.csrfToken },
     });
     assert.equal(firstRefresh.status, 200);
 
@@ -46,17 +58,16 @@ test('refresh endpoint rotates refresh tokens and rejects replays', async () => 
 
     const replayRefresh = await fetch(`${baseUrl}/api/auth/refresh`, {
       method: 'POST',
-      headers: { cookie: originalCookie },
+      headers: { cookie: cookieHeader, [csrfHeaderName]: csrfJson.csrfToken },
     });
     assert.equal(replayRefresh.status, 401);
 
     const secondRefresh = await fetch(`${baseUrl}/api/auth/refresh`, {
       method: 'POST',
-      headers: { cookie: rotatedCookie },
+      headers: { cookie: `${rotatedCookie}; ${csrfCookie}`, [csrfHeaderName]: csrfJson.csrfToken },
     });
     assert.equal(secondRefresh.status, 200);
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }
 });
-

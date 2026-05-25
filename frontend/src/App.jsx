@@ -4,6 +4,7 @@ import PlatformBanner from "./gifts/PlatformBanner.jsx";
 import SparkStormShell from "./gifts/SparkStormShell.jsx";
 import GiftEffectPreviewControls from "./gifts/GiftEffectPreviewControls.jsx";
 import VybeLuxuryPreview from "./gifts/VybeLuxuryPreview.jsx";
+import useGiftQueue from "./gifts/useGiftQueue.js";
 
 /* ═══ ICONS — 40+ custom SVGs, zero emojis ═══ */
 function I({n,s=20,c="currentColor",st={}}){const p={width:s,height:s,flexShrink:0,display:"inline-block",verticalAlign:"middle",...st};const d={
@@ -1025,7 +1026,7 @@ export default function App(){
     favPerfs:["luna","jade","raven"],
     perfHistory:{luna:{sessions:12,sparksSpent:3400,since:"Mar 2027"},jade:{sessions:6,sparksSpent:1200,since:"Apr 2027"},raven:{sessions:3,sparksSpent:800,since:"May 2027"}}});
 
-  const [demoGift,setDemoGift]=useState({giftId:null,sender:"",recipient:"Luna Voss",visible:false});
+  const {current:demoGift,enqueue:enqueueDemoGift,advance:advanceDemoGift}=useGiftQueue();
   const [giftEvents,setGiftEvents]=useState([]);
   const DEMO_GIFTS=["neon_rose","crown_drop","private_key"];
   let _demoIdx=useRef(0);
@@ -1034,7 +1035,7 @@ export default function App(){
     const sender=user.name||"VelvetKing";
     const ev={id:Date.now(),giftId,sender,recipient,timestamp:Date.now()};
     setGiftEvents(p=>[ev,...p].slice(0,20));
-    setDemoGift({giftId,sender,recipient,visible:true});
+    enqueueDemoGift({giftId,sender,recipient});
   },[pf,user.name]);
   const fireDemoGift=useCallback(()=>{
     const giftId=DEMO_GIFTS[_demoIdx.current%DEMO_GIFTS.length];
@@ -1070,8 +1071,8 @@ export default function App(){
     {md==="vip"&&pf&&<BK perf={pf} sparks={user.sparks} pkgs={VIPPK} label="VIP Session" onOk={cs} onClose={()=>setMd(null)}/>}
     {md==="viewer"&&<ViewerProfile user={user} onClose={()=>setMd(null)}/>}
     {authed&&ok&&!ck&&<CK onOk={()=>setCk(true)}/>}
-    <GiftSpectacleOverlay giftId={demoGift.giftId} sender={demoGift.sender} recipient={demoGift.recipient} visible={demoGift.visible} onDone={()=>setDemoGift(g=>({...g,visible:false}))}/>
-    <PlatformBanner giftId={demoGift.giftId} sender={demoGift.sender} recipient={demoGift.recipient} visible={demoGift.visible} onDone={()=>{}}/>
+    <GiftSpectacleOverlay giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={advanceDemoGift}/>
+    <PlatformBanner giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={()=>{}}/>
     <SparkStormShell events={giftEvents} stormThreshold={3}/>
     {giftDebug&&authed&&ok&&vw==="room"&&<GiftEffectPreviewControls onPreview={triggerDemoGift}/>}
   </>;

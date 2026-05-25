@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { GIFT_EFFECT_MAP } from "./giftEffectCatalog.js";
+import useReducedMotion from "./useReducedMotion.js";
 
 /*
   SparkStormShell
@@ -26,6 +27,7 @@ export default function SparkStormShell({
   const [visibleEvents, setVisibleEvents] = useState([]);
   const cooldownTimer = useRef(null);
   const prevStorming = useRef(false);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (!events.length) return;
@@ -81,7 +83,7 @@ export default function SparkStormShell({
     overflow: "hidden",
     pointerEvents: "none",
     userSelect: "none",
-    animation: "vybe-storm-enter 0.3s cubic-bezier(0.22,1,0.36,1) both",
+    animation: reducedMotion ? "none" : "vybe-storm-enter 0.3s cubic-bezier(0.22,1,0.36,1) both",
   };
 
   const headerStyle = {
@@ -150,14 +152,14 @@ export default function SparkStormShell({
 
       <div style={listStyle}>
         {visibleEvents.map((ev, i) => (
-          <StormEventRow key={ev.id || i} event={ev} index={i} heatColor={heatColor} />
+          <StormEventRow key={ev.id || i} event={ev} index={i} heatColor={heatColor} reducedMotion={reducedMotion} />
         ))}
       </div>
     </div>
   );
 }
 
-function StormEventRow({ event, index, heatColor }) {
+function StormEventRow({ event, index, heatColor, reducedMotion }) {
   const effect = event.giftId ? GIFT_EFFECT_MAP[event.giftId] : null;
   const pal = effect ? effect.palette : { primary: heatColor };
 
@@ -166,7 +168,7 @@ function StormEventRow({ event, index, heatColor }) {
     alignItems: "center",
     gap: "8px",
     padding: "4px 14px",
-    animation: "vybe-event-slide 0.25s " + index * 0.04 + "s ease both",
+    animation: reducedMotion ? "none" : "vybe-event-slide 0.25s " + index * 0.04 + "s ease both",
   };
 
   const dotStyle = {

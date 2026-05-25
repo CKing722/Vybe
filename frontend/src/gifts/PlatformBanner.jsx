@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { GIFT_EFFECT_MAP, PLATFORM_BANNER_THRESHOLD_SPARKS } from "./giftEffectCatalog.js";
+import useReducedMotion from "./useReducedMotion.js";
 
 /*
   PlatformBanner
@@ -15,6 +16,7 @@ export default function PlatformBanner({ giftId, sender = "Someone", visible, on
   const [show, setShow] = useState(false);
   const [exiting, setExiting] = useState(false);
   const timers = useRef([]);
+  const reducedMotion = useReducedMotion();
 
   const effect = giftId ? GIFT_EFFECT_MAP[giftId] : null;
   const eligible =
@@ -66,9 +68,9 @@ export default function PlatformBanner({ giftId, sender = "Someone", visible, on
     background: pal.bannerBackground || "rgba(0,0,0,0.92)",
     borderBottom: "1.5px solid " + pal.primary + "66",
     boxShadow: "0 2px 32px " + (pal.glow || pal.primary + "44"),
-    transition: "opacity 0.4s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1)",
+    transition: reducedMotion ? "opacity 0.15s ease" : "opacity 0.4s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1)",
     opacity: exiting ? 0 : 1,
-    transform: exiting ? "translateY(-100%)" : "translateY(0)",
+    transform: reducedMotion ? "none" : (exiting ? "translateY(-100%)" : "translateY(0)"),
     pointerEvents: "none",
     userSelect: "none",
   };

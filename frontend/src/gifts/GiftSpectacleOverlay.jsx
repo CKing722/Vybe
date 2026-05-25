@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { GIFT_EFFECT_MAP, PLATFORM_BANNER_THRESHOLD_SPARKS } from "./giftEffectCatalog.js";
+import useReducedMotion from "./useReducedMotion.js";
 
 /* -----------------------------------------------------------------------
    GiftSpectacleOverlay
@@ -12,6 +13,7 @@ import { GIFT_EFFECT_MAP, PLATFORM_BANNER_THRESHOLD_SPARKS } from "./giftEffectC
 export default function GiftSpectacleOverlay({ giftId, sender = "Someone", visible, onDone }) {
   const [phase, setPhase] = useState("idle"); // idle | entry | hold | exit | done
   const timers = useRef([]);
+  const reducedMotion = useReducedMotion();
 
   const effect = giftId ? GIFT_EFFECT_MAP[giftId] : null;
 
@@ -21,8 +23,17 @@ export default function GiftSpectacleOverlay({ giftId, sender = "Someone", visib
     timers.current.forEach(clearTimeout);
     timers.current = [];
 
+    // In reduced-motion mode skip directly to hold then exit without animated phases.
+    if (reducedMotion) {
+      setPhase("hold");
+      const holdMs = Math.min(effect.durationMs, 2000);
+      const exitT = setTimeout(() => setPhase("exit"), holdMs);
+      const doneT = setTimeout(() => { setPhase("done"); onDone && onDone(); }, holdMs + 200);
+      timers.current.push(exitT, doneT);
+      return () => timers.current.forEach(clearTimeout);
+    }
+
     const phases = effect.effectPhases;
-    let cursor = 0;
 
     setPhase("entry");
 
@@ -42,7 +53,7 @@ export default function GiftSpectacleOverlay({ giftId, sender = "Someone", visib
     timers.current.push(doneTimer);
 
     return () => timers.current.forEach(clearTimeout);
-  }, [visible, giftId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [visible, giftId, reducedMotion]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!effect || !visible || phase === "idle" || phase === "done") return null;
 
@@ -56,17 +67,17 @@ export default function GiftSpectacleOverlay({ giftId, sender = "Someone", visib
     : sender + " sent " + effect.displayName;
 
   if (isHigh) {
-    return <HighTierOverlay effect={effect} pal={pal} typo={typo} headline={headline} isBanner={isBanner} phase={phase} />;
+    return <HighTierOverlay effect={effect} pal={pal} typo={typo} headline={headline} isBanner={isBanner} phase={phase} reducedMotion={reducedMotion} />;
   }
-  return <LowTierToast effect={effect} pal={pal} typo={typo} sender={sender} phase={phase} />;
+  return <LowTierToast effect={effect} pal={pal} typo={typo} sender={sender} phase={phase} reducedMotion={reducedMotion} />;
 }
 
 /* -----------------------------------------------------------------------
    Low-tier: subtle corner toast - does not interrupt room content
    ----------------------------------------------------------------------- */
-function LowTierToast({ effect, pal, typo, sender, phase }) {
-  const entering = phase === "entry";
-  const exiting = phase === "exit";
+function LowTierToast({ effect, pal, typo, sender, phase, reducedMotion }) {
+  const entering = !reducedMotion && phase === "entry";
+  const exiting = !reducedMotion && phase === "exit";
 
   const s = {
     position: "fixed",
@@ -115,9 +126,9 @@ function LowTierToast({ effect, pal, typo, sender, phase }) {
 /* -----------------------------------------------------------------------
    High-tier: cinematic full-room overlay with optional platform banner
    ----------------------------------------------------------------------- */
-function HighTierOverlay({ effect, pal, typo, headline, isBanner, phase }) {
-  const entering = phase === "entry" || phase === "cinematic-open";
-  const exiting = phase === "exit";
+function HighTierOverlay({ effect, pal, typo, headline, isBanner, phase, reducedMotion }) {
+  const entering = !reducedMotion && (phase === "entry" || phase === "cinematic-open");
+  const exiting = !reducedMotion && phase === "exit";
 
   const backdropStyle = {
     position: "fixed",
@@ -230,7 +241,7 @@ function HighTierOverlay({ effect, pal, typo, headline, isBanner, phase }) {
         )}
       </div>
 
-      <ParticleBurst pal={pal} budget={effect.particleBudget} phase={phase} />
+      {!reducedMotion && <ParticleBurst pal={pal} budget={effect.particleBudget} phase={phase} />}
     </div>
   );
 }

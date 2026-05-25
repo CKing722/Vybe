@@ -2,8 +2,8 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { env } = require('../config/env');
 const { loginLimiter } = require('../middleware/rateLimiter');
-const { signAccessToken, signRefreshToken } = require('../middleware/auth');
-const { loginUser, registerUser } = require('../services/authService');
+const { requireAuth, signAccessToken, signRefreshToken } = require('../middleware/auth');
+const { loginUser, registerUser, startTwoFactorSetup, verifyTwoFactorSetup } = require('../services/authService');
 const { unauthorized } = require('../utils/errors');
 
 const router = express.Router();
@@ -42,6 +42,32 @@ router.post('/login', loginLimiter, async (req, res, next) => {
   try {
     const user = await loginUser(req.body);
     return authResponse(res, user);
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.post('/2fa/setup', requireAuth, async (req, res, next) => {
+  try {
+    const result = await startTwoFactorSetup({ userId: req.user.sub, issuer: 'VYBE' });
+    return res.status(200).json(result);
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.post('/2fa/verify', requireAuth, async (req, res, next) => {
+  try {
+    const token =
+      req.body.token ||
+      req.body.twoFactorToken ||
+      req.body.two_factor_token ||
+      req.body.totp ||
+      req.body.otp ||
+      req.body.two_factor_code ||
+      req.body.twoFactorCode;
+    const result = await verifyTwoFactorSetup({ userId: req.user.sub, token });
+    return res.status(200).json(result);
   } catch (error) {
     return next(error);
   }

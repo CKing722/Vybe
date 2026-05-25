@@ -1,11 +1,14 @@
 const bcrypt = require('bcryptjs');
+const { authenticator } = require('otplib');
 const { hasDatabase, withTransaction, query } = require('../config/db');
 const { env } = require('../config/env');
 const { badRequest, conflict, unauthorized } = require('../utils/errors');
 const { getMemoryState, randomId } = require('./memoryStore');
 
+authenticator.options = { ...authenticator.options, window: 1 };
+
 const PUBLIC_USER_COLUMNS =
-  'id, email, display_name, role, avatar_url, banner_url, bio, is_verified, is_active, created_at';
+  'id, email, display_name, role, avatar_url, banner_url, bio, is_verified, is_active, two_factor_enabled, created_at';
 
 function publicUser(user) {
   return {
@@ -18,6 +21,7 @@ function publicUser(user) {
     bio: user.bio || null,
     is_verified: Boolean(user.is_verified),
     is_active: Boolean(user.is_active),
+    two_factor_enabled: Boolean(user.two_factor_enabled),
     created_at: user.created_at,
   };
 }
@@ -88,6 +92,8 @@ function registerMemoryUser({ email, passwordHash, displayName, role }) {
     role,
     is_verified: false,
     is_active: true,
+    two_factor_enabled: false,
+    two_factor_secret: null,
     created_at: now,
   };
   state.users.set(id, user);
@@ -114,17 +120,19 @@ function registerMemoryUser({ email, passwordHash, displayName, role }) {
   return publicUser(user);
 }
 
-async function loginUser({ email, password }) {
+async function loginUser(body = {}) {
+  const { email, password } = body;
   if (!email || !password) {
     throw badRequest('email and password are required');
   }
 
   if (!hasDatabase()) {
-    return loginMemoryUser({ email, password });
+    return loginMemoryUser({ email, password, twoFactorToken: extractTwoFactorToken(body) });
   }
 
   const result = await query(
     `SELECT ${PUBLIC_USER_COLUMNS}, password_hash
+            , two_factor_secret
      FROM users
      WHERE email = $1 AND is_active = TRUE`,
     [email]
@@ -134,11 +142,37 @@ async function loginUser({ email, password }) {
     throw unauthorized('Invalid email or password');
   }
 
+  if (user.two_factor_enabled) {
+    const twoFactorToken = extractTwoFactorToken(body);
+    if (!twoFactorToken) {
+      throw unauthorized('Two-factor token required');
+    }
+    if (!user.two_factor_secret || !authenticator.check(twoFactorToken, user.two_factor_secret)) {
+      throw unauthorized('Invalid two-factor token');
+    }
+  }
+
   await query('UPDATE users SET last_login_at = NOW() WHERE id = $1', [user.id]);
   return publicUser(user);
 }
 
-async function loginMemoryUser({ email, password }) {
+function extractTwoFactorToken(body = {}) {
+  const candidate =
+    body.twoFactorToken ||
+    body.two_factor_token ||
+    body.totp ||
+    body.otp ||
+    body.two_factor_code ||
+    body.twoFactorCode;
+  if (!candidate) return null;
+  const token = String(candidate).replace(/\s+/g, '');
+  if (!/^\d{6,8}$/.test(token)) {
+    throw badRequest('twoFactorToken must be a 6-8 digit code');
+  }
+  return token;
+}
+
+async function loginMemoryUser({ email, password, twoFactorToken }) {
   const normalizedEmail = email.toLowerCase();
   const user = Array.from(getMemoryState().users.values()).find(
     (candidate) => candidate.email.toLowerCase() === normalizedEmail && candidate.is_active
@@ -146,11 +180,94 @@ async function loginMemoryUser({ email, password }) {
   if (!user || !user.password_hash || !(await bcrypt.compare(password, user.password_hash))) {
     throw unauthorized('Invalid email or password');
   }
+  if (user.two_factor_enabled) {
+    if (!twoFactorToken) {
+      throw unauthorized('Two-factor token required');
+    }
+    if (!user.two_factor_secret || !authenticator.check(twoFactorToken, user.two_factor_secret)) {
+      throw unauthorized('Invalid two-factor token');
+    }
+  }
   return publicUser(user);
+}
+
+async function findUserForTwoFactor(userId) {
+  if (!userId) {
+    throw badRequest('userId is required');
+  }
+
+  if (!hasDatabase()) {
+    const user = getMemoryState().users.get(userId);
+    if (!user) {
+      throw unauthorized('User not found');
+    }
+    return user;
+  }
+
+  const result = await query(
+    'SELECT id, email, two_factor_enabled, two_factor_secret FROM users WHERE id = $1 AND is_active = TRUE',
+    [userId]
+  );
+  const user = result.rows[0];
+  if (!user) {
+    throw unauthorized('User not found');
+  }
+  return user;
+}
+
+async function startTwoFactorSetup({ userId, issuer = 'VYBE' } = {}) {
+  const user = await findUserForTwoFactor(userId);
+  if (user.two_factor_enabled) {
+    throw badRequest('Two-factor authentication is already enabled');
+  }
+
+  const secret = authenticator.generateSecret();
+  const label = user.email || user.id;
+  const otpauthUrl = authenticator.keyuri(label, issuer, secret);
+
+  if (!hasDatabase()) {
+    user.two_factor_secret = secret;
+    user.two_factor_enabled = false;
+  } else {
+    await query(
+      'UPDATE users SET two_factor_secret = $1, two_factor_enabled = FALSE WHERE id = $2',
+      [secret, user.id]
+    );
+  }
+
+  return {
+    issuer,
+    label,
+    otpauthUrl,
+    secret,
+  };
+}
+
+async function verifyTwoFactorSetup({ userId, token } = {}) {
+  const cleanToken = extractTwoFactorToken({ twoFactorToken: token });
+  const user = await findUserForTwoFactor(userId);
+  if (!user.two_factor_secret) {
+    throw badRequest('Two-factor setup has not been started');
+  }
+
+  if (!authenticator.check(cleanToken, user.two_factor_secret)) {
+    throw unauthorized('Invalid two-factor token');
+  }
+
+  if (!hasDatabase()) {
+    user.two_factor_enabled = true;
+  } else {
+    await query('UPDATE users SET two_factor_enabled = TRUE WHERE id = $1', [user.id]);
+  }
+
+  return { twoFactorEnabled: true };
 }
 
 module.exports = {
   loginUser,
+  extractTwoFactorToken,
+  startTwoFactorSetup,
+  verifyTwoFactorSetup,
   publicUser,
   registerUser,
 };

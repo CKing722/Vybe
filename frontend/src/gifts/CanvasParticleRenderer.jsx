@@ -90,11 +90,12 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
   const canvasRef = useRef(null);
   const animIdRef = useRef(null);
 
-  // phase guard matches ParticleBurst behaviour so callers can swap drop-in
-  if (!budget || phase === "exit") return null;
+  // active drives both the effect guard and the conditional render below.
+  // All hooks are called unconditionally to satisfy Rules of Hooks.
+  const active = !!budget && phase !== "exit";
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
+    if (!active) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -170,9 +171,10 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
 
     return () => {
       cancelAnimationFrame(animIdRef.current);
-      ctx.clearRect(0, 0, w, h);
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [active]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!active) return null;
 
   return (
     <canvas

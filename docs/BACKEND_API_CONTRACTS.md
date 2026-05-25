@@ -73,6 +73,16 @@ Requires auth.
 
 Returns the current viewer, spark balance, loyalty tier, and performer history.
 
+### `GET /api/me/history/:performerId`
+
+Requires auth.
+
+Query parameters:
+
+- `limit` (default 25, max 100)
+
+Returns a `summary` of the viewer's relationship with the performer plus a `gifts` list suitable for the "Your History" UI section.
+
 ## Performers
 
 ### `GET /api/performers`

@@ -122,6 +122,7 @@ function LowTierToast({ effect, pal, typo, sender, phase, reducedMotion }) {
       {holding && (
         <style>{`@keyframes vybe-toast-dot-pulse{0%,100%{box-shadow:0 0 6px ${pal.primary};transform:scale(1)}50%{box-shadow:0 0 14px ${pal.primary},0 0 26px ${pal.primary}55;transform:scale(1.3)}}`}</style>
       )}
+      {!reducedMotion && <ParticleBurst pal={pal} budget={effect.particleBudget} phase={phase} />}
       <span style={dot} />
       <span style={{ color: pal.primary, fontWeight: 600 }}>{sender}</span>
       <span style={{ opacity: 0.75 }}>sent</span>

@@ -534,7 +534,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip}){
         <div style={{display:"flex",alignItems:"center",gap:3}}><I n={g.icon} s={11} c={g.color}/><span style={{fontWeight:700,fontSize:".7rem"}}>{g.name}</span></div>
         <p style={{fontSize:".6rem",color:"var(--mt)",lineHeight:1.3,marginTop:1}}>{g.desc}</p></button>)}</div></Pn>}
     {pn==="requests"&&<Pn onClose={()=>setPn(null)} title="Requests" icon="request" ic="var(--am)" style={{position:"absolute",bottom:60,left:"50%",transform:"translateX(-50%)",zIndex:20,width:"min(380px,88%)",maxHeight:"48vh"}}>
-      {(perf.requests||[]).map((r,i)=><button key={i} onClick={()=>{if(user.sparks>=r.sparks){onSC(-r.sparks);setCh(p=>[...p.slice(-4),{user:user.name,msg:`requested ${r.name} — ${r.sparks} sparks`,vip:true,id:Date.now()}]);setPn(null)}}} disabled={user.sparks<r.sparks} style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%",padding:"8px 0",borderBottom:i<perf.requests.length-1?"1px solid var(--bd)":"none",background:"none",border:"none",borderBottom:i<perf.requests.length-1?"1px solid var(--bd)":"none",cursor:user.sparks>=r.sparks?"pointer":"not-allowed",opacity:user.sparks>=r.sparks?1:.35,color:"var(--tx)",textAlign:"left"}}>
+      {(perf.requests||[]).map((r,i)=><button key={i} onClick={()=>{if(user.sparks>=r.sparks){onSC(-r.sparks);setCh(p=>[...p.slice(-4),{user:user.name,msg:`requested ${r.name} — ${r.sparks} sparks`,vip:true,id:Date.now()}]);setPn(null)}}} disabled={user.sparks<r.sparks} style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%",padding:"8px 0",background:"none",border:"none",borderBottom:i<perf.requests.length-1?"1px solid var(--bd)":"none",cursor:user.sparks>=r.sparks?"pointer":"not-allowed",opacity:user.sparks>=r.sparks?1:.35,color:"var(--tx)",textAlign:"left"}}>
         <div><div style={{fontWeight:700,fontSize:".8rem"}}>{r.name}</div><div style={{fontSize:".66rem",color:"var(--mt)"}}>{r.desc}</div></div>
         <span style={{fontWeight:800,fontSize:".76rem",color:"var(--am)",display:"flex",alignItems:"center",gap:2,flexShrink:0}}><I n="spark" s={10} c="var(--am)"/>{r.sparks.toLocaleString()}</span></button>)}</Pn>}
     {gm&&<GE game={gm} onClose={()=>setGm(null)} onSB={sb}/>}
@@ -840,9 +840,10 @@ function PerfDash({perfData,onGoLive,onLogout}){
 
 /* ═══ MAIN APP ═══ */
 export default function App(){
-  const [authed,setAuthed]=useState(false);const [authUser,setAuthUser]=useState(null);
-  const [ok,setOk]=useState(false);const [ck,setCk]=useState(false);const [vw,setVw]=useState("lobby");
-  const [pf,setPf]=useState(null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
+  const visualPreview=typeof window!=="undefined"&&new URLSearchParams(window.location.search).get("vybePreview")==="gift";
+  const [authed,setAuthed]=useState(visualPreview);const [authUser,setAuthUser]=useState(visualPreview?{email:"preview@vybe.local",name:"VelvetKing",role:"viewer"}:null);
+  const [ok,setOk]=useState(visualPreview);const [ck,setCk]=useState(visualPreview);const [vw,setVw]=useState(visualPreview?"room":"lobby");
+  const [pf,setPf]=useState(visualPreview?PERFS[0]:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
   const [user,setUser]=useState({name:"VelvetKing",sparks:2500,spent:450,gamesPlayed:87,winRate:72,sparksEarned:1240,totalSessions:23,topStreak:8,perfCount:4,
     badges:["First Win","5-Game Streak","100 Games","Luna's Top 10","Crown Sender"],
     favPerfs:["luna","jade","raven"],
@@ -859,6 +860,7 @@ export default function App(){
     setGiftEvents(p=>[ev,...p].slice(0,20));
     setDemoGift({giftId,sender:"DemoUser",visible:true});
   },[]);
+  useEffect(()=>{if(visualPreview){const t=setTimeout(fireDemoGift,800);return()=>clearTimeout(t)}},[visualPreview,fireDemoGift]);
 
   const handleAuth=(u)=>{setAuthUser(u);setUser(p=>({...p,name:u.name}));setAuthed(true);if(u.role==="performer")setOk(true)};/*performers skip age verify*/
   const logout=()=>{setAuthed(false);setAuthUser(null);setOk(false);setVw("lobby")};

@@ -148,7 +148,7 @@ export default function GiftEffectPreviewControls({ onPreview }) {
         aria-expanded={open}
         aria-label="Toggle gift effect preview panel"
       >
-        {open ? "Close Preview" : <>&#9889; Gift Preview</>}
+        {open ? "Close Preview" : "Gift Preview"}
       </button>
     </div>
   );

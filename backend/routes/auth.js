@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { env } = require('../config/env');
+const { CSRF_HEADER_NAME, issueCsrfToken, requireCsrf } = require('../middleware/csrf');
 const { loginLimiter } = require('../middleware/rateLimiter');
 const { signAccessToken, signRefreshToken } = require('../middleware/auth');
 const { loginUser, registerUser } = require('../services/authService');
@@ -23,6 +24,11 @@ function authResponse(res, user) {
   setRefreshCookie(res, refreshToken);
   return res.status(200).json({ user, accessToken, expiresInSeconds: 15 * 60 });
 }
+
+router.get('/csrf', (req, res) => {
+  const csrfToken = issueCsrfToken(res);
+  res.status(200).json({ csrfToken, headerName: CSRF_HEADER_NAME });
+});
 
 router.post('/register', async (req, res, next) => {
   try {
@@ -47,7 +53,7 @@ router.post('/login', loginLimiter, async (req, res, next) => {
   }
 });
 
-router.post('/refresh', (req, res, next) => {
+router.post('/refresh', requireCsrf, (req, res, next) => {
   try {
     const token = req.cookies.vybe_refresh;
     if (!token) throw unauthorized('Refresh token missing');
@@ -71,8 +77,9 @@ router.post('/refresh', (req, res, next) => {
   }
 });
 
-router.post('/logout', (req, res) => {
+router.post('/logout', requireCsrf, (req, res) => {
   res.clearCookie('vybe_refresh');
+  res.clearCookie('vybe_csrf');
   res.status(204).end();
 });
 

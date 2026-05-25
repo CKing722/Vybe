@@ -251,6 +251,55 @@ Socket events:
 - `spark_storm_update`
 - `spark_storm_complete`
 
+#### `gift_animation` payload
+
+```json
+{
+  "giftId": "uuid",
+  "senderName": "VelvetKing",
+  "gift": { "id": "crown", "name": "Crown Drop", "cost": 500, "color": "#...", "icon": "..." },
+  "animationType": "descend",
+  "durationMs": 6000,
+  "spectacleTier": "standard|major|cinematic"
+}
+```
+
+#### `platform_banner` payload
+
+```json
+{
+  "id": "uuid",
+  "type": "gift",
+  "senderName": "VelvetKing",
+  "performerName": "Luna Voss",
+  "performerId": "uuid",
+  "giftName": "Crown Drop",
+  "sparkAmount": 500,
+  "expiresAt": "ISO-8601",
+  "createdAt": "ISO-8601"
+}
+```
+
+#### Spark Storm payloads
+
+`spark_storm_start`:
+
+```json
+{ "stormId": "uuid", "roomId": "uuid", "performerId": "uuid", "target": 1000, "current": 25, "timerMs": 180000, "level": 1 }
+```
+
+`spark_storm_update`:
+
+```json
+{ "stormId": "uuid", "roomId": "uuid", "current": 250, "target": 1000, "level": 1, "participantCount": 3 }
+```
+
+`spark_storm_complete`:
+
+```json
+{ "stormId": "uuid", "roomId": "uuid", "rewardPerParticipant": 10, "participantCount": 3 }
+```
+
 ## Platform Banners
 
 ### `GET /api/banners/active`

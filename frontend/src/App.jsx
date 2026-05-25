@@ -849,18 +849,23 @@ export default function App(){
     favPerfs:["luna","jade","raven"],
     perfHistory:{luna:{sessions:12,sparksSpent:3400,since:"Mar 2027"},jade:{sessions:6,sparksSpent:1200,since:"Apr 2027"},raven:{sessions:3,sparksSpent:800,since:"May 2027"}}});
 
-  const [demoGift,setDemoGift]=useState({giftId:null,sender:"",visible:false});
+  const [demoGift,setDemoGift]=useState({giftId:null,sender:"",recipient:"Luna Voss",visible:false});
   const [giftEvents,setGiftEvents]=useState([]);
   const DEMO_GIFTS=["neon_rose","crown_drop","private_key"];
   let _demoIdx=useRef(0);
+  const triggerDemoGift=useCallback((giftId)=>{
+    const recipient=pf?.name||PERFS[0].name;
+    const sender=user.name||"VelvetKing";
+    const ev={id:Date.now(),giftId,sender,recipient,timestamp:Date.now()};
+    setGiftEvents(p=>[ev,...p].slice(0,20));
+    setDemoGift({giftId,sender,recipient,visible:true});
+  },[pf,user.name]);
   const fireDemoGift=useCallback(()=>{
     const giftId=DEMO_GIFTS[_demoIdx.current%DEMO_GIFTS.length];
     _demoIdx.current++;
-    const ev={id:Date.now(),giftId,sender:"DemoUser",timestamp:Date.now()};
-    setGiftEvents(p=>[ev,...p].slice(0,20));
-    setDemoGift({giftId,sender:"DemoUser",visible:true});
-  },[]);
-  useEffect(()=>{if(visualPreview){const t=setTimeout(fireDemoGift,800);return()=>clearTimeout(t)}},[visualPreview,fireDemoGift]);
+    triggerDemoGift(giftId);
+  },[triggerDemoGift]);
+  useEffect(()=>{if(visualPreview){const t=setTimeout(()=>triggerDemoGift("crown_drop"),800);return()=>clearTimeout(t)}},[visualPreview,triggerDemoGift]);
 
   const handleAuth=(u)=>{setAuthUser(u);setUser(p=>({...p,name:u.name}));setAuthed(true);if(u.role==="performer")setOk(true)};/*performers skip age verify*/
   const logout=()=>{setAuthed(false);setAuthUser(null);setOk(false);setVw("lobby")};
@@ -887,9 +892,9 @@ export default function App(){
     {md==="vip"&&pf&&<BK perf={pf} sparks={user.sparks} pkgs={VIPPK} label="VIP Session" onOk={cs} onClose={()=>setMd(null)}/>}
     {md==="viewer"&&<ViewerProfile user={user} onClose={()=>setMd(null)}/>}
     {authed&&ok&&!ck&&<CK onOk={()=>setCk(true)}/>}
-    <GiftSpectacleOverlay giftId={demoGift.giftId} sender={demoGift.sender} visible={demoGift.visible} onDone={()=>setDemoGift(g=>({...g,visible:false}))}/>
-    <PlatformBanner giftId={demoGift.giftId} sender={demoGift.sender} visible={demoGift.visible} onDone={()=>{}}/>
+    <GiftSpectacleOverlay giftId={demoGift.giftId} sender={demoGift.sender} recipient={demoGift.recipient} visible={demoGift.visible} onDone={()=>setDemoGift(g=>({...g,visible:false}))}/>
+    <PlatformBanner giftId={demoGift.giftId} sender={demoGift.sender} recipient={demoGift.recipient} visible={demoGift.visible} onDone={()=>{}}/>
     <SparkStormShell events={giftEvents} stormThreshold={3}/>
-    {authed&&ok&&vw==="room"&&<GiftEffectPreviewControls onPreview={id=>{const ev={id:Date.now(),giftId:id,sender:"DemoUser",timestamp:Date.now()};setGiftEvents(p=>[ev,...p].slice(0,20));setDemoGift({giftId:id,sender:"DemoUser",visible:true});}}/>}
+    {authed&&ok&&vw==="room"&&<GiftEffectPreviewControls onPreview={triggerDemoGift}/>}
   </>;
 }

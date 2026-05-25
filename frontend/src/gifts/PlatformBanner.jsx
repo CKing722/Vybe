@@ -7,12 +7,13 @@ import useReducedMotion from "./useReducedMotion.js";
   Props:
     giftId   - string, key in GIFT_EFFECT_MAP
     sender   - string, display name of sender
+    recipient - string, performer/room receiving the gift
     visible  - boolean, triggers the banner cycle
     onDone   - callback fired when banner dismisses
   Renders a full-width top banner strip for 500+ spark gifts.
   Does not interrupt room content below it.
 */
-export default function PlatformBanner({ giftId, sender = "Someone", visible, onDone }) {
+export default function PlatformBanner({ giftId, sender = "Someone", recipient = "this room", visible, onDone }) {
   const [show, setShow] = useState(false);
   const [exiting, setExiting] = useState(false);
   const timers = useRef([]);
@@ -49,9 +50,7 @@ export default function PlatformBanner({ giftId, sender = "Someone", visible, on
 
   const pal = effect.palette;
   const typo = effect.typography;
-  const headline = typo.bannerHeadline
-    ? typo.bannerHeadline.replace("{sender}", sender)
-    : sender + " sent " + effect.displayName;
+  const headline = sender + " sent " + effect.displayName + " to " + recipient;
   const isCinematic = effect.sparkCost >= 5000;
 
   const bannerStyle = {
@@ -63,16 +62,21 @@ export default function PlatformBanner({ giftId, sender = "Someone", visible, on
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: "12px",
-    padding: "10px 20px",
-    background: pal.bannerBackground || "rgba(0,0,0,0.92)",
-    borderBottom: "1.5px solid " + pal.primary + "66",
-    boxShadow: "0 2px 32px " + (pal.glow || pal.primary + "44"),
+    flexWrap: "wrap",
+    gap: "14px",
+    rowGap: "4px",
+    minHeight: "62px",
+    padding: "9px 18px 8px",
+    background: "linear-gradient(90deg, rgba(5,6,12,0.96), " + pal.primary + "24, rgba(5,6,12,0.96))",
+    borderBottom: "1px solid " + pal.primary + "77",
+    boxShadow: "0 12px 36px rgba(0,0,0,0.38), 0 0 34px " + (pal.glow || pal.primary + "44"),
     transition: reducedMotion ? "opacity 0.15s ease" : "opacity 0.4s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1)",
     opacity: exiting ? 0 : 1,
     transform: reducedMotion ? "none" : (exiting ? "translateY(-100%)" : "translateY(0)"),
     pointerEvents: "none",
     userSelect: "none",
+    backdropFilter: "blur(14px)",
+    WebkitBackdropFilter: "blur(14px)",
   };
 
   const labelStyle = {
@@ -91,14 +95,17 @@ export default function PlatformBanner({ giftId, sender = "Someone", visible, on
   const headlineStyle = {
     fontFamily: typo.displayFont === "monospace" ? "monospace" : "inherit",
     fontWeight: typo.weight || 700,
-    fontSize: "clamp(0.85rem, 2.5vw, 1.05rem)",
-    letterSpacing: typo.letterSpacing || "0.08em",
-    textTransform: typo.casing === "uppercase" ? "uppercase" : "none",
-    color: pal.primary,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
+    fontSize: "clamp(0.86rem, 2.4vw, 1.08rem)",
+    letterSpacing: "0.03em",
+    textTransform: "none",
+    color: "#fff",
+    whiteSpace: "normal",
+    overflow: "visible",
+    textOverflow: "clip",
     margin: 0,
+    flex: "1 1 360px",
+    textAlign: "center",
+    minWidth: "min(330px, 76vw)",
   };
 
   const sparkStyle = {
@@ -110,6 +117,17 @@ export default function PlatformBanner({ giftId, sender = "Someone", visible, on
     fontWeight: 700,
     flexShrink: 0,
     opacity: 0.85,
+  };
+
+  const routeStyle = {
+    color: pal.primary,
+    fontSize: "11px",
+    fontWeight: 800,
+    letterSpacing: "0.13em",
+    textTransform: "uppercase",
+    flex: "1 0 100%",
+    textAlign: "center",
+    opacity: 0.95,
   };
 
   const dividerStyle = {
@@ -124,6 +142,8 @@ export default function PlatformBanner({ giftId, sender = "Someone", visible, on
       <span style={labelStyle}>{isCinematic ? "CINEMATIC" : "PLATFORM"}</span>
       <div style={dividerStyle} />
       <p style={headlineStyle}>{headline}</p>
+      <div style={dividerStyle} />
+      <span style={routeStyle}>Tap to join {recipient}</span>
       {typo.showSparkCount && (
         <>
           <div style={dividerStyle} />

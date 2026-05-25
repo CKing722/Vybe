@@ -48,6 +48,18 @@ function spawnParticles(budget, w, h) {
   });
 }
 
+function sizeCanvas(canvas) {
+  const rect = canvas.parentElement?.getBoundingClientRect();
+  const cssW = Math.max(1, Math.floor(rect?.width || window.innerWidth || 800));
+  const cssH = Math.max(1, Math.floor(rect?.height || window.innerHeight || 600));
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.floor(cssW * dpr);
+  canvas.height = Math.floor(cssH * dpr);
+  canvas.style.width = cssW + "px";
+  canvas.style.height = cssH + "px";
+  return { cssW, cssH, dpr };
+}
+
 /*
   CanvasParticleRenderer
   Props:
@@ -67,12 +79,9 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    canvas.width = window.innerWidth || 800;
-    canvas.height = window.innerHeight || 600;
-
-    const w = canvas.width;
-    const h = canvas.height;
+    const { cssW: w, cssH: h, dpr } = sizeCanvas(canvas);
     const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const spread = budget.spread || "radial-tight";
 
     const particles = spawnParticles(budget, w, h);

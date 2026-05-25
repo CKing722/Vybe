@@ -8,10 +8,11 @@ import CanvasParticleRenderer from "./CanvasParticleRenderer.jsx";
    Props:
      giftId   - string, key in GIFT_EFFECT_MAP (e.g. "neon_rose")
      sender   - string, display name of sender
+     recipient - string, performer/room receiving the gift
      visible  - boolean, mount/unmount trigger
      onDone   - callback fired when animation cycle completes
    ----------------------------------------------------------------------- */
-export default function GiftSpectacleOverlay({ giftId, sender = "Someone", visible, onDone }) {
+export default function GiftSpectacleOverlay({ giftId, sender = "Someone", recipient = "this room", visible, onDone }) {
   const [phase, setPhase] = useState("idle"); // idle | entry | hold | exit | done
   const timers = useRef([]);
   const reducedMotion = useReducedMotion();
@@ -68,7 +69,7 @@ export default function GiftSpectacleOverlay({ giftId, sender = "Someone", visib
     : sender + " sent " + effect.displayName;
 
   if (isHigh) {
-    return <HighTierOverlay effect={effect} pal={pal} typo={typo} headline={headline} isBanner={isBanner} phase={phase} reducedMotion={reducedMotion} />;
+    return <HighTierOverlay effect={effect} pal={pal} typo={typo} sender={sender} recipient={recipient} headline={headline} isBanner={isBanner} phase={phase} reducedMotion={reducedMotion} />;
   }
   return <LowTierToast effect={effect} pal={pal} typo={typo} sender={sender} phase={phase} reducedMotion={reducedMotion} />;
 }
@@ -125,125 +126,184 @@ function LowTierToast({ effect, pal, typo, sender, phase, reducedMotion }) {
 }
 
 /* -----------------------------------------------------------------------
-   High-tier: cinematic full-room overlay with optional platform banner
+   High-tier: compact premium 3D room moment, not a full-screen takeover.
    ----------------------------------------------------------------------- */
-function HighTierOverlay({ effect, pal, typo, headline, isBanner, phase, reducedMotion }) {
+function HighTierOverlay({ effect, pal, typo, sender, recipient, isBanner, phase, reducedMotion }) {
   const entering = !reducedMotion && (phase === "entry" || phase === "cinematic-open");
   const exiting = !reducedMotion && phase === "exit";
+  const isKey = effect.id === "private_key";
+  const headline = sender + " sent " + effect.displayName + " to " + recipient;
 
-  const backdropStyle = {
+  const shellStyle = {
     position: "fixed",
-    inset: 0,
-    zIndex: 2000,
+    left: "50%",
+    top: isKey ? "43%" : "40%",
+    width: isKey ? "min(340px, 76vw)" : "min(300px, 70vw)",
+    height: isKey ? "min(340px, 76vw)" : "min(300px, 70vw)",
+    zIndex: 2200,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    background: pal.bannerBackground || "rgba(0,0,0,0.82)",
-    transition: "opacity 0.5s ease",
+    transform: entering
+      ? "translate(-50%, -50%) scale(0.72) rotateX(14deg)"
+      : exiting
+        ? "translate(-50%, -55%) scale(0.82) rotateX(0deg)"
+        : "translate(-50%, -50%) scale(1) rotateX(0deg)",
+    transition: "opacity 0.45s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1)",
     opacity: entering ? 0 : exiting ? 0 : 1,
     pointerEvents: "none",
+    perspective: "980px",
   };
 
-  const cardStyle = {
-    width: "min(520px, 90vw)",
-    padding: "32px 28px 28px",
-    borderRadius: "16px",
-    background: pal.bannerBackground || "rgba(12,10,0,0.94)",
-    border: "1.5px solid " + pal.primary + "88",
-    boxShadow:
-      "0 0 40px " + (pal.glow || pal.primary + "55") + ", " +
-      "0 0 80px " + (pal.glow || pal.primary + "22"),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "12px",
-    transition: "transform 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.45s ease",
-    transform: entering ? "scale(0.88) translateY(20px)" : exiting ? "scale(0.96) translateY(-8px)" : "scale(1) translateY(0)",
-    opacity: entering ? 0 : exiting ? 0 : 1,
+  const auraStyle = {
+    position: "absolute",
+    inset: "9%",
+    borderRadius: "50%",
+    background: "radial-gradient(circle, " + pal.primary + "22 0%, " + pal.primary + "10 34%, transparent 68%)",
+    filter: "blur(10px)",
+    transform: "translateZ(-80px)",
   };
 
-  const badgeStyle = {
-    padding: "4px 14px",
-    borderRadius: "12px",
-    background: pal.primary + "22",
+  const labelStyle = {
+    position: "absolute",
+    left: "50%",
+    bottom: isKey ? "-2px" : "8px",
+    transform: "translateX(-50%)",
+    minWidth: "min(320px, 86vw)",
+    padding: "9px 14px",
+    borderRadius: "999px",
     border: "1px solid " + pal.primary + "66",
+    background: "rgba(5,7,13,0.82)",
+    boxShadow: "0 18px 42px rgba(0,0,0,0.36), 0 0 24px " + (pal.glow || pal.primary + "33"),
+    color: "#fff",
+    textAlign: "center",
+    fontSize: "12px",
+    fontWeight: 800,
+    letterSpacing: "0.03em",
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
+  };
+
+  const metaStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "7px",
     color: pal.primary,
-    fontSize: "11px",
-    fontWeight: 700,
-    letterSpacing: "0.14em",
+    marginTop: "3px",
+    fontSize: "10px",
+    letterSpacing: "0.16em",
     textTransform: "uppercase",
   };
 
-  const headlineStyle = {
-    fontFamily: typo.displayFont === "monospace" ? "monospace" : "inherit",
-    fontWeight: typo.weight || 700,
-    fontSize: typo.size === "2xl" ? "clamp(1.4rem, 4vw, 2rem)" : "clamp(1.2rem, 3.5vw, 1.6rem)",
-    letterSpacing: typo.letterSpacing || "0.1em",
-    textTransform: typo.casing === "uppercase" ? "uppercase" : "none",
-    color: pal.primary,
-    textAlign: "center",
-    lineHeight: 1.25,
-    margin: 0,
+  return (
+    <div style={shellStyle} aria-live="assertive" role="status" aria-label={headline}>
+      <style>{`
+        @keyframes vybe-gift-orbit {
+          0% { transform: rotateY(-18deg) rotateX(12deg) translateY(0); }
+          50% { transform: rotateY(20deg) rotateX(16deg) translateY(-9px); }
+          100% { transform: rotateY(-18deg) rotateX(12deg) translateY(0); }
+        }
+        @keyframes vybe-gift-crown-drop {
+          0% { transform: translateY(-42px) rotateX(28deg) rotateZ(-5deg) scale(0.82); opacity: 0; }
+          32% { opacity: 1; }
+          58% { transform: translateY(6px) rotateX(18deg) rotateZ(3deg) scale(1.05); }
+          100% { transform: translateY(0) rotateX(14deg) rotateZ(0deg) scale(1); opacity: 1; }
+        }
+        @keyframes vybe-gift-ring {
+          0% { transform: translate(-50%, -50%) rotateX(70deg) scale(0.72); opacity: 0; }
+          35% { opacity: 0.9; }
+          100% { transform: translate(-50%, -50%) rotateX(70deg) scale(1.28); opacity: 0; }
+        }
+      `}</style>
+      <div style={auraStyle} />
+      {!reducedMotion && <CanvasParticleRenderer pal={pal} budget={effect.particleBudget} phase={phase} />}
+      <Gift3DObject effect={effect} pal={pal} />
+      <div style={labelStyle}>
+        <div>{headline}</div>
+        <div style={metaStyle}>
+          <span>{isBanner ? "Platform banner live" : "Room gift"}</span>
+          {typo.showSparkCount && <span>{effect.sparkCost.toLocaleString()} sparks</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Gift3DObject({ effect, pal }) {
+  const objectStyle = {
+    position: "relative",
+    width: effect.id === "private_key" ? "180px" : "154px",
+    height: effect.id === "private_key" ? "180px" : "154px",
+    transformStyle: "preserve-3d",
+    animation: effect.id === "crown_drop" ? "vybe-gift-crown-drop 900ms cubic-bezier(0.16,1,0.3,1) both, vybe-gift-orbit 2.6s ease-in-out 900ms infinite" : "vybe-gift-orbit 2.8s ease-in-out infinite",
+    filter: "drop-shadow(0 22px 32px rgba(0,0,0,0.52)) drop-shadow(0 0 24px " + (pal.glow || pal.primary + "55") + ")",
   };
 
-  const sublineStyle = {
-    fontSize: "13px",
-    color: pal.secondary || "#aaa",
-    letterSpacing: "0.08em",
-    textAlign: "center",
-    opacity: 0.85,
-  };
-
-  const sparkBadgeStyle = {
-    display: "flex",
-    alignItems: "center",
-    gap: "5px",
-    padding: "5px 12px",
-    borderRadius: "20px",
-    background: "rgba(255,255,255,0.06)",
-    color: pal.primary,
-    fontSize: "13px",
-    fontWeight: 700,
-    letterSpacing: "0.06em",
-    marginTop: "4px",
-  };
-
-  const dividerStyle = {
-    width: "48px",
-    height: "2px",
-    background: "linear-gradient(90deg, transparent, " + pal.primary + ", transparent)",
-    borderRadius: "1px",
-    margin: "4px 0",
+  const ringStyle = {
+    position: "absolute",
+    left: "50%",
+    top: "55%",
+    width: "210px",
+    height: "64px",
+    borderRadius: "50%",
+    border: "1px solid " + pal.primary + "66",
+    boxShadow: "0 0 28px " + (pal.glow || pal.primary + "44"),
+    animation: "vybe-gift-ring 1.8s ease-out infinite",
   };
 
   return (
-    <div style={backdropStyle} aria-modal="true" aria-live="assertive" role="dialog" aria-label={headline}>
-      <div style={cardStyle}>
-        {isBanner && (
-          <div style={badgeStyle}>
-            {effect.sparkCost >= 5000 ? "CINEMATIC" : "PLATFORM MOMENT"}
-          </div>
-        )}
-
-        <div style={headlineStyle}>{headline}</div>
-
-        <div style={dividerStyle} />
-
-        {typo.subline && (
-          <div style={sublineStyle}>{typo.subline}</div>
-        )}
-
-        {typo.showSparkCount && (
-          <div style={sparkBadgeStyle}>
-            <span>&#9889;</span>
-            <span>{effect.sparkCost.toLocaleString()} sparks</span>
-          </div>
-        )}
+    <>
+      <div style={ringStyle} />
+      <div style={objectStyle}>
+        {effect.id === "private_key" ? <KeyMesh pal={pal} /> : <CrownMesh pal={pal} />}
       </div>
+    </>
+  );
+}
 
-      {!reducedMotion && <CanvasParticleRenderer pal={pal} budget={effect.particleBudget} phase={phase} />}
-    </div>
+function CrownMesh({ pal }) {
+  return (
+    <svg viewBox="0 0 220 180" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <linearGradient id="vybeCrownFace" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#fff7b2" />
+          <stop offset="0.42" stopColor={pal.primary} />
+          <stop offset="1" stopColor="#9c6b00" />
+        </linearGradient>
+        <linearGradient id="vybeCrownSide" x1="0" x2="1">
+          <stop offset="0" stopColor="#5f3900" />
+          <stop offset="1" stopColor={pal.primary} />
+        </linearGradient>
+      </defs>
+      <path d="M29 134 L48 48 L86 104 L110 28 L134 104 L172 48 L191 134 Z" fill="url(#vybeCrownSide)" opacity="0.7" transform="translate(10,10)" />
+      <path d="M25 128 L45 42 L83 99 L110 22 L137 99 L175 42 L195 128 Z" fill="url(#vybeCrownFace)" stroke="#fff3a6" strokeWidth="3" strokeLinejoin="round" />
+      <rect x="32" y="124" width="156" height="28" rx="10" fill="url(#vybeCrownFace)" stroke="#fff3a6" strokeWidth="3" />
+      {[45,110,175].map((x, i) => <circle key={i} cx={x} cy={i === 1 ? 23 : 43} r="11" fill="#fff7c8" opacity="0.95" />)}
+      <path d="M42 136 C78 148 141 148 178 136" fill="none" stroke="#fff7cc" strokeWidth="4" opacity="0.55" />
+    </svg>
+  );
+}
+
+function KeyMesh({ pal }) {
+  return (
+    <svg viewBox="0 0 220 180" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <linearGradient id="vybeKeyFace" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#dfffee" />
+          <stop offset="0.46" stopColor={pal.primary} />
+          <stop offset="1" stopColor={pal.secondary || "#005c40"} />
+        </linearGradient>
+      </defs>
+      <g transform="rotate(-24 110 90)">
+        <circle cx="72" cy="82" r="40" fill="rgba(0,255,178,0.18)" stroke={pal.primary} strokeWidth="14" />
+        <circle cx="72" cy="82" r="17" fill="rgba(5,7,13,0.86)" stroke="#dfffee" strokeWidth="4" />
+        <rect x="107" y="72" width="86" height="22" rx="11" fill="url(#vybeKeyFace)" stroke="#dfffee" strokeWidth="3" />
+        <rect x="165" y="89" width="16" height="29" rx="5" fill="url(#vybeKeyFace)" />
+        <rect x="187" y="89" width="15" height="22" rx="5" fill="url(#vybeKeyFace)" />
+        <path d="M34 101 C74 126 139 121 197 91" fill="none" stroke="#dfffee" strokeWidth="5" opacity="0.3" />
+      </g>
+    </svg>
   );
 }
 

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vybe://contracts/socketio/v1/server-to-client/spark_storm_complete.schema.json",
+  "title": "Socket.io spark_storm_complete event payload (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "stormId": { "type": "string", "minLength": 1 },
+    "roomId": { "type": "string", "minLength": 1 },
+    "rewardPerParticipant": { "type": "integer", "minimum": 0 },
+    "participantCount": { "type": "integer", "minimum": 0 }
+  },
+  "required": ["stormId", "roomId", "rewardPerParticipant", "participantCount"]
+}

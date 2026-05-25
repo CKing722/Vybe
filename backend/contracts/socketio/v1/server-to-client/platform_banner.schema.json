@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vybe://contracts/socketio/v1/server-to-client/platform_banner.schema.json",
+  "title": "Socket.io platform_banner event payload (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "type": { "type": "string", "minLength": 1 },
+    "senderName": { "type": "string", "minLength": 1 },
+    "performerName": { "type": "string", "minLength": 1 },
+    "performerId": { "type": "string", "minLength": 1 },
+    "giftName": { "type": "string", "minLength": 1 },
+    "sparkAmount": { "type": "integer", "minimum": 0 },
+    "expiresAt": { "type": "string", "format": "date-time" },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "required": [
+    "id",
+    "type",
+    "senderName",
+    "performerName",
+    "performerId",
+    "giftName",
+    "sparkAmount",
+    "expiresAt",
+    "createdAt"
+  ]
+}

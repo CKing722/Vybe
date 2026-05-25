@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vybe://contracts/socketio/v1/client-to-server/send_gift.schema.json",
+  "title": "Socket.io send_gift payload (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "performer_id": { "type": "string", "minLength": 1 },
+    "performerId": { "type": "string", "minLength": 1 },
+    "gift_type_id": { "type": "string", "minLength": 1 },
+    "giftTypeId": { "type": "string", "minLength": 1 },
+    "room_id": { "type": "string", "minLength": 1 },
+    "roomId": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    { "anyOf": [{ "required": ["performer_id"] }, { "required": ["performerId"] }] },
+    { "anyOf": [{ "required": ["gift_type_id"] }, { "required": ["giftTypeId"] }] },
+    { "anyOf": [{ "required": ["room_id"] }, { "required": ["roomId"] }] }
+  ]
+}

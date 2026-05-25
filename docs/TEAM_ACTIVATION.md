@@ -30,6 +30,7 @@ Damon has approved moving from setup into active buildout. The team should opera
   - `28f1157 Add CI workflow`
   - `863bcfd Add frontend-ready demo API contracts`
   - `22deda5 Document backend API contracts`
+  - `c800699 backend: add viewer profile update endpoint` (branch `backend/me-profile-update`)
 - Next scope: continue backend/frontend integration contracts, auth hardening, and no-cost local adapters.
 
 ### Hermes

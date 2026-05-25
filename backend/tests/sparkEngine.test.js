@@ -81,6 +81,26 @@ test('demo API exposes viewer, performer, and spark contracts for frontend integ
     assert.equal(me.user.displayName, 'VelvetKing');
     assert.equal(me.viewer.sparks, 10000);
 
+    const profileUpdateResponse = await fetch(`${baseUrl}/api/me/profile`, {
+      method: 'PUT',
+      headers: { ...headers, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        display_name: 'NeonVelvet',
+        avatar: 'https://cdn.vybe.local/avatars/neon.png',
+        bio: 'I only gift in cinematic.',
+      }),
+    });
+    assert.equal(profileUpdateResponse.status, 200);
+    const updatedProfile = await profileUpdateResponse.json();
+    assert.equal(updatedProfile.user.displayName, 'NeonVelvet');
+    assert.equal(updatedProfile.user.avatarUrl, 'https://cdn.vybe.local/avatars/neon.png');
+    assert.equal(updatedProfile.user.bio, 'I only gift in cinematic.');
+
+    const meAfterResponse = await fetch(`${baseUrl}/api/me`, { headers });
+    assert.equal(meAfterResponse.status, 200);
+    const meAfter = await meAfterResponse.json();
+    assert.equal(meAfter.user.displayName, 'NeonVelvet');
+
     const performersResponse = await fetch(`${baseUrl}/api/performers?live=true`);
     assert.equal(performersResponse.status, 200);
     const performers = await performersResponse.json();
@@ -187,4 +207,35 @@ test('storm service emits start/update/complete events once gift velocity hits t
   assert.ok(completeEvent);
   assert.equal(completeEvent.payload.roomId, roomId);
   assert.equal(completeEvent.payload.participantCount, 1);
+});
+
+test('viewer profile update rejects invalid avatar URLs', async () => {
+  resetMemoryStore();
+  resetStormState();
+  const app = createApp();
+  const server = http.createServer(app);
+
+  await new Promise((resolve) => server.listen(0, resolve));
+  const { port } = server.address();
+  const baseUrl = `http://127.0.0.1:${port}`;
+
+  try {
+    const loginResponse = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: 'viewer@vybe.local', password: 'vybe-demo' }),
+    });
+    assert.equal(loginResponse.status, 200);
+    const login = await loginResponse.json();
+    const headers = { authorization: `Bearer ${login.accessToken}` };
+
+    const profileUpdateResponse = await fetch(`${baseUrl}/api/me/profile`, {
+      method: 'PUT',
+      headers: { ...headers, 'content-type': 'application/json' },
+      body: JSON.stringify({ avatar: 'javascript:alert(1)' }),
+    });
+    assert.equal(profileUpdateResponse.status, 400);
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+  }
 });

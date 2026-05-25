@@ -4,6 +4,16 @@ Activated: 2026-05-24
 
 Damon has approved moving from setup into active buildout. The team should operate hands-off, no-spend, and continuously from the highest-priority unblocked VYBE work.
 
+## Autonomous Queue Rule
+
+Each lane must keep moving. At the start of every run, the assigned agent checks its prior task:
+
+- If the task has a passing validation result, committed/local artifact, or completed research/QA output and no unresolved blocker, it is complete.
+- Once complete, that same lane immediately selects the next highest-priority unblocked task it owns.
+- The lane must not stay idle, repeat completed work, or wait for Damon simply because the prior task finished.
+- If no explicit task is open for that lane, create or select the next safe scoped task from the VYBE build order, respecting ownership boundaries.
+- True Damon blockers are only secrets, paid services/assets, live credentials, production-risk approvals, account gates, or decisions that cannot be safely inferred.
+
 ## Routing
 
 - Linear team: `GhostNexus`
@@ -43,6 +53,10 @@ Damon has approved moving from setup into active buildout. The team should opera
   - `docs/qa/vybe-gho-008-gift-spectacle-qa.md`
 - Hermes board: `vybe-platform`
 - ID note: `VYBE-GHO-006` remains GitHub SSH bootstrap; 3D research is `VYBE-GHO-007`; gift QA is `VYBE-GHO-008`.
+- Current queued follow-ups:
+  - `VYBE-GHO-009: Research - Advanced No-Cost 3D Gift Authoring Pipeline`
+  - `VYBE-GHO-010: QA - Gift Spectacle Runtime Acceptance Gate v2`
+  - `VYBE-GHO-011: Compliance - Cross-Room Gift Banner And Adult Platform Guardrails`
 
 ### ChatGPT
 

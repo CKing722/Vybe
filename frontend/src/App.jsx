@@ -3,6 +3,7 @@ import GiftSpectacleOverlay from "./gifts/GiftSpectacleOverlay.jsx";
 import PlatformBanner from "./gifts/PlatformBanner.jsx";
 import SparkStormShell from "./gifts/SparkStormShell.jsx";
 import GiftEffectPreviewControls from "./gifts/GiftEffectPreviewControls.jsx";
+import VybeLuxuryPreview from "./gifts/VybeLuxuryPreview.jsx";
 
 /* ═══ ICONS — 40+ custom SVGs, zero emojis ═══ */
 function I({n,s=20,c="currentColor",st={}}){const p={width:s,height:s,flexShrink:0,display:"inline-block",verticalAlign:"middle",...st};const d={
@@ -877,6 +878,8 @@ export default function App(){
   const cs=pk=>{setUser(u=>({...u,sparks:u.sparks-pk.sparks,spent:u.spent+pk.sparks*0.1,totalSessions:u.totalSessions+1}));setMd(null);setVw("room")};
   const by=pk=>{const b=Math.floor(pk.sparks*pk.bonus/100);setUser(u=>({...u,sparks:u.sparks+pk.sparks+b,spent:u.spent+parseFloat(pk.price.replace("$",""))}));setMd(null)};
   const sc=d=>setUser(u=>({...u,sparks:u.sparks+d}));
+
+  if(visualPreview)return <VybeLuxuryPreview/>;
 
   return<>
     <style>{css}</style>

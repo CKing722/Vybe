@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
 const giftCatalog = [
-  { id: "rose", name: "Neon Rose", sparks: 5, tone: "#ff2d78" },
-  { id: "crown", name: "Crown Drop", sparks: 500, tone: "#ffd166" },
-  { id: "key", name: "Private Key", sparks: 5000, tone: "#00ffb2" },
+  { id: "neon_rose", name: "Neon Rose", sparks: 5, tone: "#ff2d78" },
+  { id: "crown_drop", name: "Crown Drop", sparks: 500, tone: "#ffd166" },
+  { id: "private_key", name: "Private Key", sparks: 5000, tone: "#00ffb2" },
 ];
 
 export default function VybeLuxuryPreview() {
@@ -175,8 +175,8 @@ function drawAura(ctx, w, h, tone, t) {
 }
 
 function drawObject(ctx, w, h, gift, t) {
-  if (gift.id === "key") return drawKey(ctx, w, h, gift.tone, t);
-  if (gift.id === "rose") return drawRose(ctx, w, h, gift.tone, t);
+  if (gift.id === "private_key") return drawKey(ctx, w, h, gift.tone, t);
+  if (gift.id === "neon_rose") return drawRose(ctx, w, h, gift.tone, t);
   return drawCrown(ctx, w, h, gift.tone, t);
 }
 

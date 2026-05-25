@@ -286,3 +286,20 @@ Request:
   "count": 5
 }
 ```
+
+Response:
+
+```json
+{
+  "provider": "local",
+  "paidProviderUsed": false,
+  "rawProviderApisEnabled": false,
+  "questions": [
+    {
+      "q": "What makes a Spark Storm feel communal?",
+      "opts": ["Shared progress", "Hidden scores", "Muted chat", "Static UI"],
+      "ans": 0
+    }
+  ]
+}
+```

@@ -9,3 +9,4 @@ Notes:
 
 - This project is **no-spend by default**. Game questions are generated locally; raw paid provider APIs are disabled unless explicitly enabled server-side.
 - WebSocket (Socket.io) event payloads are documented in `docs/BACKEND_API_CONTRACTS.md` and versioned as JSON schemas here.
+- Contract validation runs in `cd backend && npm run check` (OpenAPI + JSON schema compilation).

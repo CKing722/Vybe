@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import GiftSpectacleOverlay from "./gifts/GiftSpectacleOverlay.jsx";
+import PlatformBanner from "./gifts/PlatformBanner.jsx";
+import SparkStormShell from "./gifts/SparkStormShell.jsx";
 
 /* ═══ ICONS — 40+ custom SVGs, zero emojis ═══ */
 function I({n,s=20,c="currentColor",st={}}){const p={width:s,height:s,flexShrink:0,display:"inline-block",verticalAlign:"middle",...st};const d={
@@ -844,6 +847,18 @@ export default function App(){
     favPerfs:["luna","jade","raven"],
     perfHistory:{luna:{sessions:12,sparksSpent:3400,since:"Mar 2027"},jade:{sessions:6,sparksSpent:1200,since:"Apr 2027"},raven:{sessions:3,sparksSpent:800,since:"May 2027"}}});
 
+  const [demoGift,setDemoGift]=useState({giftId:null,sender:"",visible:false});
+  const [giftEvents,setGiftEvents]=useState([]);
+  const DEMO_GIFTS=["neon_rose","crown_drop","private_key"];
+  let _demoIdx=useRef(0);
+  const fireDemoGift=useCallback(()=>{
+    const giftId=DEMO_GIFTS[_demoIdx.current%DEMO_GIFTS.length];
+    _demoIdx.current++;
+    const ev={id:Date.now(),giftId,sender:"DemoUser",timestamp:Date.now()};
+    setGiftEvents(p=>[ev,...p].slice(0,20));
+    setDemoGift({giftId,sender:"DemoUser",visible:true});
+  },[]);
+
   const handleAuth=(u)=>{setAuthUser(u);setUser(p=>({...p,name:u.name}));setAuthed(true);if(u.role==="performer")setOk(true)};/*performers skip age verify*/
   const logout=()=>{setAuthed(false);setAuthUser(null);setOk(false);setVw("lobby")};
   const isPerf=authed&&authUser?.role==="performer";
@@ -869,5 +884,9 @@ export default function App(){
     {md==="vip"&&pf&&<BK perf={pf} sparks={user.sparks} pkgs={VIPPK} label="VIP Session" onOk={cs} onClose={()=>setMd(null)}/>}
     {md==="viewer"&&<ViewerProfile user={user} onClose={()=>setMd(null)}/>}
     {authed&&ok&&!ck&&<CK onOk={()=>setCk(true)}/>}
+    <GiftSpectacleOverlay giftId={demoGift.giftId} sender={demoGift.sender} visible={demoGift.visible} onDone={()=>setDemoGift(g=>({...g,visible:false}))}/>
+    <PlatformBanner giftId={demoGift.giftId} sender={demoGift.sender} visible={demoGift.visible} onDone={()=>{}}/>
+    <SparkStormShell events={giftEvents} stormThreshold={3}/>
+    {authed&&ok&&vw==="room"&&<button onClick={fireDemoGift} style={{position:"fixed",bottom:"16px",left:"50%",transform:"translateX(-50%)",zIndex:4000,padding:"7px 18px",borderRadius:"20px",border:"1px solid #ff2d7888",background:"rgba(20,14,28,0.9)",color:"#ff2d78",fontSize:"12px",fontWeight:700,letterSpacing:"0.1em",cursor:"pointer",userSelect:"none"}}>&#9889; Send Demo Gift</button>}
   </>;
 }

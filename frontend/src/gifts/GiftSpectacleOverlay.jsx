@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { GIFT_EFFECT_MAP, PLATFORM_BANNER_THRESHOLD_SPARKS } from "./giftEffectCatalog.js";
 import useReducedMotion from "./useReducedMotion.js";
+import CanvasParticleRenderer from "./CanvasParticleRenderer.jsx";
 
 /* -----------------------------------------------------------------------
    GiftSpectacleOverlay
@@ -241,7 +242,7 @@ function HighTierOverlay({ effect, pal, typo, headline, isBanner, phase, reduced
         )}
       </div>
 
-      {!reducedMotion && <ParticleBurst pal={pal} budget={effect.particleBudget} phase={phase} />}
+      {!reducedMotion && <CanvasParticleRenderer pal={pal} budget={effect.particleBudget} phase={phase} />}
     </div>
   );
 }

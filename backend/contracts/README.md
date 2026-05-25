@@ -4,6 +4,7 @@ This folder contains machine-readable contracts for frontend integration.
 
 - `openapi.yaml`: HTTP API contract for the local demo backend (`http://localhost:4000`).
 - `socketio/v1/`: Socket.io event payload schemas (gifts, platform banners, spark storms).
+- `asyncapi.yaml`: AsyncAPI wrapper spec for the Socket.io event contract (v1).
 
 Notes:
 

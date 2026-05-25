@@ -6,6 +6,7 @@ Machine-readable contracts:
 
 - `backend/contracts/openapi.yaml`
 - `backend/contracts/socketio/v1/`
+- `backend/contracts/asyncapi.yaml`
 
 ## Local Backend
 

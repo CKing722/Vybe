@@ -93,17 +93,17 @@ const PERFS=[
     schedule:[{day:"Wed",time:"9PM"},{day:"Sat",time:"10PM"}],stats:{hoursLive:900,followers:4200},posts:[{text:"Couples night Wednesday.",time:"1d"}]},
 ];
 const GAMES=[
-  {id:"trivia",name:"Tease Trivia",icon:"brain",desc:"Answer right, the reveal climbs.",color:"#c6ff00",type:"trivia"},
-  {id:"spin",name:"Spin & Sin",icon:"wheel",desc:"Wheel of dares, reveals, bonuses.",color:"#ff2d78",type:"wheel"},
-  {id:"truth",name:"Truth or Dare",icon:"target",desc:"Pick truth or dare. Performer executes.",color:"#00d4ff",type:"binary"},
-  {id:"hotseat",name:"Hot Seat",icon:"hotseat",desc:"Timed. Slowest = eliminated.",color:"#ffab00",type:"timed"},
-  {id:"clash",name:"Card Clash",icon:"cards",desc:"Flip cards. Higher wins.",color:"#8b5cf6",type:"cards"},
-  {id:"auction",name:"Fantasy Auction",icon:"gavel",desc:"Bid sparks. Highest wins.",color:"#f472b6",type:"auction"},
-  {id:"king",name:"King of the Hill",icon:"kinghill",desc:"Top scorer wins bonus.",color:"#fbbf24",type:"score"},
-  {id:"mystery",name:"Mystery Box",icon:"mystery",desc:"Open for random prizes.",color:"#34d399",type:"box"},
-  {id:"ladder",name:"Dare Ladder",icon:"ladder",desc:"5 rungs. Climb or bank.",color:"#f97316",type:"ladder"},
-  {id:"buzz",name:"Buzz Battle",icon:"tap",desc:"Fastest tap wins.",color:"#06b6d4",type:"reaction"},
-  {id:"jackpot",name:"All-In Jackpot",icon:"star",desc:"10 streak = free session.",color:"#fbbf24",type:"jackpot"},
+  {id:"trivia",name:"Desire Read",icon:"brain",desc:"Patrons predict her preference; correct answers raise room heat.",color:"#c6ff00",type:"trivia"},
+  {id:"spin",name:"Velvet Dial",icon:"wheel",desc:"A cinematic mood selector with performer-approved outcomes.",color:"#ff2d78",type:"wheel"},
+  {id:"truth",name:"Confession Gate",icon:"target",desc:"The room votes on polished, consent-safe prompts.",color:"#00d4ff",type:"binary"},
+  {id:"hotseat",name:"Pulse Seat",icon:"hotseat",desc:"Timed questions that reward focus and anticipation.",color:"#ffab00",type:"timed"},
+  {id:"clash",name:"Chemistry Cards",icon:"cards",desc:"Match mood cards to unlock a shared room moment.",color:"#8b5cf6",type:"cards"},
+  {id:"auction",name:"Moment Auction",icon:"gavel",desc:"Bid for performer-approved highlights and room direction.",color:"#f472b6",type:"auction"},
+  {id:"king",name:"Patron Crown",icon:"kinghill",desc:"Top patron earns a tasteful on-screen acknowledgement.",color:"#fbbf24",type:"score"},
+  {id:"mystery",name:"Secret Drop",icon:"mystery",desc:"Unlock mystery prompts, badges, or subscriber previews.",color:"#34d399",type:"box"},
+  {id:"ladder",name:"Tension Ladder",icon:"ladder",desc:"Climb through escalating, performer-controlled milestones.",color:"#f97316",type:"ladder"},
+  {id:"buzz",name:"Touch Trace",icon:"tap",desc:"Draw glow marks on the live frame; performer accepts the winning trace.",color:"#06b6d4",type:"touch"},
+  {id:"jackpot",name:"Afterglow Streak",icon:"star",desc:"Build a streak for a premium but performer-approved reward.",color:"#fbbf24",type:"jackpot"},
 ];
 const GIFTS=[
   {id:"rose",name:"Neon Rose",cost:5,icon:"rose",color:"#ff2d78",anim:"bloom"},
@@ -354,7 +354,7 @@ function GE({game,onClose,onSB}){
   const [qs,setQs]=useState(FBQ.sort(()=>Math.random()-.5).slice(0,5));
   const [s,setS]=useState({qi:0,fb:"",m:0,wr:null,sp:false,td:null,tm:15,cP:0,cO:0,bid:50,hb:120,at:20,hs:0,hr:1,
     bx:[...Array(6)].map((_,i)=>({id:i,op:false,pr:["10 sparks","25 sparks","50 sparks","Reveal +1","Badge","Empty"][i]})),
-    lr:0,lb:false,br:false,bt:null,bres:null,bms:0,jl:3,js:0,jw:false});
+    lr:0,lb:false,br:false,bt:null,bres:null,bms:0,jl:3,js:0,jw:false,tc:[]});
   const u=(k,v)=>setS(p=>({...p,...(typeof k==="string"?{[k]:v}:k)}));
   useEffect(()=>{genQs().then(nq=>{if(nq.length>0)setQs(nq)}).catch(()=>{})},[]);
   useEffect(()=>{if(s.qi>0&&s.qi%4===0)genQs().then(nq=>{if(nq.length>0)setQs(p=>[...p,...nq])}).catch(()=>{})},[s.qi]);
@@ -363,17 +363,23 @@ function GE({game,onClose,onSB}){
   const q=qs[s.qi%qs.length]||FBQ[0];
   const ans=(i)=>{if(i===q.ans){u({m:Math.min(100,s.m+12),fb:"Correct!",qi:s.qi+1});onSB(5)}else u({fb:"Wrong!",qi:s.qi+1});setTimeout(()=>u("fb",""),1800)};
 
-  return<Pn onClose={onClose} title={game.name} icon={game.icon} ic={game.color} style={{position:"absolute",right:10,bottom:68,zIndex:15,width:"min(330px,40%)",maxHeight:"60vh"}}>
+  return<Pn onClose={onClose} title={game.name} icon={game.icon} ic={game.color} style={{position:"absolute",right:12,top:84,bottom:76,zIndex:24,width:"min(390px,34vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(9,10,18,.9))",boxShadow:"0 30px 90px rgba(0,0,0,.45)"}}>
     <div style={{height:4,borderRadius:999,background:"rgba(255,255,255,.05)",marginBottom:8}}><div style={{height:"100%",borderRadius:"inherit",width:`${s.m}%`,transition:"width .4s",background:"linear-gradient(90deg,var(--cy),var(--lm),var(--pk))"}}/></div>
 
     {game.type==="trivia"&&<div><h4 style={{fontSize:".92rem",fontWeight:700,lineHeight:1.2,marginBottom:7}}>{q.q}</h4>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>ans(i)} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:600,fontSize:".76rem",cursor:"pointer"}}>{o}</button>)}</div></div>}
 
     {game.type==="wheel"&&<div style={{textAlign:"center"}}>
-      <div style={{width:100,height:100,borderRadius:"50%",border:"3px solid var(--pk)",margin:"0 auto 8px",display:"flex",alignItems:"center",justifyContent:"center",background:"conic-gradient(var(--pk),var(--am),var(--lm),var(--cy),var(--vi),var(--pk))",animation:s.sp?"spin 2s cubic-bezier(.17,.67,.12,.99) forwards":"none"}}>
-        <div style={{width:32,height:32,borderRadius:"50%",background:"var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--tx)",fontSize:".55rem",fontWeight:800}}>SPIN</div></div>
-      {s.wr&&<div style={{fontWeight:700,fontSize:".82rem",color:"var(--lm)",marginBottom:5}}>{s.wr}</div>}
-      <Btn primary small disabled={s.sp} onClick={()=>{u("sp",true);setTimeout(()=>{const r=WSEGS[Math.floor(Math.random()*8)];u({sp:false,wr:r,m:Math.min(100,s.m+8)});if(r.includes("Sparks"))onSB(15)},2000)}}>Spin</Btn></div>}
+      <div style={{position:"relative",width:188,height:188,margin:"2px auto 12px"}}>
+        <div style={{position:"absolute",left:"50%",top:-4,transform:"translateX(-50%)",width:0,height:0,borderLeft:"9px solid transparent",borderRight:"9px solid transparent",borderTop:"18px solid #fff",filter:"drop-shadow(0 0 10px rgba(255,255,255,.45))",zIndex:2}}/>
+        <div style={{position:"absolute",inset:0,borderRadius:"50%",background:"conic-gradient(from -18deg,#ff2d78 0 44deg,#d6b15e 44deg 88deg,#c6ff00 88deg 132deg,#00d4ff 132deg 176deg,#8b5cf6 176deg 220deg,#ff8aa8 220deg 264deg,#f97316 264deg 308deg,#ff2d78 308deg 360deg)",boxShadow:"0 0 0 1px rgba(255,255,255,.12) inset,0 24px 80px rgba(255,45,120,.18)",animation:s.sp?"spin 2.4s cubic-bezier(.12,.76,.18,1) forwards":"none"}}/>
+        <div style={{position:"absolute",inset:20,borderRadius:"50%",background:"radial-gradient(circle at 35% 30%,rgba(255,255,255,.22),rgba(13,15,26,.96) 45%)",border:"1px solid rgba(255,255,255,.16)",display:"grid",placeItems:"center"}}>
+          <div><div style={{fontSize:".55rem",letterSpacing:".15em",textTransform:"uppercase",color:"var(--mt)",fontWeight:900}}>Mood lock</div><div style={{fontWeight:1000,fontSize:"1rem",marginTop:3}}>VYBE</div></div>
+        </div>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5,marginBottom:10}}>{["Glow","Whisper","Choice","Spotlight"].map(x=><span key={x} style={{padding:"6px 8px",borderRadius:999,border:"1px solid var(--bd)",background:"rgba(255,255,255,.04)",fontSize:".62rem",fontWeight:800,color:"rgba(255,255,255,.72)"}}>{x}</span>)}</div>
+      {s.wr&&<div style={{fontWeight:900,fontSize:".86rem",color:"var(--lm)",marginBottom:8}}>{s.wr}</div>}
+      <Btn primary small disabled={s.sp} onClick={()=>{u("sp",true);setTimeout(()=>{const r=WSEGS[Math.floor(Math.random()*8)];u({sp:false,wr:r,m:Math.min(100,s.m+8)});if(r.includes("Sparks"))onSB(15)},2400)}}>{s.sp?"Dialing...":"Spin Velvet Dial"}</Btn></div>}
 
     {game.type==="binary"&&<div style={{textAlign:"center"}}>
       {s.td?<div style={{padding:12,borderRadius:8,border:"1px solid var(--bd)",background:"var(--cd)",marginBottom:6}}><Tag color={s.td.t==="Truth"?"var(--cy)":"var(--pk)"}>{s.td.t}</Tag><p style={{marginTop:5,fontWeight:600,fontSize:".85rem",lineHeight:1.4}}>{s.td.x}</p></div>
@@ -419,6 +425,16 @@ function GE({game,onClose,onSB}){
           <span style={{fontWeight:900,fontSize:s.br?".9rem":".72rem",color:s.br?"var(--pk)":"var(--mt)"}}>{s.br?"TAP!":"Wait..."}</span></button></>
       :<div><div style={{fontWeight:900,fontSize:"1.3rem",color:s.bms<500?"var(--gn)":"var(--pk)"}}>{s.bms}ms</div>
         <Btn primary small onClick={()=>u({br:false,bres:null,bms:0})} style={{marginTop:6}}>Again</Btn></div>}</div>}
+
+    {game.type==="touch"&&<div>
+      <p style={{fontSize:".74rem",color:"var(--mt)",lineHeight:1.45,marginBottom:8}}>Draw a glow trace over the live frame. The performer sees it as a pending interaction and accepts the one they want to acknowledge.</p>
+      <div onPointerDown={e=>{const r=e.currentTarget.getBoundingClientRect(),x=((e.clientX-r.left)/r.width)*100,y=((e.clientY-r.top)/r.height)*100;u({tc:[...s.tc.slice(-7),{x,y,id:Date.now()}],m:Math.min(100,s.m+9)});onSB(5)}} style={{position:"relative",height:190,borderRadius:12,border:"1px solid rgba(0,212,255,.24)",overflow:"hidden",cursor:"crosshair",background:"radial-gradient(circle at 50% 34%,rgba(255,196,160,.22),transparent 14%),linear-gradient(180deg,rgba(10,14,24,.9),rgba(14,6,22,.96))"}}>
+        <div style={{position:"absolute",left:"50%",bottom:0,transform:"translateX(-50%)",width:82,height:142,borderRadius:"44% 44% 14px 14px",background:"linear-gradient(170deg,rgba(255,45,120,.76),rgba(139,92,246,.62),rgba(5,8,16,.9))",filter:"blur(.1px)"}}/>
+        {s.tc.map((m,i)=><div key={m.id} style={{position:"absolute",left:`${m.x}%`,top:`${m.y}%`,width:42,height:42,borderRadius:"50%",transform:"translate(-50%,-50%)",border:"1px solid rgba(0,212,255,.7)",background:"radial-gradient(circle,rgba(0,212,255,.28),transparent 68%)",boxShadow:"0 0 30px rgba(0,212,255,.35)",opacity:.45+i*.07}}/>)}
+        <div style={{position:"absolute",left:10,bottom:10,right:10,display:"flex",justifyContent:"space-between",fontSize:".58rem",color:"rgba(255,255,255,.62)",fontWeight:800}}><span>touch map</span><span>{s.tc.length} traces</span></div>
+      </div>
+      <div style={{display:"flex",gap:6,marginTop:8}}><Btn small primary onClick={()=>{u({fb:"Trace sent for performer approval",m:Math.min(100,s.m+12)});onSB(10)}}>Send Trace</Btn><Btn small onClick={()=>u("tc",[])}>Clear</Btn></div>
+    </div>}
 
     {game.type==="jackpot"&&<div>
       <div style={{display:"flex",justifyContent:"space-between",padding:7,borderRadius:7,background:"linear-gradient(135deg,rgba(251,191,36,.05),rgba(255,45,120,.03))",border:"1px solid rgba(251,191,36,.12)",marginBottom:6}}>
@@ -493,17 +509,21 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const [ch,setCh]=useState([{user:"VYBE",msg:`Welcome — ${perf.name} is live. You are known here.`,vip:false,id:0}]);
   const [ci,setCi]=useState("");const [chH,setChH]=useState(false);
   const [anims,setAnims]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
+  const [pendingReq,setPendingReq]=useState([{id:1,user:"test",name:"Ultimate Fantasy",desc:"You design it, she delivers",sparks:5000,status:"pending"}]);
   const aid=useRef(0);const CP=[{user:"NightOwl",msg:"Let's go"},{user:"VelvetKing",msg:"Crown incoming",vip:true},{user:"AceHigh",msg:"All in",vip:true},{user:"DiamondJay",msg:"Here we go",vip:true}];
-  useEffect(()=>{const t=setInterval(()=>setTm(p=>Math.max(0,p-1)),1000);return()=>clearInterval(t)},[]);
-  useEffect(()=>{const t=setInterval(()=>{setCh(p=>[...p.slice(-4),{...CP[Math.floor(Math.random()*4)],id:Date.now()}])},5000);return()=>clearInterval(t)},[]);
+  useEffect(()=>{const t=setInterval(()=>{if(!media.paused)setTm(p=>Math.max(0,p-1))},1000);return()=>clearInterval(t)},[media.paused]);
+  useEffect(()=>{const t=setInterval(()=>{setCh(p=>[...p.slice(-39),{...CP[Math.floor(Math.random()*4)],id:Date.now()}])},5000);return()=>clearInterval(t)},[]);
   const fmt=s=>`${Math.floor(s/60)}:${(s%60).toString().padStart(2,"0")}`;
   const tog=n=>{setPn(p=>p===n?null:n);if(n)setGm(null)};
   const sg=g=>{if(user.sparks<g.cost)return;onSC(-g.cost);const id=++aid.current,x=68+Math.random()*20,y=18+Math.random()*24;
     const effectId=g.id==="crown"?"crown_drop":g.id==="key"?"private_key":"neon_rose";
     setAnims(p=>[...p,{...g,id,x,y}]);setTimeout(()=>setAnims(p=>p.filter(a=>a.id!==id)),2200);
-    setCh(p=>[...p.slice(-4),{user:user.name,msg:`sent ${g.name}`,vip:true,id:Date.now()}]);onGiftSent&&onGiftSent(effectId);setPn(null)};
-  const sc=()=>{if(!ci.trim())return;setCh(p=>[...p.slice(-4),{user:user.name,msg:ci,vip:true,id:Date.now()}]);setCi("")};
+    setCh(p=>[...p.slice(-39),{user:user.name,msg:`sent ${g.name}`,vip:true,id:Date.now()}]);onGiftSent&&onGiftSent(effectId);setPn(null)};
+  const sc=()=>{if(!ci.trim())return;setCh(p=>[...p.slice(-39),{user:user.name,msg:ci,vip:true,id:Date.now()}]);setCi("")};
   const sb=a=>{onSC(a);setNotif(`+${a} sparks earned`);setTimeout(()=>setNotif(null),1800)};
+  const acceptReq=id=>{const rq=pendingReq.find(r=>r.id===id);setPendingReq(p=>p.map(r=>r.id===id?{...r,status:"accepted"}:r));if(rq)setCh(p=>[...p.slice(-39),{user:"Performer",msg:`accepted ${rq.name}`,vip:false,id:Date.now()}])};
+  const declineReq=id=>{const rq=pendingReq.find(r=>r.id===id);setPendingReq(p=>p.map(r=>r.id===id?{...r,status:"declined"}:r));if(rq){if(rq.user===user.name)onSC(rq.sparks);setCh(p=>[...p.slice(-39),{user:"VYBE",msg:`${rq.name} declined - ${rq.sparks.toLocaleString()} sparks refunded to ${rq.user}`,vip:false,id:Date.now()}]);setNotif(`${rq.sparks.toLocaleString()} sparks refunded to ${rq.user}`)}};
+  const addReq=r=>{if(user.sparks<r.sparks)return;onSC(-r.sparks);const item={id:Date.now(),user:user.name,name:r.name,desc:r.desc,sparks:r.sparks,status:"pending"};setPendingReq(p=>[item,...p].slice(0,5));setCh(p=>[...p.slice(-39),{user:user.name,msg:`requested ${r.name} - pending performer approval`,vip:true,id:Date.now()}]);setPn(null)};
   const avG=GAMES.filter(g=>perf.caps.games.includes(g.id));
 
   return<div style={{position:"relative",width:"100%",height:"100vh",overflow:"hidden",background:"#050810"}}>
@@ -524,23 +544,39 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
       <div style={{display:"flex",gap:3}}>
         <G onClick={onWallet} style={{padding:"4px 7px",display:"flex",alignItems:"center",gap:2,cursor:"pointer"}}><I n="spark" s={10} c="var(--am)"/><span style={{fontWeight:800,fontSize:".76rem",color:"var(--am)"}}>{user.sparks.toLocaleString()}</span><I n="plus" s={7} c="var(--mt)"/></G>
       </div></div>
-    {/* Reveal */}
-    <G style={{position:"absolute",left:7,top:"50%",transform:"translateY(-50%)",padding:"5px 4px",zIndex:10,textAlign:"center",width:34}}>
-      <div style={{width:3,height:100,borderRadius:999,background:"rgba(255,255,255,.05)",margin:"0 auto",position:"relative",overflow:"hidden"}}>
-        <div style={{position:"absolute",bottom:0,width:"100%",borderRadius:"inherit",height:"33%",transition:"height .5s",background:"linear-gradient(to top,var(--cy),var(--lm),var(--pk))"}}/></div></G>
-    {/* Chat */}
-    {!chH&&<div style={{position:"absolute",top:76,right:10,bottom:88,zIndex:8,width:"min(340px,calc(100vw - 20px))",display:"flex",flexDirection:"column",justifyContent:"flex-end",pointerEvents:"auto"}}>
-      <G style={{padding:12,borderRadius:12,background:"linear-gradient(180deg,rgba(8,10,16,.5),rgba(8,10,16,.86))",boxShadow:"0 22px 70px rgba(0,0,0,.28)"}}>
+    {/* Room signal + chat */}
+    {!chH&&<div style={{position:"absolute",top:76,left:12,bottom:88,zIndex:8,width:"clamp(280px,28vw,360px)",display:"flex",flexDirection:"column",gap:10,pointerEvents:"auto"}}>
+      <G style={{padding:12,borderRadius:12,background:"linear-gradient(180deg,rgba(8,10,16,.54),rgba(8,10,16,.86))",boxShadow:"0 22px 70px rgba(0,0,0,.28)"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+          <div style={{fontSize:".66rem",fontWeight:900,letterSpacing:".12em",textTransform:"uppercase",color:"var(--mt)"}}>Room heat</div>
+          <div style={{fontSize:".68rem",fontWeight:900,color:"var(--lm)"}}>74%</div>
+        </div>
+        <div style={{height:84,borderRadius:10,position:"relative",overflow:"hidden",border:"1px solid rgba(255,255,255,.07)",background:"radial-gradient(circle at 72% 46%,rgba(255,45,120,.24),transparent 20%),radial-gradient(circle at 38% 70%,rgba(0,212,255,.18),transparent 24%),linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))"}}>
+          {[18,34,50,66,82].map((x,i)=><div key={x} style={{position:"absolute",left:`${x}%`,bottom:10,width:18+i*4,height:28+i*7,borderRadius:999,background:`linear-gradient(180deg,${["#00d4ff","#c6ff00","#ffab00","#ff2d78","#8b5cf6"][i]},rgba(255,255,255,.05))`,filter:"blur(.2px)",opacity:.82}}/>)}
+          <svg viewBox="0 0 320 72" preserveAspectRatio="none" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}>
+            <path d="M0 54 C42 44 62 58 100 38 S164 28 210 40 S274 28 320 18" fill="none" stroke="rgba(255,255,255,.42)" strokeWidth="2"/>
+            <path d="M0 58 C42 48 62 62 100 42 S164 32 210 44 S274 32 320 22" fill="none" stroke="rgba(255,45,120,.55)" strokeWidth="5" opacity=".28"/>
+          </svg>
+          <div style={{position:"absolute",left:10,bottom:8,right:10,display:"flex",justifyContent:"space-between",fontSize:".54rem",color:"rgba(255,255,255,.58)",fontWeight:800}}><span>attention</span><span>requests</span><span>spark pressure</span></div>
+        </div>
+      </G>
+      <G style={{padding:12,borderRadius:12,background:"linear-gradient(180deg,rgba(8,10,16,.5),rgba(8,10,16,.9))",boxShadow:"0 22px 70px rgba(0,0,0,.28)",minHeight:0,display:"flex",flexDirection:"column",flex:1}}>
         <div style={{fontSize:".68rem",fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",color:"var(--mt)",marginBottom:8}}>Room</div>
-        {ch.slice(-5).map((m,i)=><div key={m.id} style={{padding:"3px 0",fontSize:".76rem",opacity:.6+i*.1,lineHeight:1.35}}>
-          <span style={{fontWeight:800,color:m.vip?"var(--am)":"var(--cy)",marginRight:5}}>{m.user}</span>
-          <span style={{color:"rgba(255,255,255,.76)"}}>{m.msg}</span></div>)}
+        {pendingReq.filter(r=>r.status==="pending").map(r=><div key={r.id} style={{padding:10,borderRadius:10,border:"1px solid rgba(255,171,0,.28)",background:"linear-gradient(135deg,rgba(255,171,0,.09),rgba(255,45,120,.05))",marginBottom:8}}>
+          <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"start"}}><div><div style={{fontSize:".58rem",letterSpacing:".12em",textTransform:"uppercase",color:"var(--am)",fontWeight:900}}>Pending request</div><div style={{fontWeight:900,fontSize:".82rem",marginTop:3}}>{r.name}</div><div style={{fontSize:".66rem",color:"var(--mt)",marginTop:2}}>{r.user} escrowed {r.sparks.toLocaleString()} sparks</div></div><I n="request" s={18} c="var(--am)"/></div>
+          <div style={{display:"flex",gap:6,marginTop:9}}><button onClick={()=>acceptReq(r.id)} style={{flex:1,height:30,border:0,borderRadius:8,background:"var(--gn)",color:"#04110a",fontWeight:900,cursor:"pointer"}}>Accept</button><button onClick={()=>declineReq(r.id)} style={{flex:1,height:30,border:"1px solid rgba(255,255,255,.12)",borderRadius:8,background:"rgba(255,255,255,.06)",color:"var(--tx)",fontWeight:900,cursor:"pointer"}}>Decline + refund</button></div>
+        </div>)}
+        <div style={{overflowY:"auto",minHeight:0,flex:1,paddingRight:4}}>
+          {ch.map((m,i)=><div key={m.id} style={{padding:"4px 0",fontSize:".76rem",opacity:.62+Math.min(i,ch.length-1)/(Math.max(ch.length-1,1))*.36,lineHeight:1.35}}>
+            <span style={{fontWeight:800,color:m.vip?"var(--am)":"var(--cy)",marginRight:5}}>{m.user}</span>
+            <span style={{color:"rgba(255,255,255,.76)"}}>{m.msg}</span></div>)}
+        </div>
         <div style={{display:"flex",gap:5,marginTop:10}}><input type="text" value={ci} onChange={e=>setCi(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")sc()}} placeholder="Type..." style={{fontSize:".76rem",padding:"7px 9px",background:"rgba(255,255,255,.06)",borderRadius:999}}/>
           <button onClick={sc} style={{background:"var(--pk)",border:"none",borderRadius:999,padding:"0 11px",cursor:"pointer",color:"#fff",fontWeight:800,fontSize:".68rem"}}>Send</button></div>
       </G>
     </div>}
     {/* Panels */}
-    {pn==="board"&&<Pn onClose={()=>setPn(null)} title="Leaderboard" icon="trophy" ic="var(--am)" style={{position:"absolute",right:8,top:"50%",transform:"translateY(-50%)",zIndex:20,width:180}}>
+    {pn==="board"&&<Pn onClose={()=>setPn(null)} title="Leaderboard" icon="trophy" ic="var(--am)" style={{position:"absolute",right:12,top:88,zIndex:22,width:230,maxHeight:"calc(100vh - 180px)",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
       {VWR.map((v,i)=><div key={v.name} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",fontSize:".7rem",borderBottom:i<4?"1px solid var(--bd)":"none"}}>
         <span style={{display:"flex",alignItems:"center",gap:3}}>{i===0&&<I n="crown" s={8} c="var(--am)"/>}{v.badge&&<I n={v.badge} s={8} c="var(--am)"/>}{v.name}</span><span style={{fontWeight:700,color:"var(--pk)"}}>{v.score}</span></div>)}</Pn>}
     {pn==="gifts"&&<G className="ai" style={{position:"absolute",left:10,right:10,bottom:56,zIndex:14,padding:"9px 10px",borderRadius:12,background:"rgba(15,18,29,.92)"}}>
@@ -552,14 +588,19 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
         <button onClick={()=>setPn(null)} aria-label="Close gifts" style={{width:34,height:34,borderRadius:17,border:"1px solid var(--bd)",background:"rgba(255,255,255,.07)",color:"var(--mt)",cursor:"pointer",display:"grid",placeItems:"center",flexShrink:0}}><I n="close" s={14}/></button>
       </div>
     </G>}
-    {pn==="games"&&<Pn onClose={()=>setPn(null)} title="Games" icon="gamepad" ic="var(--cy)" style={{position:"absolute",bottom:60,left:"50%",transform:"translateX(-50%)",zIndex:20,width:"min(500px,92%)",maxHeight:"48vh"}}>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(125px,1fr))",gap:4}}>{avG.map(g=><button key={g.id} onClick={()=>{setGm(g);setPn(null)}} style={{padding:"7px 6px",borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",textAlign:"left",cursor:"pointer"}}>
+    {pn==="games"&&<Pn onClose={()=>setPn(null)} title="Games" icon="gamepad" ic="var(--cy)" style={{position:"absolute",right:12,top:88,bottom:76,zIndex:22,width:"min(390px,34vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
+      <div style={{padding:9,borderRadius:10,border:"1px solid rgba(0,212,255,.18)",background:"rgba(0,212,255,.055)",marginBottom:9}}>
+        <div style={{fontWeight:900,fontSize:".78rem"}}>VYBE game direction</div>
+        <p style={{fontSize:".66rem",lineHeight:1.45,color:"var(--mt)",marginTop:3}}>Games create anticipation, performer choice, and audience competition. No automatic performer control without acceptance.</p>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr",gap:5,overflowY:"auto",maxHeight:"calc(100% - 88px)",paddingRight:3}}>{avG.map(g=><button key={g.id} onClick={()=>{setGm(g);setPn(null)}} style={{padding:"9px 8px",borderRadius:8,border:"1px solid var(--bd)",background:"var(--cd)",textAlign:"left",cursor:"pointer"}}>
         <div style={{display:"flex",alignItems:"center",gap:3}}><I n={g.icon} s={11} c={g.color}/><span style={{fontWeight:700,fontSize:".7rem"}}>{g.name}</span></div>
         <p style={{fontSize:".6rem",color:"var(--mt)",lineHeight:1.3,marginTop:1}}>{g.desc}</p></button>)}</div></Pn>}
-    {pn==="requests"&&<Pn onClose={()=>setPn(null)} title="Requests" icon="request" ic="var(--am)" style={{position:"absolute",bottom:60,left:"50%",transform:"translateX(-50%)",zIndex:20,width:"min(380px,88%)",maxHeight:"48vh"}}>
-      {(perf.requests||[]).map((r,i)=><button key={i} onClick={()=>{if(user.sparks>=r.sparks){onSC(-r.sparks);setCh(p=>[...p.slice(-4),{user:user.name,msg:`requested ${r.name} — ${r.sparks} sparks`,vip:true,id:Date.now()}]);setPn(null)}}} disabled={user.sparks<r.sparks} style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%",padding:"8px 0",background:"none",border:"none",borderBottom:i<perf.requests.length-1?"1px solid var(--bd)":"none",cursor:user.sparks>=r.sparks?"pointer":"not-allowed",opacity:user.sparks>=r.sparks?1:.35,color:"var(--tx)",textAlign:"left"}}>
+    {pn==="requests"&&<Pn onClose={()=>setPn(null)} title="Requests" icon="request" ic="var(--am)" style={{position:"absolute",right:12,top:88,bottom:76,zIndex:22,width:"min(390px,34vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
+      <div style={{padding:9,borderRadius:10,border:"1px solid rgba(255,171,0,.22)",background:"rgba(255,171,0,.06)",fontSize:".66rem",lineHeight:1.45,color:"var(--mt)",marginBottom:8}}>Requests are held in spark escrow. Performer accepts to fulfill or declines to refund.</div>
+      <div style={{overflowY:"auto",maxHeight:"calc(100% - 76px)",paddingRight:3}}>{(perf.requests||[]).map((r,i)=><button key={i} onClick={()=>addReq(r)} disabled={user.sparks<r.sparks} style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%",padding:"8px 0",background:"none",border:"none",borderBottom:i<perf.requests.length-1?"1px solid var(--bd)":"none",cursor:user.sparks>=r.sparks?"pointer":"not-allowed",opacity:user.sparks>=r.sparks?1:.35,color:"var(--tx)",textAlign:"left"}}>
         <div><div style={{fontWeight:700,fontSize:".8rem"}}>{r.name}</div><div style={{fontSize:".66rem",color:"var(--mt)"}}>{r.desc}</div></div>
-        <span style={{fontWeight:800,fontSize:".76rem",color:"var(--am)",display:"flex",alignItems:"center",gap:2,flexShrink:0}}><I n="spark" s={10} c="var(--am)"/>{r.sparks.toLocaleString()}</span></button>)}</Pn>}
+        <span style={{fontWeight:800,fontSize:".76rem",color:"var(--am)",display:"flex",alignItems:"center",gap:2,flexShrink:0}}><I n="spark" s={10} c="var(--am)"/>{r.sparks.toLocaleString()}</span></button>)}</div></Pn>}
     {gm&&<GE game={gm} onClose={()=>setGm(null)} onSB={sb}/>}
     {/* Viewer avatars with badges */}
     <div style={{position:"absolute",bottom:60,left:"50%",transform:"translateX(-50%)",display:"flex",zIndex:5}}>
@@ -567,9 +608,9 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
     {/* Action Bar */}
     <div style={{position:"absolute",bottom:0,left:0,right:0,zIndex:15}}>
       <div style={{display:"grid",gridTemplateColumns:"minmax(210px,1fr) auto minmax(210px,1fr)",alignItems:"center",gap:12,padding:"8px 12px",background:"linear-gradient(to top,rgba(5,8,16,.96) 68%,transparent)"}}>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <MediaButton label={media.paused?"Play":"Pause"} onClick={()=>setMedia(p=>({...p,paused:!p.paused}))}><I n={media.paused?"play":"pause"} s={14}/></MediaButton>
-          <MediaButton label="Replay" onClick={()=>setTm(1800)}><I n="refresh" s={15}/></MediaButton>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <button type="button" title={media.paused?"Resume feed":"Pause feed"} onClick={()=>setMedia(p=>({...p,paused:!p.paused}))} style={{height:36,padding:"0 10px",borderRadius:18,border:"1px solid var(--bd)",background:media.paused?"rgba(255,171,0,.16)":"rgba(255,255,255,.07)",color:"#fff",display:"inline-flex",alignItems:"center",gap:6,cursor:"pointer",fontWeight:900,fontSize:".66rem"}}><I n={media.paused?"play":"pause"} s={13}/>{media.paused?"Resume":"Pause"}</button>
+          <button type="button" title="Restart preview timer" onClick={()=>{setTm(1800);setNotif("Replay marker reset");setTimeout(()=>setNotif(null),1500)}} style={{height:36,padding:"0 10px",borderRadius:18,border:"1px solid var(--bd)",background:"rgba(255,255,255,.07)",color:"#fff",display:"inline-flex",alignItems:"center",gap:6,cursor:"pointer",fontWeight:900,fontSize:".66rem"}}><I n="refresh" s={14}/>Replay</button>
           <span style={{color:"rgba(255,255,255,.74)",fontSize:".82rem",fontWeight:900,fontVariantNumeric:"tabular-nums"}}>{fmt(1800-tm)}</span>
         </div>
         <div style={{display:"flex",justifyContent:"center",gap:3,overflowX:"auto",maxWidth:"min(620px,48vw)",paddingBottom:1}}>

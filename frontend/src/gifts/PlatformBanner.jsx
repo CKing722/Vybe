@@ -70,9 +70,10 @@ export default function PlatformBanner({ giftId, sender = "Someone", recipient =
     background: "linear-gradient(90deg, rgba(5,6,12,0.96), " + pal.primary + "24, rgba(5,6,12,0.96))",
     borderBottom: "1px solid " + pal.primary + "77",
     boxShadow: "0 12px 36px rgba(0,0,0,0.38), 0 0 34px " + (pal.glow || pal.primary + "44"),
-    transition: reducedMotion ? "opacity 0.15s ease" : "opacity 0.4s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1)",
+    transition: reducedMotion ? "opacity 0.15s ease" : "opacity 0.45s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1)",
     opacity: exiting ? 0 : 1,
     transform: reducedMotion ? "none" : (exiting ? "translateY(-100%)" : "translateY(0)"),
+    animation: (!exiting && !reducedMotion) ? "vybe-banner-enter 0.5s cubic-bezier(0.22,1,0.36,1) both" : "none",
     pointerEvents: "none",
     userSelect: "none",
     backdropFilter: "blur(14px)",
@@ -139,6 +140,7 @@ export default function PlatformBanner({ giftId, sender = "Someone", recipient =
 
   return (
     <div style={bannerStyle} role="status" aria-live="polite" aria-label={headline}>
+      <style>{`@keyframes vybe-banner-enter{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}`}</style>
       <span style={labelStyle}>{isCinematic ? "CINEMATIC" : "PLATFORM"}</span>
       <div style={dividerStyle} />
       <p style={headlineStyle}>{headline}</p>

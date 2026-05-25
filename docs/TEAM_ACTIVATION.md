@@ -57,6 +57,9 @@ Each lane must keep moving. At the start of every run, the assigned agent checks
   - `VYBE-GHO-009: Research - Advanced No-Cost 3D Gift Authoring Pipeline`
   - `VYBE-GHO-010: QA - Gift Spectacle Runtime Acceptance Gate v2`
   - `VYBE-GHO-011: Compliance - Cross-Room Gift Banner And Adult Platform Guardrails`
+  - `VYBE-GHO-012: QA - Integrated Gift Demo Visual Smoke Matrix`
+  - `VYBE-GHO-013: Research - Canvas And WebGL Particle Renderer Adapter Plan`
+  - `VYBE-GHO-014: Guardrails - Platform-Wide Banner Anti-Spam And Safety Rules`
 
 ### ChatGPT
 

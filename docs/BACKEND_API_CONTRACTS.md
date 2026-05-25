@@ -155,6 +155,22 @@ Query parameters:
 
 Returns a `summary` of the viewer's relationship with the performer plus a `gifts` list suitable for the "Your History" UI section.
 
+### `PUT /api/me/profile`
+
+Requires auth.
+
+Request:
+
+```json
+{
+  "display_name": "NeonVelvet",
+  "avatar": "https://cdn.vybe.local/avatars/neon.png",
+  "bio": "I only gift in cinematic."
+}
+```
+
+Response: same shape as `GET /api/me` with updated `user` fields.
+
 ## Performers
 
 ### `GET /api/performers`

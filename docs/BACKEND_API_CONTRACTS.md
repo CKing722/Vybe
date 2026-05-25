@@ -65,6 +65,39 @@ Use the access token as:
 Authorization: Bearer <accessToken>
 ```
 
+### `GET /api/auth/csrf`
+
+Sets a CSRF cookie and returns the token the frontend must echo back in the `x-vybe-csrf` header for cookie-auth endpoints (refresh/logout).
+
+Response:
+
+```json
+{
+  "csrfToken": "...",
+  "headerName": "x-vybe-csrf"
+}
+```
+
+### `POST /api/auth/refresh`
+
+Cookie-auth endpoint.
+
+Requirements:
+
+- `Cookie: vybe_refresh=...; vybe_csrf=...`
+- `x-vybe-csrf: <value of vybe_csrf cookie>`
+
+Returns a new access token.
+
+### `POST /api/auth/logout`
+
+Cookie-auth endpoint.
+
+Requirements:
+
+- `Cookie: vybe_refresh=...; vybe_csrf=...`
+- `x-vybe-csrf: <value of vybe_csrf cookie>`
+
 ## Viewer
 
 ### `GET /api/me`

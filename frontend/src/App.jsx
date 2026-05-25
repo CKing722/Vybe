@@ -32,6 +32,15 @@ live:<svg viewBox="0 0 24 24" style={p}><circle cx="12" cy="12" r="4" fill={c}/>
 chat:<svg viewBox="0 0 24 24" style={p}><path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z" fill="none" stroke={c} strokeWidth="1.5"/></svg>,
 trophy:<svg viewBox="0 0 24 24" style={p}><path d="M8 3h8v6a4 4 0 01-8 0V3z" fill="none" stroke={c} strokeWidth="1.5"/><path d="M8 5H5a2 2 0 00-2 2v1a3 3 0 003 3h2M16 5h3a2 2 0 012 2v1a3 3 0 01-3 3h-2" fill="none" stroke={c} strokeWidth="1.2"/><line x1="12" y1="13" x2="12" y2="17" stroke={c} strokeWidth="1.5"/><rect x="8" y="17" width="8" height="2" rx="1" fill="none" stroke={c} strokeWidth="1.2"/></svg>,
 gear:<svg viewBox="0 0 24 24" style={p}><circle cx="12" cy="12" r="3" fill="none" stroke={c} strokeWidth="1.5"/><path d="M12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
+play:<svg viewBox="0 0 24 24" style={p}><path d="M8 5v14l11-7z" fill={c}/></svg>,
+pause:<svg viewBox="0 0 24 24" style={p}><rect x="6" y="4" width="4" height="16" rx="1" fill={c}/><rect x="14" y="4" width="4" height="16" rx="1" fill={c}/></svg>,
+refresh:<svg viewBox="0 0 24 24" style={p}><path d="M20 7v5h-5M4 17v-5h5" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M18 12a6 6 0 00-10-4.5L4 11M6 12a6 6 0 0010 4.5l4-3.5" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
+fullscreen:<svg viewBox="0 0 24 24" style={p}><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+volume:<svg viewBox="0 0 24 24" style={p}><path d="M4 9v6h4l6 5V4L8 9H4z" fill="none" stroke={c} strokeWidth="1.6" strokeLinejoin="round"/><path d="M17 9a4 4 0 010 6M19.5 6.5a7.5 7.5 0 010 11" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
+volumeoff:<svg viewBox="0 0 24 24" style={p}><path d="M4 9v6h4l6 5V4L8 9H4z" fill="none" stroke={c} strokeWidth="1.6" strokeLinejoin="round"/><path d="M18 9l4 6M22 9l-4 6" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round"/></svg>,
+cc:<svg viewBox="0 0 24 24" style={p}><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke={c} strokeWidth="1.5"/><path d="M10 10a2.5 2.5 0 100 4M17 10a2.5 2.5 0 100 4" fill="none" stroke={c} strokeWidth="1.4" strokeLinecap="round"/></svg>,
+pip:<svg viewBox="0 0 24 24" style={p}><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke={c} strokeWidth="1.5"/><rect x="12" y="11" width="6" height="4" rx="1" fill={c}/></svg>,
+orientation:<svg viewBox="0 0 24 24" style={p}><rect x="7" y="3" width="10" height="18" rx="2" fill="none" stroke={c} strokeWidth="1.5"/><path d="M10 18h4M5 8l-2 2 2 2M19 8l2 2-2 2" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
 back:<svg viewBox="0 0 24 24" style={p}><polyline points="15,18 9,12 15,6" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"/></svg>,
 close:<svg viewBox="0 0 24 24" style={p}><line x1="18" y1="6" x2="6" y2="18" stroke={c} strokeWidth="2" strokeLinecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke={c} strokeWidth="2" strokeLinecap="round"/></svg>,
 users:<svg viewBox="0 0 24 24" style={p}><circle cx="9" cy="7" r="3" fill="none" stroke={c} strokeWidth="1.5"/><path d="M2 20c0-3 3-6 7-6s7 3 7 6" fill="none" stroke={c} strokeWidth="1.5"/><circle cx="17" cy="8" r="2.5" fill="none" stroke={c} strokeWidth="1.2" opacity=".6"/></svg>,
@@ -478,6 +487,8 @@ function LB({user,onPerf,onWallet,cat,setCat,onMenu}){
 /* ═══ LIVE ROOM ═══ */
 function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const [pn,setPn]=useState(null);const [gm,setGm]=useState(null);
+  const settingsPreview=typeof window!=="undefined"&&new URLSearchParams(window.location.search).get("settingsPreview")==="1";
+  const [media,setMedia]=useState({paused:false,muted:false,settings:settingsPreview,captions:false,pip:false,quality:"1080p",layout:"Theater"});
   const [ch,setCh]=useState([{user:"VYBE",msg:`Welcome — ${perf.name} is live. You are known here.`,vip:false,id:0}]);
   const [ci,setCi]=useState("");const [chH,setChH]=useState(false);
   const [anims,setAnims]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
@@ -517,12 +528,15 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
       <div style={{width:3,height:100,borderRadius:999,background:"rgba(255,255,255,.05)",margin:"0 auto",position:"relative",overflow:"hidden"}}>
         <div style={{position:"absolute",bottom:0,width:"100%",borderRadius:"inherit",height:"33%",transition:"height .5s",background:"linear-gradient(to top,var(--cy),var(--lm),var(--pk))"}}/></div></G>
     {/* Chat */}
-    {!chH&&<div style={{position:"absolute",bottom:64,left:7,zIndex:8,maxWidth:230,width:"27%"}}>
-      {ch.slice(-4).map((m,i)=><div key={m.id} style={{padding:"1px 0",fontSize:".66rem",opacity:.5+i*.12}}>
-        <span style={{fontWeight:700,color:m.vip?"var(--am)":"var(--cy)",marginRight:3}}>{m.user}</span>
-        <span style={{color:"rgba(255,255,255,.65)"}}>{m.msg}</span></div>)}
-      <div style={{display:"flex",gap:2,marginTop:2}}><input type="text" value={ci} onChange={e=>setCi(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")sc()}} placeholder="Say something..." style={{fontSize:".66rem",padding:"4px 6px",background:"rgba(10,14,24,.7)"}}/>
-        <button onClick={sc} style={{background:"var(--pk)",border:"none",borderRadius:5,padding:"0 7px",cursor:"pointer",color:"#fff",fontWeight:700,fontSize:".62rem"}}>Send</button></div>
+    {!chH&&<div style={{position:"absolute",top:76,right:10,bottom:88,zIndex:8,width:"min(340px,calc(100vw - 20px))",display:"flex",flexDirection:"column",justifyContent:"flex-end",pointerEvents:"auto"}}>
+      <G style={{padding:12,borderRadius:12,background:"linear-gradient(180deg,rgba(8,10,16,.5),rgba(8,10,16,.86))",boxShadow:"0 22px 70px rgba(0,0,0,.28)"}}>
+        <div style={{fontSize:".68rem",fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",color:"var(--mt)",marginBottom:8}}>Room</div>
+        {ch.slice(-5).map((m,i)=><div key={m.id} style={{padding:"3px 0",fontSize:".76rem",opacity:.6+i*.1,lineHeight:1.35}}>
+          <span style={{fontWeight:800,color:m.vip?"var(--am)":"var(--cy)",marginRight:5}}>{m.user}</span>
+          <span style={{color:"rgba(255,255,255,.76)"}}>{m.msg}</span></div>)}
+        <div style={{display:"flex",gap:5,marginTop:10}}><input type="text" value={ci} onChange={e=>setCi(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")sc()}} placeholder="Type..." style={{fontSize:".76rem",padding:"7px 9px",background:"rgba(255,255,255,.06)",borderRadius:999}}/>
+          <button onClick={sc} style={{background:"var(--pk)",border:"none",borderRadius:999,padding:"0 11px",cursor:"pointer",color:"#fff",fontWeight:800,fontSize:".68rem"}}>Send</button></div>
+      </G>
     </div>}
     {/* Panels */}
     {pn==="board"&&<Pn onClose={()=>setPn(null)} title="Leaderboard" icon="trophy" ic="var(--am)" style={{position:"absolute",right:8,top:"50%",transform:"translateY(-50%)",zIndex:20,width:180}}>
@@ -551,15 +565,48 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
       {VWR.slice(0,4).map((v,i)=><div key={v.name} style={{width:18,height:18,borderRadius:"50%",background:`hsl(${i*55+200},55%,48%)`,border:"2px solid #050810",display:"flex",alignItems:"center",justifyContent:"center",fontSize:".44rem",fontWeight:800,marginLeft:i>0?-3:0,color:"#fff"}}>{v.name[0]}</div>)}</div>
     {/* Action Bar */}
     <div style={{position:"absolute",bottom:0,left:0,right:0,zIndex:15}}>
-      <div style={{display:"flex",justifyContent:"center",gap:3,padding:"7px 8px",background:"linear-gradient(to top,rgba(5,8,16,.95) 60%,transparent)"}}>
-        {[{i:"gift",l:"Gift",k:"gifts"},{i:"gamepad",l:"Games",k:"games"},{i:"request",l:"Request",k:"requests"},{i:"trophy",l:"Board",k:"board"},
-          {i:"bookmark",l:"Book",action:onBook},{i:"crown",l:"VIP",action:onVip},{i:"wallet",l:"Top Up",action:onWallet},
-          {i:chH?"eye":"eyeoff",l:chH?"Chat":"Hide",action:()=>setChH(!chH)}].map(b=>
-          <button key={b.l} onClick={()=>{if(b.action)b.action();else if(b.k)tog(b.k)}} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,padding:"4px 7px",borderRadius:7,border:"1px solid "+(pn===b.k?"var(--pk)":"var(--bd)"),background:pn===b.k?"rgba(255,45,120,.06)":"var(--gl)",color:"var(--tx)",cursor:"pointer",minWidth:38}}>
-            <I n={b.i} s={13}/><span style={{fontSize:".46rem",fontWeight:700,color:pn===b.k?"var(--pk)":"var(--mt)"}}>{b.l}</span></button>)}</div>
+      <div style={{display:"grid",gridTemplateColumns:"minmax(210px,1fr) auto minmax(210px,1fr)",alignItems:"center",gap:12,padding:"8px 12px",background:"linear-gradient(to top,rgba(5,8,16,.96) 68%,transparent)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <MediaButton label={media.paused?"Play":"Pause"} onClick={()=>setMedia(p=>({...p,paused:!p.paused}))}><I n={media.paused?"play":"pause"} s={14}/></MediaButton>
+          <MediaButton label="Replay" onClick={()=>setTm(1800)}><I n="refresh" s={15}/></MediaButton>
+          <span style={{color:"rgba(255,255,255,.74)",fontSize:".82rem",fontWeight:900,fontVariantNumeric:"tabular-nums"}}>{fmt(1800-tm)}</span>
+        </div>
+        <div style={{display:"flex",justifyContent:"center",gap:3,overflowX:"auto",maxWidth:"min(620px,48vw)",paddingBottom:1}}>
+          {[{i:"gift",l:"Gift",k:"gifts"},{i:"gamepad",l:"Games",k:"games"},{i:"request",l:"Request",k:"requests"},{i:"trophy",l:"Board",k:"board"},
+            {i:"bookmark",l:"Book",action:onBook},{i:"crown",l:"VIP",action:onVip},{i:"wallet",l:"Top Up",action:onWallet},
+            {i:chH?"eye":"eyeoff",l:chH?"Chat":"Hide",action:()=>setChH(!chH)}].map(b=>
+            <button key={b.l} onClick={()=>{if(b.action)b.action();else if(b.k)tog(b.k)}} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,padding:"4px 7px",borderRadius:7,border:"1px solid "+(pn===b.k?"var(--pk)":"var(--bd)"),background:pn===b.k?"rgba(255,45,120,.06)":"var(--gl)",color:"var(--tx)",cursor:"pointer",minWidth:38,flexShrink:0}}>
+              <I n={b.i} s={13}/><span style={{fontSize:".46rem",fontWeight:700,color:pn===b.k?"var(--pk)":"var(--mt)"}}>{b.l}</span></button>)}
+        </div>
+        <div style={{display:"flex",justifyContent:"flex-end",alignItems:"center",gap:8,position:"relative"}}>
+          <MediaButton label="Settings" active={media.settings} onClick={()=>setMedia(p=>({...p,settings:!p.settings}))}><I n="gear" s={16}/></MediaButton>
+          <MediaButton label="Fullscreen"><I n="fullscreen" s={16}/></MediaButton>
+          <MediaButton label={media.muted?"Unmute":"Mute"} onClick={()=>setMedia(p=>({...p,muted:!p.muted}))}><I n={media.muted?"volumeoff":"volume"} s={17}/></MediaButton>
+          {media.settings&&<MediaSettings media={media} setMedia={setMedia}/>}
+        </div>
+      </div>
     </div></div>;}
 
 /* ═══ AUTH — Login / Register ═══ */
+function MediaButton({children,label,onClick,active=false}) {
+  return <button type="button" aria-label={label} title={label} onClick={onClick} style={{width:36,height:36,borderRadius:18,border:"1px solid "+(active?"rgba(255,255,255,.24)":"var(--bd)"),background:active?"rgba(255,255,255,.16)":"rgba(255,255,255,.07)",color:"#fff",display:"grid",placeItems:"center",cursor:"pointer",boxShadow:active?"0 0 24px rgba(255,255,255,.08)":"none",flexShrink:0}}>
+    {children}
+  </button>;
+}
+
+function MediaSettings({media,setMedia}) {
+  const row=(icon,label,value,onClick)=><button type="button" onClick={onClick} style={{display:"grid",gridTemplateColumns:"22px minmax(0,1fr) auto",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",border:"none",borderRadius:9,background:"transparent",color:"#f7f7f7",textAlign:"left",cursor:"pointer",font:"inherit",fontSize:".78rem",fontWeight:800}}>
+    <I n={icon} s={16} c="rgba(255,255,255,.82)"/><span>{label}</span><span style={{color:"rgba(255,255,255,.58)",fontSize:".72rem",fontWeight:900}}>{value}</span>
+  </button>;
+  return <G className="ai" style={{position:"fixed",right:110,bottom:58,width:274,padding:7,borderRadius:12,background:"rgba(42,42,46,.97)",border:"1px solid rgba(255,255,255,.14)",boxShadow:"0 24px 80px rgba(0,0,0,.5)",zIndex:80}}>
+    {row("cc","Show captions / CC",media.captions?"On":"C",()=>setMedia(p=>({...p,captions:!p.captions})))}
+    {row("orientation","Orientation",media.layout,()=>setMedia(p=>({...p,layout:p.layout==="Theater"?"Vertical":"Theater"})))}
+    {row("gear","Quality",media.quality,()=>setMedia(p=>({...p,quality:p.quality==="1080p"?"720p":p.quality==="720p"?"540p":"1080p"})))}
+    {row("pip","Picture-in-picture",media.pip?"On":"P",()=>setMedia(p=>({...p,pip:!p.pip})))}
+    {row("fullscreen","Switch layout",media.layout==="Theater"?"Wide":"Tall",()=>setMedia(p=>({...p,layout:p.layout==="Theater"?"Vertical":"Theater"})))}
+  </G>;
+}
+
 function Auth({onAuth}){
   const [mode,setMode]=useState("login");const [role,setRole]=useState("viewer");
   const [form,setForm]=useState({email:"",pass:"",name:"",confirm:"",agree:false});

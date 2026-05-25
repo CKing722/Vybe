@@ -8,6 +8,8 @@
  * platformWideBanner: true → eligible for 500+ spark full-room banner overlay
  */
 
+export const PLATFORM_BANNER_THRESHOLD_SPARKS = 500;
+
 /** @type {GiftEffect[]} */
 export const GIFT_EFFECT_CATALOG = [
   {
@@ -161,7 +163,7 @@ export const GIFT_EFFECT_CATALOG = [
       spread: "matrix-fall",   // digital rain aesthetic
       trailFade: false,        // hard-edge cipher particles
       glitterEnabled: false,
-      cipherGlyphs: true,      // renderer may use ₿ ◆ # glyph particles
+      cipherGlyphs: true,      // renderer may use BTC/diamond/hash glyph particles
     },
 
     typography: {

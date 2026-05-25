@@ -136,20 +136,20 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, isBanner, phase
 
   const shellStyle = {
     position: "fixed",
-    left: "50%",
-    top: isKey ? "43%" : "40%",
-    width: isKey ? "min(340px, 76vw)" : "min(300px, 70vw)",
-    height: isKey ? "min(340px, 76vw)" : "min(300px, 70vw)",
+    right: "max(18px, 7vw)",
+    top: isKey ? "24%" : "22%",
+    width: isKey ? "min(210px, 28vw)" : "min(180px, 24vw)",
+    height: isKey ? "min(210px, 28vw)" : "min(180px, 24vw)",
     zIndex: 2200,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     transform: entering
-      ? "translate(-50%, -50%) scale(0.72) rotateX(14deg)"
+      ? "translateY(12px) scale(0.72) rotateX(14deg)"
       : exiting
-        ? "translate(-50%, -55%) scale(0.82) rotateX(0deg)"
-        : "translate(-50%, -50%) scale(1) rotateX(0deg)",
+        ? "translateY(-8px) scale(0.82) rotateX(0deg)"
+        : "translateY(0) scale(1) rotateX(0deg)",
     transition: "opacity 0.45s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1)",
     opacity: entering ? 0 : exiting ? 0 : 1,
     pointerEvents: "none",
@@ -167,18 +167,18 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, isBanner, phase
 
   const labelStyle = {
     position: "absolute",
-    left: "50%",
+    right: 0,
     bottom: isKey ? "-2px" : "8px",
-    transform: "translateX(-50%)",
-    minWidth: "min(320px, 86vw)",
-    padding: "9px 14px",
+    minWidth: "min(220px, 52vw)",
+    maxWidth: "min(260px, 58vw)",
+    padding: "7px 10px",
     borderRadius: "999px",
     border: "1px solid " + pal.primary + "66",
     background: "rgba(5,7,13,0.82)",
     boxShadow: "0 18px 42px rgba(0,0,0,0.36), 0 0 24px " + (pal.glow || pal.primary + "33"),
     color: "#fff",
     textAlign: "center",
-    fontSize: "12px",
+    fontSize: "10px",
     fontWeight: 800,
     letterSpacing: "0.03em",
     backdropFilter: "blur(12px)",
@@ -191,7 +191,7 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, isBanner, phase
     gap: "7px",
     color: pal.primary,
     marginTop: "3px",
-    fontSize: "10px",
+    fontSize: "9px",
     letterSpacing: "0.16em",
     textTransform: "uppercase",
   };

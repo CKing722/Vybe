@@ -131,12 +131,12 @@ const css=`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;6
 body,#root{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--tx)}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-@keyframes gp{0%{opacity:1;transform:scale(.5)}40%{transform:scale(2.2)}100%{opacity:0;transform:scale(.2)}}
+@keyframes gp{0%{opacity:0;transform:translateY(10px) scale(.65)}20%{opacity:1;transform:translateY(0) scale(1)}70%{opacity:1;transform:translateY(-12px) scale(1.08)}100%{opacity:0;transform:translateY(-26px) scale(.72)}}
 @keyframes glow{0%,100%{box-shadow:0 0 20px rgba(255,45,120,.1)}50%{box-shadow:0 0 45px rgba(255,45,120,.25)}}
 @keyframes spin{from{transform:rotate(0)}to{transform:rotate(1080deg)}}
 @keyframes bf{0%,100%{background:var(--cd)}50%{background:rgba(255,45,120,.15)}}
 @keyframes rainDown{0%{opacity:1;transform:translateY(-20px)}100%{opacity:0;transform:translateY(60px)}}
-.ai{animation:fi .3s ease both}.gpa{animation:gp 1.8s ease forwards;position:absolute;pointer-events:none;z-index:99}
+.ai{animation:fi .3s ease both}.gpa{animation:gp 1.8s ease forwards;position:absolute;pointer-events:none;z-index:9}
 input[type=text]{background:var(--cd);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:8px 12px;font:inherit;outline:none;width:100%}input[type=text]:focus{border-color:var(--cy)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}`;
 
@@ -476,7 +476,7 @@ function LB({user,onPerf,onWallet,cat,setCat,onMenu}){
   </div>;}
 
 /* ═══ LIVE ROOM ═══ */
-function RM({perf,user,onBack,onSC,onWallet,onBook,onVip}){
+function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const [pn,setPn]=useState(null);const [gm,setGm]=useState(null);
   const [ch,setCh]=useState([{user:"VYBE",msg:`Welcome — ${perf.name} is live. You are known here.`,vip:false,id:0}]);
   const [ci,setCi]=useState("");const [chH,setChH]=useState(false);
@@ -486,9 +486,10 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip}){
   useEffect(()=>{const t=setInterval(()=>{setCh(p=>[...p.slice(-4),{...CP[Math.floor(Math.random()*4)],id:Date.now()}])},5000);return()=>clearInterval(t)},[]);
   const fmt=s=>`${Math.floor(s/60)}:${(s%60).toString().padStart(2,"0")}`;
   const tog=n=>{setPn(p=>p===n?null:n);if(n)setGm(null)};
-  const sg=g=>{if(user.sparks<g.cost)return;onSC(-g.cost);const id=++aid.current,x=25+Math.random()*50,y=30+Math.random()*35;
+  const sg=g=>{if(user.sparks<g.cost)return;onSC(-g.cost);const id=++aid.current,x=68+Math.random()*20,y=18+Math.random()*24;
+    const effectId=g.id==="crown"?"crown_drop":g.id==="key"?"private_key":"neon_rose";
     setAnims(p=>[...p,{...g,id,x,y}]);setTimeout(()=>setAnims(p=>p.filter(a=>a.id!==id)),2200);
-    setCh(p=>[...p.slice(-4),{user:user.name,msg:`sent ${g.name}`,vip:true,id:Date.now()}]);setPn(null)};
+    setCh(p=>[...p.slice(-4),{user:user.name,msg:`sent ${g.name}`,vip:true,id:Date.now()}]);onGiftSent&&onGiftSent(effectId);setPn(null)};
   const sc=()=>{if(!ci.trim())return;setCh(p=>[...p.slice(-4),{user:user.name,msg:ci,vip:true,id:Date.now()}]);setCi("")};
   const sb=a=>{onSC(a);setNotif(`+${a} sparks earned`);setTimeout(()=>setNotif(null),1800)};
   const avG=GAMES.filter(g=>perf.caps.games.includes(g.id));
@@ -498,7 +499,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip}){
       <div style={{position:"absolute",bottom:0,left:"50%",transform:"translateX(-50%)",width:"min(300px,36%)",height:"72%"}}>
         <div style={{position:"absolute",top:"4%",left:"50%",transform:"translateX(-50%)",width:64,height:64,borderRadius:"50%",background:"radial-gradient(circle,#e8c4a8 55%,#c49070)"}}/>
         <div style={{position:"absolute",bottom:"-3%",left:"50%",transform:"translateX(-50%)",width:160,height:"70%",borderRadius:"42% 42% 20px 20px",background:`linear-gradient(170deg,${perf.accent} 15%,var(--vi) 50%,#0a0e1a 90%)`}}/></div>
-      {anims.map(g=><div key={g.id} className="gpa" style={{left:`${g.x}%`,top:`${g.y}%`}}><I n={g.icon} s={g.cost>=500?60:g.cost>=150?44:32} c={g.color}/></div>)}
+      {anims.map(g=><div key={g.id} className="gpa" style={{left:`${g.x}%`,top:`${g.y}%`}}><I n={g.icon} s={g.cost>=500?40:g.cost>=150?32:24} c={g.color}/></div>)}
     </div>
     {notif&&<div className="ai" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:50,padding:"7px 16px",borderRadius:9,background:"rgba(34,197,94,.1)",border:"1px solid var(--gn)",fontWeight:800,fontSize:".82rem",color:"var(--gn)"}}>{notif}</div>}
     {/* Top */}
@@ -527,9 +528,15 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip}){
     {pn==="board"&&<Pn onClose={()=>setPn(null)} title="Leaderboard" icon="trophy" ic="var(--am)" style={{position:"absolute",right:8,top:"50%",transform:"translateY(-50%)",zIndex:20,width:180}}>
       {VWR.map((v,i)=><div key={v.name} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",fontSize:".7rem",borderBottom:i<4?"1px solid var(--bd)":"none"}}>
         <span style={{display:"flex",alignItems:"center",gap:3}}>{i===0&&<I n="crown" s={8} c="var(--am)"/>}{v.badge&&<I n={v.badge} s={8} c="var(--am)"/>}{v.name}</span><span style={{fontWeight:700,color:"var(--pk)"}}>{v.score}</span></div>)}</Pn>}
-    {pn==="gifts"&&<Pn onClose={()=>setPn(null)} title="Gifts" icon="gift" ic="var(--pk)" style={{position:"absolute",bottom:60,left:"50%",transform:"translateX(-50%)",zIndex:20,width:"min(440px,90%)"}}>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(72px,1fr))",gap:4}}>{GIFTS.map(g=><button key={g.id} onClick={()=>sg(g)} disabled={user.sparks<g.cost} style={{padding:"6px 2px",borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",cursor:user.sparks>=g.cost?"pointer":"not-allowed",textAlign:"center",opacity:user.sparks>=g.cost?1:.3}}>
-        <I n={g.icon} s={18} c={g.color}/><div style={{fontWeight:700,fontSize:".58rem",marginTop:1}}>{g.name}</div><div style={{fontSize:".52rem",color:"var(--am)",fontWeight:700}}>{g.cost}</div></button>)}</div></Pn>}
+    {pn==="gifts"&&<G className="ai" style={{position:"absolute",left:10,right:10,bottom:56,zIndex:14,padding:"9px 10px",borderRadius:12,background:"rgba(15,18,29,.92)"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8}}>
+        <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:2,flex:1}}>
+          {GIFTS.map(g=><button key={g.id} onClick={()=>sg(g)} disabled={user.sparks<g.cost} style={{minWidth:78,height:72,padding:"7px 5px",borderRadius:9,border:"1px solid "+(user.sparks>=g.cost?g.color+"55":"var(--bd)"),background:user.sparks>=g.cost?"rgba(255,255,255,.055)":"rgba(255,255,255,.025)",cursor:user.sparks>=g.cost?"pointer":"not-allowed",textAlign:"center",opacity:user.sparks>=g.cost?1:.34,display:"grid",placeItems:"center",gap:1,flexShrink:0}}>
+            <I n={g.icon} s={24} c={g.color}/><div style={{fontWeight:800,fontSize:".62rem",lineHeight:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",maxWidth:68}}>{g.name}</div><div style={{fontSize:".56rem",color:"var(--am)",fontWeight:800}}><I n="spark" s={8} c="var(--am)"/> {g.cost.toLocaleString()}</div></button>)}
+        </div>
+        <button onClick={()=>setPn(null)} aria-label="Close gifts" style={{width:34,height:34,borderRadius:17,border:"1px solid var(--bd)",background:"rgba(255,255,255,.07)",color:"var(--mt)",cursor:"pointer",display:"grid",placeItems:"center",flexShrink:0}}><I n="close" s={14}/></button>
+      </div>
+    </G>}
     {pn==="games"&&<Pn onClose={()=>setPn(null)} title="Games" icon="gamepad" ic="var(--cy)" style={{position:"absolute",bottom:60,left:"50%",transform:"translateX(-50%)",zIndex:20,width:"min(500px,92%)",maxHeight:"48vh"}}>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(125px,1fr))",gap:4}}>{avG.map(g=><button key={g.id} onClick={()=>{setGm(g);setPn(null)}} style={{padding:"7px 6px",borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",textAlign:"left",cursor:"pointer"}}>
         <div style={{display:"flex",alignItems:"center",gap:3}}><I n={g.icon} s={11} c={g.color}/><span style={{fontWeight:700,fontSize:".7rem"}}>{g.name}</span></div>
@@ -841,10 +848,14 @@ function PerfDash({perfData,onGoLive,onLogout}){
 
 /* ═══ MAIN APP ═══ */
 export default function App(){
-  const visualPreview=typeof window!=="undefined"&&new URLSearchParams(window.location.search).get("vybePreview")==="gift";
-  const [authed,setAuthed]=useState(visualPreview);const [authUser,setAuthUser]=useState(visualPreview?{email:"preview@vybe.local",name:"VelvetKing",role:"viewer"}:null);
-  const [ok,setOk]=useState(visualPreview);const [ck,setCk]=useState(visualPreview);const [vw,setVw]=useState(visualPreview?"room":"lobby");
-  const [pf,setPf]=useState(visualPreview?PERFS[0]:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
+  const searchParams=typeof window!=="undefined"?new URLSearchParams(window.location.search):new URLSearchParams();
+  const visualPreview=searchParams.get("vybePreview")==="gift";
+  const roomPreview=searchParams.get("vybePreview")==="room";
+  const previewMode=visualPreview||roomPreview;
+  const giftDebug=searchParams.get("giftDebug")==="1";
+  const [authed,setAuthed]=useState(previewMode);const [authUser,setAuthUser]=useState(previewMode?{email:"preview@vybe.local",name:"VelvetKing",role:"viewer"}:null);
+  const [ok,setOk]=useState(previewMode);const [ck,setCk]=useState(previewMode);const [vw,setVw]=useState(previewMode?"room":"lobby");
+  const [pf,setPf]=useState(previewMode?PERFS[0]:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
   const [user,setUser]=useState({name:"VelvetKing",sparks:2500,spent:450,gamesPlayed:87,winRate:72,sparksEarned:1240,totalSessions:23,topStreak:8,perfCount:4,
     badges:["First Win","5-Game Streak","100 Games","Luna's Top 10","Crown Sender"],
     favPerfs:["luna","jade","raven"],
@@ -888,7 +899,7 @@ export default function App(){
     {authed&&ok&&isPerf&&vw!=="room"&&<PerfDash perfData={perfSelf} onGoLive={()=>{setPf(perfSelf);setVw("room")}} onLogout={logout}/>}
     {authed&&ok&&!isPerf&&vw==="lobby"&&<LB user={user} onPerf={vp} onWallet={()=>setMd("wallet")} cat={cat} setCat={setCat} onMenu={()=>setMn(true)}/>}
     {authed&&ok&&!isPerf&&vw==="profile"&&pf&&<PF perf={pf} user={user} onBack={bk} onLive={gl2} onBook={gb} onVip={gv} onWallet={()=>setMd("wallet")}/>}
-    {authed&&ok&&vw==="room"&&pf&&<RM perf={pf} user={user} onBack={isPerf?()=>setVw("lobby"):bp} onSC={sc} onWallet={()=>setMd("wallet")} onBook={gb} onVip={gv}/>}
+    {authed&&ok&&vw==="room"&&pf&&<RM perf={pf} user={user} onBack={isPerf?()=>setVw("lobby"):bp} onSC={sc} onWallet={()=>setMd("wallet")} onBook={gb} onVip={gv} onGiftSent={triggerDemoGift}/>}
     <HM open={mn} onClose={()=>setMn(false)} cat={cat} setCat={setCat} onProfile={()=>{setMn(false);setMd("viewer")}}/>
     {md==="wallet"&&<WL user={user} onClose={()=>setMd(null)} onBuy={by}/>}
     {md==="book"&&pf&&<BK perf={pf} sparks={user.sparks} pkgs={BOOK.filter(p=>p.mins<=pf.caps.maxMins)} label="Book Private Session" onOk={cs} onClose={()=>setMd(null)}/>}
@@ -898,6 +909,6 @@ export default function App(){
     <GiftSpectacleOverlay giftId={demoGift.giftId} sender={demoGift.sender} recipient={demoGift.recipient} visible={demoGift.visible} onDone={()=>setDemoGift(g=>({...g,visible:false}))}/>
     <PlatformBanner giftId={demoGift.giftId} sender={demoGift.sender} recipient={demoGift.recipient} visible={demoGift.visible} onDone={()=>{}}/>
     <SparkStormShell events={giftEvents} stormThreshold={3}/>
-    {authed&&ok&&vw==="room"&&<GiftEffectPreviewControls onPreview={triggerDemoGift}/>}
+    {giftDebug&&authed&&ok&&vw==="room"&&<GiftEffectPreviewControls onPreview={triggerDemoGift}/>}
   </>;
 }

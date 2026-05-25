@@ -68,7 +68,7 @@ export default function VybeLuxuryPreview() {
             <p>Luxury private-room energy with live gifting, games, and subscriber moments.</p>
           </div>
           <div style={styles.giftPanel}>
-            <span style={styles.cardLabel}>Gift Preview</span>
+            <span style={styles.cardLabel}>Gift Shelf</span>
             {giftCatalog.map((item) => (
               <button
                 key={item.id}

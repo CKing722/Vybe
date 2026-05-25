@@ -7,7 +7,7 @@ const TIER_DOT = { low: "#ff2d78", mid: "#ffab00", high: "#ffd700" };
   GiftEffectPreviewControls
   Props:
     onPreview(giftId) - called when designer clicks a catalog entry
-  Renders a floating bottom-center panel for quickly firing any catalog gift.
+  Renders a floating debug panel for quickly firing any catalog gift.
   Dev/designer tool - not part of the live room production UI path.
 */
 export default function GiftEffectPreviewControls({ onPreview }) {
@@ -78,9 +78,8 @@ export default function GiftEffectPreviewControls({ onPreview }) {
   return (
     <div style={{
       position: "fixed",
-      bottom: "16px",
-      left: "50%",
-      transform: "translateX(-50%)",
+      right: "16px",
+      bottom: "84px",
       zIndex: 4001,
       display: "flex",
       flexDirection: "column",
@@ -148,7 +147,7 @@ export default function GiftEffectPreviewControls({ onPreview }) {
         aria-expanded={open}
         aria-label="Toggle gift effect preview panel"
       >
-        {open ? "Close Preview" : "Gift Preview"}
+        {open ? "Close Effect Lab" : "Effect Lab"}
       </button>
     </div>
   );

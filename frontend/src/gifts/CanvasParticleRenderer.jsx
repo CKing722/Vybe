@@ -14,26 +14,26 @@ function spawnParticles(budget, w, h) {
     let x, y, vx, vy;
 
     if (spread === "cascade-down") {
-      // Gold cascade: burst upward then fall with gravity
       x = cx + (Math.random() - 0.5) * w * 0.5;
       y = cy - 30;
       const sp = 1.8 + Math.random() * 2.2;
       vx = (Math.random() - 0.5) * sp * 1.3;
       vy = -(sp * 0.6 + Math.random() * sp * 0.4);
     } else if (spread === "matrix-fall") {
-      // Digital rain: fall from top across full width
       x = w * 0.05 + Math.random() * w * 0.9;
       y = -(10 + Math.random() * h * 0.3);
       vx = (Math.random() - 0.5) * 0.5;
       vy = 1.8 + Math.random() * 2.8;
     } else {
-      // radial-tight: burst outward from center
       x = cx + (Math.random() - 0.5) * 6;
       y = cy + (Math.random() - 0.5) * 6;
       const sp = 2 + Math.random() * 2.5;
       vx = Math.cos(angle) * sp;
       vy = Math.sin(angle) * sp;
     }
+
+    // glitterEnabled: ~1/3 of particles become sparkle shapes
+    const isGlitter = budget.glitterEnabled && Math.random() < 0.38;
 
     return {
       x, y, vx, vy,
@@ -44,8 +44,27 @@ function spawnParticles(budget, w, h) {
       glyph: budget.cipherGlyphs
         ? CIPHER_GLYPHS[Math.floor(Math.random() * CIPHER_GLYPHS.length)]
         : null,
+      isGlitter,
+      // glitter particles spin for sparkle effect
+      rot: isGlitter ? Math.random() * Math.PI * 2 : 0,
+      rotV: isGlitter ? (Math.random() - 0.5) * 0.18 : 0,
     };
   });
+}
+
+// Draws a 4-pointed star (sparkle) centered at (0,0) with outer radius r.
+function drawSparkle(ctx, r) {
+  const inner = r * 0.38;
+  const pts = 4;
+  ctx.beginPath();
+  for (let i = 0; i < pts * 2; i++) {
+    const a = (i * Math.PI) / pts - Math.PI / 2;
+    const radius = i % 2 === 0 ? r : inner;
+    if (i === 0) ctx.moveTo(Math.cos(a) * radius, Math.sin(a) * radius);
+    else ctx.lineTo(Math.cos(a) * radius, Math.sin(a) * radius);
+  }
+  ctx.closePath();
+  ctx.fill();
 }
 
 function sizeCanvas(canvas) {
@@ -86,6 +105,9 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
 
     const particles = spawnParticles(budget, w, h);
 
+    // trailFade=false: hard-edge particles stay opaque until nearly dead
+    const hardEdge = budget.trailFade === false;
+
     function tick() {
       ctx.clearRect(0, 0, w, h);
       let alive = 0;
@@ -97,11 +119,16 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
         p.x += p.vx;
         p.y += p.vy;
         p.life -= p.decay;
+        if (p.isGlitter) p.rot += p.rotV;
 
-        if (spread === "cascade-down") p.vy += 0.07; // gravity pull
-        if (spread === "matrix-fall") p.vy += 0.014; // gentle acceleration
+        if (spread === "cascade-down") p.vy += 0.07;
+        if (spread === "matrix-fall") p.vy += 0.014;
 
-        const a = Math.max(0, p.life);
+        // trailFade=false: full opacity until last 20% of life
+        const a = hardEdge
+          ? (p.life > 0.2 ? 1 : Math.max(0, p.life / 0.2))
+          : Math.max(0, p.life);
+
         const color = p.useSecondary ? (pal.secondary || pal.primary) : pal.primary;
 
         ctx.globalAlpha = a;
@@ -113,6 +140,15 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
           ctx.fillStyle = color;
           ctx.shadowBlur = p.size * 1.4;
           ctx.fillText(p.glyph, p.x, p.y);
+        } else if (p.isGlitter) {
+          // 4-pointed sparkle for glitterEnabled particles
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = color;
+          ctx.shadowBlur = p.size * 3.5;
+          drawSparkle(ctx, Math.max(1, p.size * 0.7));
+          ctx.restore();
         } else {
           ctx.beginPath();
           ctx.arc(p.x, p.y, Math.max(0.5, p.size * 0.5), 0, Math.PI * 2);

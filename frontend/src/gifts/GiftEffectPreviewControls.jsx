@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { GIFT_EFFECT_CATALOG } from "./giftEffectCatalog.js";
 
 const TIER_DOT = { low: "#ff2d78", mid: "#ffab00", high: "#ffd700" };

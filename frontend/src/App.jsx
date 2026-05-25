@@ -897,95 +897,112 @@ function PerfDash({perfData,onGoLive,onLogout}){
 
 /* ═══ MAIN APP ═══ */
 function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
-  const nav=[
-    {id:"home",label:"Home",icon:"live"},
-    {id:"analytics",label:"Analytics",icon:"trophy"},
-    {id:"content",label:"LIVE recordings",icon:"eye"},
-    {id:"inbox",label:"Fan Club",icon:"users"},
-    {id:"store",label:"Rewards",icon:"gift"},
-    {id:"settings",label:"About me",icon:"user"},
+  const modules=[
+    {id:"home",label:"Command",icon:"live",tone:"#d6b15e"},
+    {id:"analytics",label:"Signals",icon:"trophy",tone:"#58d7c4"},
+    {id:"content",label:"Vault",icon:"eye",tone:"#b98cff"},
+    {id:"inbox",label:"Patrons",icon:"users",tone:"#ff8aa8"},
+    {id:"store",label:"Offers",icon:"gift",tone:"#ffbd66"},
+    {id:"settings",label:"Room",icon:"user",tone:"#8fb5ff"},
   ];
-  const title={home:"Studio Home",analytics:"Analytics",content:"LIVE recordings",inbox:"Fan Club",store:"Rewards",settings:"About me"}[tab]||"Studio Home";
-  const subtitle={home:"Your control room for going live, tracking audience momentum, and preparing the next session.",analytics:"Quiet metrics for understanding retention, revenue, and audience behavior.",content:"A clean archive of sessions, highlights, clips, and subscriber media.",inbox:"Your most valuable fans, their history, and the next relationship action.",store:"Mission rewards, custom menus, premium offers, and creator incentives.",settings:"How viewers see your room when they enter."}[tab];
-  const metricData=[
-    {label:"LIVE duration",value:"30:00",sub:"scheduled tonight"},
-    {label:"Views",value:p.viewers.toLocaleString(),sub:"waiting now"},
-    {label:"Diamonds",value:"2.8K",sub:"pending conversion"},
-    {label:"New followers",value:"124",sub:"last 7 days"},
-    {label:"Viewers who commented",value:"38%",sub:"engagement"},
-  ];
-  const panelStyle={border:"1px solid rgba(255,255,255,.07)",background:"#181818",borderRadius:8};
-  const sectionTitle={fontSize:".78rem",fontWeight:900,color:"#f5f5f5",letterSpacing:0};
-  const muted={color:"rgba(245,245,245,.56)",fontSize:".72rem",lineHeight:1.45};
-  const empty=(icon,msg,sub)=><div style={{minHeight:190,display:"grid",placeItems:"center",textAlign:"center",color:"rgba(255,255,255,.56)"}}><div><I n={icon} s={34} c="rgba(255,255,255,.28)"/><div style={{fontWeight:900,fontSize:".75rem",marginTop:10,color:"rgba(255,255,255,.78)"}}>{msg}</div><div style={{...muted,maxWidth:260,margin:"5px auto 0"}}>{sub}</div></div></div>;
-
-  return <div style={{minHeight:"100vh",display:"grid",gridTemplateColumns:"136px minmax(0,1fr)",background:"#101010",color:"#f5f5f5"}}>
-    <aside style={{background:"#252525",borderRight:"1px solid rgba(255,255,255,.06)",padding:"18px 8px",display:"flex",flexDirection:"column"}}>
-      <div style={{fontWeight:1000,fontSize:"1.05rem",margin:"0 8px 28px"}}>VYBE</div>
-      <div style={{fontWeight:900,fontSize:".7rem",margin:"0 8px 10px",color:"#fff"}}>Studio</div>
-      {nav.map(item=><button key={item.id} type="button" onClick={()=>setTab(item.id)} style={{display:"flex",alignItems:"center",gap:8,width:"100%",minHeight:34,padding:"0 8px",border:0,borderRadius:4,background:tab===item.id?"rgba(255,255,255,.14)":"transparent",color:tab===item.id?"#fff":"rgba(255,255,255,.64)",font:"inherit",fontSize:".72rem",fontWeight:800,textAlign:"left",cursor:"pointer",marginBottom:3}}>
-        <I n={item.icon} s={14} c="currentColor"/><span>{item.label}</span>
-      </button>)}
-      <button type="button" onClick={onLogout} style={{marginTop:"auto",display:"flex",alignItems:"center",gap:8,padding:"8px",border:0,background:"transparent",color:"rgba(255,255,255,.56)",font:"inherit",fontSize:".72rem",fontWeight:800,cursor:"pointer"}}><I n="back" s={13}/>Sign out</button>
-    </aside>
-    <main style={{display:"grid",gridTemplateRows:"52px 1fr",minWidth:0}}>
-      <div style={{background:"#222",borderBottom:"1px solid rgba(255,255,255,.06)",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 26px"}}>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <div style={{width:30,height:30,borderRadius:"50%",background:`linear-gradient(135deg,${p.accent},#121212)`,border:"1px solid rgba(255,255,255,.16)"}}/>
-          <div><div style={{fontWeight:900,fontSize:".86rem"}}>{p.name}</div><div style={{fontSize:".65rem",color:"rgba(255,255,255,.56)"}}>Creator workspace</div></div>
-        </div>
-        <Btn small primary onClick={onGoLive}><I n="live" s={12} c="#fff" st={{marginRight:4}}/>Go Live</Btn>
+  const active=modules.find(m=>m.id===tab)||modules[0];
+  const compact=typeof window!=="undefined"&&window.innerWidth<900;
+  const ink="#f6efe5",soft="rgba(246,239,229,.62)",dim="rgba(246,239,229,.38)",line="rgba(246,239,229,.09)";
+  const panel={border:`1px solid ${line}`,background:"linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.032))",borderRadius:10,boxShadow:"0 24px 70px rgba(0,0,0,.26)"};
+  const label={fontSize:".62rem",fontWeight:900,letterSpacing:".13em",textTransform:"uppercase",color:dim};
+  const copy={fontSize:".72rem",lineHeight:1.55,color:soft};
+  const title={home:"Session Command",analytics:"Signal Map",content:"Asset Vault",inbox:"Patron Intelligence",store:"Offer Architect",settings:"Room Identity"}[tab]||"Session Command";
+  const subtitle={home:"Prepare the room, read audience pressure, and launch with every operational risk visible.",analytics:"A VYBE-native read on retention, spend velocity, and room heat.",content:"Clips, drops, subscriber previews, and paid media staged from one clean vault.",inbox:"Known patrons, intent, loyalty, limits, and relationship history.",store:"Design requests, rewards, bundles, and timed premium offers without clutter.",settings:"Shape the public room promise, entry card, and compliance posture."}[tab];
+  const topFans=fans.slice(0,4);
+  const bars=[46,62,38,76,57,84,68,92,74,88,63,79];
+  const Empty=({icon,title,body})=><div style={{minHeight:180,display:"grid",placeItems:"center",textAlign:"center",color:soft}}><div><I n={icon} s={30} c="rgba(246,239,229,.22)"/><div style={{fontWeight:900,fontSize:".82rem",marginTop:10,color:ink}}>{title}</div><div style={{...copy,maxWidth:280,margin:"5px auto 0"}}>{body}</div></div></div>;
+  const Stat=({k,v,sub,tone=active.tone})=><div style={{...panel,padding:compact?10:14,minHeight:compact?78:92}}><div style={{...label,color:dim,fontSize:compact?".55rem":label.fontSize}}>{k}</div><div style={{fontSize:compact?"1.05rem":"1.45rem",fontWeight:1000,marginTop:compact?7:9,color:tone,lineHeight:1}}>{v}</div><div style={{...copy,fontSize:compact?".56rem":".64rem",marginTop:6}}>{sub}</div></div>;
+  const HeaderCard=()=> <section style={{...panel,padding:compact?14:18,display:"grid",gridTemplateColumns:compact?"1fr":"minmax(0,1fr) auto",gap:compact?14:18,alignItems:"center",background:"linear-gradient(135deg,rgba(214,177,94,.12),rgba(88,215,196,.04) 42%,rgba(255,138,168,.055))"}}>
+    <div>
+      <div style={label}>Tonight's runway</div>
+      <h2 style={{fontSize:compact?"1.1rem":"1.6rem",fontWeight:1000,lineHeight:1.08,marginTop:8}}>Private-room energy with games, gifting, and subscriber moments.</h2>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:14}}>
+        {["Age gate clear","Menu synced","Gift effects restrained","Payout guard active"].map((x,i)=><span key={x} style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 9px",borderRadius:999,border:`1px solid ${line}`,background:i===0?"rgba(88,215,196,.1)":"rgba(255,255,255,.035)",fontSize:".64rem",fontWeight:900,color:i===0?"#8af0df":soft}}><span style={{width:6,height:6,borderRadius:6,background:i===0?"#58d7c4":"rgba(246,239,229,.42)"}}/>{x}</span>)}
       </div>
-      <div style={{padding:"22px 28px 40px",overflowY:"auto"}}>
-        <div style={{maxWidth:1040,margin:"0 auto"}}>
-          <header style={{display:"flex",justifyContent:"space-between",alignItems:"end",gap:16,marginBottom:16}}>
-            <div><h1 style={{fontSize:"1.28rem",lineHeight:1.15,fontWeight:1000,marginBottom:5}}>{title}</h1><p style={muted}>{subtitle}</p></div>
-            <div style={{fontSize:".68rem",color:"rgba(255,255,255,.52)",fontWeight:800}}>Updated 12:30 AM CT</div>
-          </header>
-          {tab==="home"&&<div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 310px",gap:14}}>
-            <section style={{...panelStyle,padding:16,gridColumn:"1 / -1"}}>
-              <div style={{...sectionTitle,marginBottom:16}}>From last 60 days</div>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:16}}>{metricData.map(m=><div key={m.label}><div style={{fontSize:"1rem",fontWeight:1000,marginBottom:4}}>{m.value}</div><div style={{fontSize:".62rem",color:"rgba(255,255,255,.68)",fontWeight:900}}>{m.label}</div><div style={{fontSize:".58rem",color:"rgba(255,255,255,.38)",marginTop:2}}>{m.sub}</div></div>)}</div>
-            </section>
-            <section style={{...panelStyle,padding:16}}>
-              <div style={sectionTitle}>Scaled LIVE rewards</div>
-              <div style={{display:"flex",gap:34,marginTop:18}}><div><div style={{...muted,fontSize:".64rem"}}>Per-LIVE mission</div><div style={{fontWeight:1000,fontSize:"1.2rem"}}>Up to 40%</div></div><div><div style={{...muted,fontSize:".64rem"}}>Weekly mission</div><div style={{fontWeight:1000,fontSize:"1.2rem"}}>Up to 13%</div></div></div>
-              <div style={{...muted,marginTop:14}}>Total diamonds: 2,847</div>
-            </section>
-            <section style={{...panelStyle,padding:16}}>
-              <div style={sectionTitle}>Viewer ranking</div>
-              {fans.slice(0,3).map((fan,i)=><div key={fan.name} style={{display:"grid",gridTemplateColumns:"24px minmax(0,1fr) auto",alignItems:"center",gap:10,padding:"10px 0",borderBottom:i<2?"1px solid rgba(255,255,255,.06)":"none"}}><strong style={{color:i===0?"var(--am)":"rgba(255,255,255,.46)"}}>{i+1}</strong><div><div style={{fontSize:".76rem",fontWeight:900}}>{fan.name}</div><div style={muted}>{fan.sessions} sessions</div></div><div style={{fontSize:".74rem",fontWeight:1000}}>{fan.sparks.toLocaleString()}</div></div>)}
-            </section>
-            <section style={{...panelStyle,padding:16}}>
-              <div style={sectionTitle}>LIVE recordings</div>
-              {empty("eye","No recordings yet","Recordings and highlights will appear here after your next live session.")}
-            </section>
-            <section style={{...panelStyle,padding:16}}>
-              <div style={sectionTitle}>Restrictions</div>
-              <div style={{...muted,marginTop:18}}>No active restrictions. Keep your room details current before going live.</div>
-            </section>
+    </div>
+    <button type="button" onClick={onGoLive} style={{height:46,width:compact?"100%":"auto",padding:"0 18px",border:0,borderRadius:9,background:"linear-gradient(135deg,#d6b15e,#ff8aa8)",color:"#17110d",font:"inherit",fontWeight:1000,cursor:"pointer",boxShadow:"0 18px 44px rgba(214,177,94,.18)"}}><I n="live" s={14} c="#17110d" st={{marginRight:7}}/>Go Live</button>
+  </section>;
+  const Readiness=()=> <section style={{...panel,padding:18}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}><div><div style={label}>Room readiness</div><div style={{fontSize:".82rem",fontWeight:900,marginTop:5}}>Launch quality</div></div><div style={{width:74,height:74,borderRadius:"50%",display:"grid",placeItems:"center",background:"conic-gradient(#58d7c4 0 78%,rgba(255,255,255,.08) 78% 100%)"}}><div style={{width:56,height:56,borderRadius:"50%",background:"#101019",display:"grid",placeItems:"center",fontWeight:1000}}>78%</div></div></div>
+    <div style={{marginTop:16,display:"grid",gap:8}}>{["Camera framing reviewed","Intro card needs final copy","Three premium gifts tested","Subscriber queue warmed"].map((x,i)=><div key={x} style={{display:"grid",gridTemplateColumns:"16px minmax(0,1fr) auto",gap:9,alignItems:"center",fontSize:".72rem",color:i===1?"#ffbd66":soft}}><span style={{width:8,height:8,borderRadius:8,background:i===1?"#ffbd66":"#58d7c4"}}/><span>{x}</span><span style={{fontWeight:900,color:dim}}>{i===1?"OPEN":"OK"}</span></div>)}</div>
+  </section>;
+  const SparkLine=()=> <section style={{...panel,padding:18,minHeight:230}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}><div><div style={label}>Room heat</div><div style={{fontWeight:1000,marginTop:5}}>Spend velocity rising</div></div><div style={{fontSize:".72rem",fontWeight:1000,color:"#58d7c4"}}>+18%</div></div>
+    <div style={{height:130,display:"flex",alignItems:"end",gap:7}}>{bars.map((h,i)=><div key={i} style={{height:h+"%",flex:1,borderRadius:5,background:i>7?"linear-gradient(180deg,#ff8aa8,#d6b15e)":"rgba(246,239,229,.12)"}}/>)}</div>
+    <div style={{display:"flex",justifyContent:"space-between",marginTop:12,...copy,fontSize:".64rem"}}><span>pre-show</span><span>first gift</span><span>storm window</span></div>
+  </section>;
+  const PatronList=()=> <section style={{...panel,padding:18}}>
+    <div style={label}>Known patrons live now</div>
+    <div style={{marginTop:13,display:"grid",gap:10}}>{topFans.map((fan,i)=><div key={fan.name} style={{display:"grid",gridTemplateColumns:"32px minmax(0,1fr) auto",gap:10,alignItems:"center"}}>
+      <div style={{width:32,height:32,borderRadius:9,background:`linear-gradient(135deg,hsl(${210+i*42},52%,42%),rgba(255,255,255,.12))`,display:"grid",placeItems:"center",fontWeight:1000,fontSize:".68rem"}}>{fan.name[0]}</div>
+      <div style={{minWidth:0}}><div style={{fontWeight:900,fontSize:".78rem"}}>{fan.name}</div><div style={{...copy,fontSize:".64rem",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{fan.msg}</div></div>
+      <div style={{fontSize:".72rem",fontWeight:1000,color:"#ffbd66"}}>{fan.sparks.toLocaleString()}</div>
+    </div>)}</div>
+  </section>;
+  const RoomCard=()=> <section style={{...panel,padding:18,background:"radial-gradient(circle at 20% 5%,rgba(255,138,168,.13),transparent 32%),linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.03))"}}>
+    <div style={label}>Public room card</div>
+    <div style={{marginTop:14,height:178,borderRadius:10,overflow:"hidden",border:`1px solid ${line}`,position:"relative",background:`linear-gradient(145deg,${p.accent}33,rgba(15,18,28,.95) 48%,rgba(214,177,94,.12))`}}>
+      <div style={{position:"absolute",left:16,bottom:16,right:16}}><div style={{fontSize:"1rem",fontWeight:1000}}>{p.name}</div><div style={{...copy,color:"rgba(255,255,255,.78)",marginTop:6,maxWidth:330}}>Luxury private-room energy with live games, clean gifting, and subscriber-only moments.</div></div>
+      <div style={{position:"absolute",top:14,right:14,padding:"5px 8px",borderRadius:999,background:"rgba(0,0,0,.38)",fontSize:".62rem",fontWeight:1000}}>Preview</div>
+    </div>
+  </section>;
+  const Analytics=()=> <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(4,1fr)",gap:14}}>
+    <Stat k="Average watch" v="18m" sub="session depth" tone="#58d7c4"/><Stat k="Gift conversion" v="11.4%" sub="viewers to senders" tone="#d6b15e"/><Stat k="Return intent" v="64%" sub="saved or followed" tone="#ff8aa8"/><Stat k="Requests" v="27" sub="tonight's menu taps" tone="#b98cff"/>
+    <div style={{gridColumn:compact?"auto":"1 / 4"}}><SparkLine/></div><section style={{...panel,padding:18}}><div style={label}>Friction alerts</div><div style={{marginTop:14,...copy}}>No payment, stream, or age-gate incidents in the current preview. Mobile safe-area pass is still needed before launch.</div></section>
+  </div>;
+  const Vault=()=> <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1.2fr .8fr",gap:14}}>
+    <section style={{...panel,padding:18}}><div style={label}>Staged media</div><div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(3,1fr)",gap:10,marginTop:14}}>{content.slice(0,3).map((c,i)=><div key={c.text} style={{minHeight:142,borderRadius:9,border:`1px solid ${line}`,background:`linear-gradient(140deg,rgba(255,255,255,.08),rgba(255,255,255,.025)),linear-gradient(135deg,${[p.accent,"#b98cff","#d6b15e"][i]}33,transparent)`,padding:12,display:"flex",flexDirection:"column",justifyContent:"end"}}><div style={{fontWeight:900,fontSize:".76rem"}}>{c.type.toUpperCase()}</div><div style={{...copy,fontSize:".63rem",marginTop:4}}>{c.text}</div></div>)}</div></section>
+    <section style={{...panel,padding:18}}><div style={label}>Release queue</div><Empty icon="clock" title="Nothing scheduled" body="Drops, story moments, and paid previews will queue here with price and audience rules."/></section>
+  </div>;
+  const Patrons=()=> <div style={{display:"grid",gridTemplateColumns:compact?"1fr":".8fr 1.2fr",gap:14}}><PatronList/><section style={{...panel,padding:18}}><div style={label}>Relationship ledger</div>{topFans.map((fan,i)=><div key={fan.name} style={{display:"grid",gridTemplateColumns:compact?"1fr auto":"120px minmax(0,1fr) auto",gap:12,padding:"12px 0",borderBottom:i<topFans.length-1?`1px solid ${line}`:"none",alignItems:"center"}}><strong style={{fontSize:".78rem"}}>{fan.name}</strong><span style={copy}>{fan.sessions} sessions, prefers games, responds to direct acknowledgements.</span><span style={{fontSize:".68rem",fontWeight:1000,color:"#58d7c4"}}>{fan.online?"LIVE":"LATER"}</span></div>)}</section></div>;
+  const Offers=()=> <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1fr 1fr",gap:14}}>
+    <section style={{...panel,padding:18}}><div style={label}>Request architecture</div>{p.requests.slice(0,6).map((r,i)=><div key={r.name} style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) auto",gap:12,padding:"11px 0",borderBottom:i<5?`1px solid ${line}`:"none"}}><div><div style={{fontWeight:900,fontSize:".78rem"}}>{r.name}</div><div style={{...copy,fontSize:".64rem"}}>{r.desc}</div></div><strong style={{fontSize:".74rem",color:"#ffbd66"}}>{r.sparks}</strong></div>)}</section>
+    <section style={{...panel,padding:18}}><div style={label}>Payout flow</div><div style={{fontSize:"2rem",fontWeight:1000,marginTop:18,color:"#58d7c4"}}>${earn.pending.toLocaleString()}</div><div style={copy}>Projected pending payout after platform split and chargeback reserve. This panel becomes a real settlement view once the backend ledger is active.</div></section>
+  </div>;
+  const Room=()=> <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1fr 1fr",gap:14}}><RoomCard/><section style={{...panel,padding:18}}><div style={label}>Entry promise</div><textarea defaultValue={"Come ready to play. Tonight is intimate, game-led, and subscriber moments come first."} style={{width:"100%",minHeight:122,marginTop:14,border:`1px solid ${line}`,borderRadius:9,background:"rgba(0,0,0,.18)",color:ink,padding:12,font:"inherit",fontSize:".78rem",lineHeight:1.5,resize:"vertical",outline:"none"}}/><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,marginTop:12,flexWrap:"wrap"}}><span style={copy}>Shown before viewers enter the room.</span><button type="button" style={{height:34,padding:"0 12px",border:`1px solid ${line}`,borderRadius:8,background:"rgba(255,255,255,.06)",color:ink,font:"inherit",fontWeight:900,cursor:"pointer"}}>Save draft</button></div></section></div>;
+
+  return <div style={{minHeight:"100vh",display:"grid",gridTemplateColumns:compact?"74px minmax(0,1fr)":"92px minmax(0,1fr)",background:"radial-gradient(circle at 8% 0%,rgba(214,177,94,.16),transparent 34%),radial-gradient(circle at 100% 14%,rgba(88,215,196,.1),transparent 34%),#090a10",color:ink}}>
+    <aside style={{borderRight:`1px solid ${line}`,background:"rgba(8,9,14,.78)",backdropFilter:"blur(18px)",padding:"18px 10px",display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
+      <div style={{width:46,height:46,borderRadius:14,display:"grid",placeItems:"center",fontWeight:1000,background:"linear-gradient(135deg,#d6b15e,#ff8aa8)",color:"#15100d",letterSpacing:"-.05em"}}>V</div>
+      <div style={{width:"100%",display:"grid",gap:8,marginTop:8}}>{modules.map(item=><button key={item.id} type="button" title={item.label} onClick={()=>setTab(item.id)} style={{width:"100%",minHeight:compact?50:58,border:`1px solid ${tab===item.id?item.tone+"66":"transparent"}`,borderRadius:14,background:tab===item.id?`${item.tone}18`:"transparent",color:tab===item.id?ink:soft,font:"inherit",fontSize:compact?".5rem":".58rem",fontWeight:900,cursor:"pointer",display:"grid",placeItems:"center",gap:4}}>
+        <I n={item.icon} s={17} c={tab===item.id?item.tone:"currentColor"}/><span>{item.label}</span>
+      </button>)}</div>
+      <button type="button" onClick={onLogout} title="Sign out" style={{marginTop:"auto",width:46,height:46,borderRadius:14,border:`1px solid ${line}`,background:"rgba(255,255,255,.03)",color:soft,cursor:"pointer"}}><I n="back" s={16}/></button>
+    </aside>
+    <main style={{minWidth:0,display:"grid",gridTemplateRows:"74px 1fr"}}>
+      <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,padding:compact?"0 14px":"0 30px",borderBottom:`1px solid ${line}`,background:"rgba(11,12,18,.55)",backdropFilter:"blur(18px)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:13,minWidth:0}}>
+          <div style={{width:40,height:40,borderRadius:12,background:`linear-gradient(135deg,${p.accent},rgba(214,177,94,.65))`,boxShadow:`0 0 32px ${p.accent}22`}}/>
+          <div style={{minWidth:0}}><div style={{fontWeight:1000,fontSize:".92rem",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{p.name}</div><div style={{...copy,fontSize:".65rem"}}>VYBE Studio workspace</div></div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <span style={{...label,color:active.tone,display:compact?"none":"inline"}}>CT 12:42 AM</span>
+          <span style={{height:30,display:compact?"none":"inline-flex",alignItems:"center",padding:"0 10px",border:`1px solid ${line}`,borderRadius:999,color:soft,fontSize:".66rem",fontWeight:900}}>Workspace clean</span>
+        </div>
+      </header>
+      <div style={{padding:compact?"18px 14px 32px":"26px 32px 44px",overflowY:"auto"}}>
+        <div style={{maxWidth:1180,margin:"0 auto"}}>
+          <div style={{display:"flex",flexDirection:compact?"column":"row",alignItems:compact?"stretch":"end",justifyContent:"space-between",gap:14,marginBottom:18}}>
+            <div><div style={{...label,color:active.tone}}>{active.label}</div><h1 style={{fontSize:compact?"1.24rem":"1.42rem",fontWeight:1000,lineHeight:1.1,marginTop:6}}>{title}</h1><p style={{...copy,maxWidth:720,marginTop:6}}>{subtitle}</p></div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gap:8}}>
+              <Stat k="Now" v={p.viewers} sub="waiting" tone="#58d7c4"/><Stat k="Today" v={`$${earn.today}`} sub="earned" tone="#d6b15e"/><Stat k="Pulse" v="64%" sub="storm" tone="#ff8aa8"/>
+            </div>
+          </div>
+          {tab==="home"&&<div style={{display:"grid",gridTemplateColumns:compact?"1fr":"minmax(0,1.55fr) minmax(300px,.85fr)",gap:14}}>
+            <div style={{display:"grid",gap:14}}><HeaderCard/><SparkLine/></div>
+            <div style={{display:"grid",gap:14}}><Readiness/><PatronList/></div>
+            <div style={{gridColumn:"1 / -1",display:"grid",gridTemplateColumns:compact?"1fr":"1fr 1fr 1fr",gap:14}}><RoomCard/><section style={{...panel,padding:18}}><div style={label}>Compliance channel</div><div style={{...copy,marginTop:12}}>Age verification, content boundaries, payment risk, and creator safety are surfaced as live operational checks instead of hidden settings.</div></section><section style={{...panel,padding:18}}><div style={label}>Next action</div><div style={{fontSize:"1rem",fontWeight:1000,marginTop:12}}>Rewrite the intro card</div><p style={{...copy,marginTop:8}}>The room is technically ready. The public promise needs more luxury and less generic live-stream wording.</p></section></div>
           </div>}
-          {tab==="analytics"&&<div style={{display:"grid",gap:14}}>
-            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Key metrics</div><div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginTop:12}}>{["Viewership","Rewards","Engagement","Activity"].map((m,i)=><div key={m} style={{borderLeft:"1px solid rgba(255,255,255,.08)",padding:"4px 0 4px 12px"}}><div style={muted}>{m}</div><div style={{fontSize:"1.15rem",fontWeight:1000,marginTop:10}}>{i===0?p.viewers:i===1?"2.8K":i===2?"38%":"30m"}</div></div>)}</div></section>
-            <section style={{...panelStyle,padding:16,minHeight:230}}><div style={sectionTitle}>Audience trend</div><div style={{height:150,display:"flex",alignItems:"end",gap:8,marginTop:24}}>{[16,28,22,42,35,54,48].map((h,i)=><div key={i} style={{height:h+"%",flex:1,borderRadius:3,background:i===6?"var(--pk)":"rgba(255,255,255,.14)"}}/>)}</div></section>
-          </div>}
-          {tab==="content"&&<div style={{display:"grid",gridTemplateColumns:"1fr 310px",gap:14}}>
-            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Highlight mixes</div>{empty("eye","No highlight mixes yet","Clip your strongest moments from LIVE recordings.")}</section>
-            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Recent posts</div>{content.slice(0,3).map(c=><div key={c.text} style={{padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,.06)"}}><div style={{fontSize:".78rem",fontWeight:900}}>{c.text}</div><div style={muted}>{c.time} ago - {c.likes} likes</div></div>)}</section>
-          </div>}
-          {tab==="inbox"&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
-            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Fan Club members</div>{fans.map(f=><div key={f.name} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,.06)"}}><span style={{fontWeight:900,fontSize:".78rem"}}>{f.name}</span><span style={muted}>{f.sparks.toLocaleString()} sparks</span></div>)}</section>
-            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Their journey with you</div>{empty("users","Relationship timeline","Tags, milestones, requests, and special moments will live here.")}</section>
-          </div>}
-          {tab==="store"&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
-            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Request menu</div>{p.requests.slice(0,5).map(r=><div key={r.name} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,.06)"}}><span style={{fontWeight:900,fontSize:".78rem"}}>{r.name}</span><span style={muted}>{r.sparks.toLocaleString()} sparks</span></div>)}</section>
-            <section style={{...panelStyle,padding:16}}><div style={sectionTitle}>Mission rewards</div><div style={{fontSize:"1.6rem",fontWeight:1000,marginTop:22}}>${earn.pending.toLocaleString()}</div><div style={muted}>Pending payout estimate</div></section>
-          </div>}
-          {tab==="settings"&&<section style={{...panelStyle,padding:24,maxWidth:720}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:18}}><div><h2 style={{fontSize:"1.2rem",fontWeight:1000}}>Introduce yourself and your LIVE</h2><p style={{...muted,marginTop:10}}>Add a concise intro shown when viewers join your room. This should feel polished, clear, and adult-compliant.</p></div><button type="button" style={{width:44,height:24,borderRadius:999,border:0,background:"rgba(255,255,255,.2)",position:"relative"}}><span style={{position:"absolute",left:3,top:3,width:18,height:18,borderRadius:"50%",background:"#fff"}}/></button></div>
-            <div style={{height:1,background:"rgba(255,255,255,.08)",margin:"22px 0"}}/>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:22}}><div><div style={sectionTitle}>VYBE app</div><div style={{height:124,borderRadius:8,background:`linear-gradient(135deg,${p.accent}33,rgba(255,255,255,.08)),#2a2a2a`,marginTop:12,padding:16}}><div style={{fontWeight:1000}}>{p.name}</div><p style={{...muted,color:"#fff",marginTop:8}}>Welcome to my LIVE. Come ready to play.</p></div></div><div><div style={sectionTitle}>VYBE web</div><div style={{height:124,borderRadius:8,background:"#f5f5f5",color:"#111",marginTop:12,padding:16}}><div style={{fontWeight:1000}}>{p.name}</div><p style={{fontSize:".72rem",lineHeight:1.45,marginTop:8}}>Welcome to my LIVE. Come ready to play.</p></div></div></div>
-          </section>}
+          {tab==="analytics"&&<Analytics/>}
+          {tab==="content"&&<Vault/>}
+          {tab==="inbox"&&<Patrons/>}
+          {tab==="store"&&<Offers/>}
+          {tab==="settings"&&<Room/>}
         </div>
       </div>
     </main>

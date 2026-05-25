@@ -104,7 +104,13 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const spread = budget.spread || "radial-tight";
 
-    const particles = spawnParticles(budget, w, h);
+    // Cap particle count on narrow viewports to protect mobile frame rate.
+    const isMobile = w < 480;
+    const effectiveBudget = isMobile
+      ? { ...budget, count: Math.min(budget.count, 32) }
+      : budget;
+
+    const particles = spawnParticles(effectiveBudget, w, h);
 
     // trailFade=false: hard-edge particles stay opaque until nearly dead
     const hardEdge = budget.trailFade === false;

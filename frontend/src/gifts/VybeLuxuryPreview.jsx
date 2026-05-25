@@ -25,7 +25,7 @@ export default function VybeLuxuryPreview() {
           <div style={styles.livePill}>LIVE</div>
           <div>
             <div style={styles.performerName}>Luna Voss</div>
-            <div style={styles.roomMeta}>342 watching · Velvet Suite</div>
+            <div style={styles.roomMeta}>342 watching - Velvet Suite</div>
           </div>
         </div>
         <div style={styles.wallet}>2,500 sparks</div>
@@ -115,8 +115,8 @@ function GiftMoment({ gift, pulse }) {
     <div className="luxury-gift-moment" key={gift.id + pulse} style={styles.giftMoment}>
       <GiftCanvas gift={gift} />
       <div style={{ ...styles.giftCaption, borderColor: gift.tone + "66", boxShadow: "0 18px 44px rgba(0,0,0,0.36), 0 0 34px " + gift.tone + "24" }}>
-        <strong>VelvetKing sent {gift.name}</strong>
-        <span style={{ color: gift.tone }}>to Luna Voss · {gift.sparks.toLocaleString()} sparks</span>
+        <strong>{gift.name}</strong>
+        <span style={{ color: gift.tone }}>{gift.sparks.toLocaleString()} sparks</span>
       </div>
     </div>
   );
@@ -157,20 +157,20 @@ function GiftCanvas({ gift }) {
 
 function drawAura(ctx, w, h, tone, t) {
   const cx = w / 2;
-  const cy = h / 2 + 12;
+  const cy = h / 2 + 9;
   const ringPulse = 0.9 + Math.sin(t * 2.2) * 0.06;
-  const glow = ctx.createRadialGradient(cx, cy, 8, cx, cy, w * 0.42);
-  glow.addColorStop(0, tone + "42");
-  glow.addColorStop(0.42, tone + "16");
+  const glow = ctx.createRadialGradient(cx, cy, 6, cx, cy, w * 0.38);
+  glow.addColorStop(0, tone + "34");
+  glow.addColorStop(0.42, tone + "10");
   glow.addColorStop(1, "rgba(0,0,0,0)");
   ctx.fillStyle = glow;
   ctx.beginPath();
-  ctx.ellipse(cx, cy, w * 0.46, h * 0.32, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy, w * 0.38, h * 0.28, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = tone + "80";
+  ctx.strokeStyle = tone + "62";
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.ellipse(cx, cy + 34, w * 0.3 * ringPulse, h * 0.055 * ringPulse, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy + h * 0.24, w * 0.22 * ringPulse, h * 0.04 * ringPulse, 0, 0, Math.PI * 2);
   ctx.stroke();
 }
 
@@ -182,52 +182,72 @@ function drawObject(ctx, w, h, gift, t) {
 
 function drawCrown(ctx, w, h, tone, t) {
   const cx = w / 2;
-  const cy = h / 2 + Math.sin(t * 2) * 5;
+  const cy = h / 2 + Math.sin(t * 2) * 3;
+  const scale = Math.min(w, h) / 128;
   ctx.save();
   ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
   ctx.rotate(Math.sin(t * 1.5) * 0.035);
   ctx.shadowColor = tone;
-  ctx.shadowBlur = 30;
-  const body = ctx.createLinearGradient(-64, -70, 68, 74);
-  body.addColorStop(0, "#fff4b2");
-  body.addColorStop(0.26, tone);
-  body.addColorStop(0.58, "#c28a18");
-  body.addColorStop(1, "#4c320a");
+  ctx.shadowBlur = 18;
+
+  const shadow = ctx.createRadialGradient(0, 30, 4, 0, 30, 54);
+  shadow.addColorStop(0, "rgba(0,0,0,.36)");
+  shadow.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = shadow;
   ctx.beginPath();
-  ctx.moveTo(0, -70);
-  ctx.bezierCurveTo(48, -58, 74, -25, 66, 20);
-  ctx.bezierCurveTo(58, 64, 22, 82, -18, 70);
-  ctx.bezierCurveTo(-62, 56, -78, 18, -62, -22);
-  ctx.bezierCurveTo(-48, -56, -18, -76, 0, -70);
-  ctx.closePath();
-  ctx.fillStyle = body;
+  ctx.ellipse(0, 32, 52, 12, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = "#fff3bf";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.globalAlpha = 0.36;
-  ctx.fillStyle = "#fff9d8";
+
+  const crownFill = ctx.createLinearGradient(-42, -38, 42, 32);
+  crownFill.addColorStop(0, "#fff7bf");
+  crownFill.addColorStop(0.28, tone);
+  crownFill.addColorStop(0.62, "#d0931c");
+  crownFill.addColorStop(1, "#6d4309");
   ctx.beginPath();
-  ctx.ellipse(-22, -30, 16, 34, 0.72, 0, Math.PI * 2);
+  ctx.moveTo(-45, 18);
+  ctx.lineTo(-34, -18);
+  ctx.lineTo(-13, 6);
+  ctx.lineTo(0, -35);
+  ctx.lineTo(14, 6);
+  ctx.lineTo(35, -18);
+  ctx.lineTo(45, 18);
+  ctx.quadraticCurveTo(18, 29, -45, 18);
+  ctx.closePath();
+  ctx.fillStyle = crownFill;
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,248,214,.92)";
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  const baseFill = ctx.createLinearGradient(-46, 12, 46, 34);
+  baseFill.addColorStop(0, "#fff2aa");
+  baseFill.addColorStop(0.45, tone);
+  baseFill.addColorStop(1, "#7b4d0c");
+  ctx.shadowBlur = 20;
+  roundRect(ctx, -47, 10, 94, 24, 8, baseFill, "rgba(255,248,214,.86)");
+
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 0.3;
+  ctx.fillStyle = "#fff9cf";
+  ctx.beginPath();
+  ctx.ellipse(-19, -3, 7, 26, -0.42, 0, Math.PI * 2);
   ctx.fill();
   ctx.globalAlpha = 1;
-  ctx.strokeStyle = "#fff8cf";
-  ctx.lineWidth = 5;
-  ctx.lineJoin = "round";
-  ctx.lineCap = "round";
+
+  [-34, 0, 35].forEach((x, index) => {
+    const y = index === 1 ? -36 : -19;
+    ctx.fillStyle = index === 1 ? "#fff8d6" : "#fff2a8";
+    ctx.beginPath();
+    ctx.arc(x, y, index === 1 ? 5 : 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  ctx.strokeStyle = "rgba(255,255,255,.64)";
+  ctx.lineWidth = 1.2;
   ctx.beginPath();
-  ctx.moveTo(-38, 12);
-  ctx.lineTo(-25, -22);
-  ctx.lineTo(-6, 4);
-  ctx.lineTo(10, -34);
-  ctx.lineTo(25, 4);
-  ctx.lineTo(42, -22);
-  ctx.lineTo(52, 12);
-  ctx.stroke();
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(-42, 23);
-  ctx.quadraticCurveTo(0, 34, 48, 23);
+  ctx.moveTo(-38, 20);
+  ctx.quadraticCurveTo(0, 27, 40, 20);
   ctx.stroke();
   ctx.restore();
 }
@@ -235,8 +255,10 @@ function drawCrown(ctx, w, h, tone, t) {
 function drawKey(ctx, w, h, tone, t) {
   const cx = w / 2;
   const cy = h / 2 + Math.sin(t * 2.2) * 4;
+  const scale = Math.min(w, h) / 150;
   ctx.save();
   ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
   ctx.rotate(-0.45 + Math.sin(t * 1.4) * 0.04);
   ctx.shadowColor = tone;
   ctx.shadowBlur = 30;
@@ -263,8 +285,10 @@ function drawKey(ctx, w, h, tone, t) {
 function drawRose(ctx, w, h, tone, t) {
   const cx = w / 2;
   const cy = h / 2 + Math.sin(t * 2) * 4;
+  const scale = Math.min(w, h) / 150;
   ctx.save();
   ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
   ctx.shadowColor = tone;
   ctx.shadowBlur = 28;
   ctx.strokeStyle = "#ffc2d8";
@@ -306,8 +330,12 @@ const css = `
   to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 }
 @keyframes giftIn {
-  from { opacity: 0; transform: translate(-50%, calc(-50% + 18px)) scale(.86); }
-  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  from { opacity: 0; transform: translateY(12px) scale(.84); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes giftIdle {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-5px) rotate(1deg); }
 }
 @keyframes stageBreath {
   0%, 100% { opacity: .82; transform: scale(1); }
@@ -338,38 +366,30 @@ nav button:hover {
     padding: 10px 12px !important;
   }
   .luxury-banner {
-    top: 70px !important;
+    top: 68px !important;
     width: calc(100vw - 20px) !important;
     min-height: auto !important;
-    grid-template-columns: auto 1fr auto !important;
-    gap: 7px !important;
-    row-gap: 7px !important;
-    padding: 10px 12px !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    padding: 8px 10px !important;
   }
   .luxury-banner-copy {
-    grid-column: 1 / -1 !important;
-    grid-row: 2 !important;
     min-width: 0 !important;
-    text-align: center !important;
-    font-size: 13px !important;
-    line-height: 1.24 !important;
-    white-space: normal !important;
+    font-size: 11px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
   .luxury-banner-badge {
-    grid-column: 1 !important;
-    grid-row: 1 !important;
+    padding: 4px 7px !important;
+    font-size: 9px !important;
   }
   .luxury-banner-join {
-    grid-column: 2 !important;
-    grid-row: 1 !important;
-    text-align: center !important;
-    font-size: 10px !important;
-    letter-spacing: .12em !important;
+    display: none !important;
   }
   .luxury-banner-sparks {
-    grid-column: 3 !important;
-    grid-row: 1 !important;
-    font-size: 11px !important;
+    font-size: 10px !important;
     white-space: nowrap !important;
   }
   .luxury-stage-grid {
@@ -387,9 +407,13 @@ nav button:hover {
     height: 100% !important;
   }
   .luxury-gift-moment {
-    top: 31% !important;
-    width: min(210px, 60vw) !important;
-    height: min(210px, 60vw) !important;
+    top: 20% !important;
+    right: 16px !important;
+    width: min(76px, 22vw) !important;
+    height: min(76px, 22vw) !important;
+  }
+  .luxury-gift-moment > div {
+    display: none !important;
   }
   .luxury-toolbar {
     width: calc(100vw - 14px) !important;
@@ -460,24 +484,24 @@ const styles = {
   },
   banner: {
     position: "fixed",
-    top: 74,
+    top: 72,
     left: "50%",
     zIndex: 20,
-    width: "min(860px, calc(100vw - 32px))",
-    minHeight: 60,
+    width: "min(780px, calc(100vw - 32px))",
+    minHeight: 42,
     display: "grid",
     gridTemplateColumns: "auto minmax(0,1fr) auto auto",
     alignItems: "center",
-    gap: 14,
-    padding: "11px 16px",
+    gap: 12,
+    padding: "8px 14px",
     border: "1px solid rgba(255,255,255,0.14)",
-    borderRadius: 12,
+    borderRadius: 999,
     background: "linear-gradient(90deg, rgba(6,7,12,.94), rgba(22,17,9,.9), rgba(6,7,12,.94))",
     backdropFilter: "blur(18px)",
     animation: "bannerIn .44s cubic-bezier(.16,1,.3,1) both",
   },
   bannerBadge: {
-    padding: "5px 10px",
+    padding: "4px 9px",
     border: "1px solid rgba(255,255,255,.18)",
     borderRadius: 999,
     fontSize: 10,
@@ -524,34 +548,34 @@ const styles = {
     overflow: "hidden",
     borderRadius: 8,
     border: "1px solid rgba(255,255,255,0.12)",
-    background: "linear-gradient(180deg, #171f2e, #090912 72%)",
+    background: "linear-gradient(180deg, #182033, #080912 72%)",
     boxShadow: "0 40px 120px rgba(0,0,0,.46), inset 0 0 80px rgba(255,255,255,.03)",
   },
   videoTexture: {
     position: "absolute",
     inset: 0,
     background:
-      "radial-gradient(circle at 50% 22%, rgba(255,215,150,0.2), transparent 10%), radial-gradient(circle at 50% 70%, rgba(255,45,120,0.23), transparent 32%), linear-gradient(105deg, transparent 0 44%, rgba(255,255,255,0.035) 45% 47%, transparent 48% 100%)",
+      "radial-gradient(circle at 50% 18%, rgba(255,215,150,0.24), transparent 11%), radial-gradient(circle at 50% 68%, rgba(255,45,120,0.2), transparent 34%), linear-gradient(105deg, transparent 0 44%, rgba(255,255,255,0.035) 45% 47%, transparent 48% 100%)",
     animation: "stageBreath 5s ease-in-out infinite",
   },
   performerSilhouette: {
     position: "absolute",
     left: "50%",
-    bottom: 72,
-    width: "26%",
-    height: "47%",
+    bottom: 48,
+    width: "31%",
+    height: "58%",
     transform: "translateX(-50%)",
     borderRadius: "46% 46% 24% 24%",
-    background: "linear-gradient(180deg, rgba(255,84,145,.58), rgba(113,72,210,.48) 64%, rgba(12,14,28,.18))",
-    boxShadow: "0 0 90px rgba(255,45,120,.18)",
+    background: "linear-gradient(180deg, rgba(255,84,145,.62), rgba(113,72,210,.52) 66%, rgba(12,14,28,.16))",
+    boxShadow: "0 0 110px rgba(255,45,120,.2)",
     overflow: "visible",
   },
   keyLight: {
     position: "absolute",
     left: "50%",
-    top: "-62px",
-    width: 70,
-    height: 70,
+    top: "-66px",
+    width: 76,
+    height: 76,
     transform: "translateX(-50%)",
     borderRadius: "50%",
     background: "linear-gradient(135deg, rgba(255,222,192,.92), rgba(171,116,86,.86))",
@@ -560,9 +584,9 @@ const styles = {
   hairLight: {
     position: "absolute",
     left: "50%",
-    top: "-70px",
-    width: 88,
-    height: 92,
+    top: "-76px",
+    width: 98,
+    height: 102,
     transform: "translateX(-50%)",
     borderRadius: "50% 50% 44% 44%",
     background: "radial-gradient(circle at 45% 18%, rgba(255,226,194,.22), transparent 36%), linear-gradient(135deg, rgba(70,38,28,.62), rgba(18,14,18,.42))",
@@ -587,29 +611,29 @@ const styles = {
   },
   giftMoment: {
     position: "absolute",
-    left: "50%",
-    top: "27%",
-    width: 210,
-    height: 210,
-    transform: "translate(-50%, -50%)",
-    animation: "giftIn .5s cubic-bezier(.16,1,.3,1) both",
+    right: "9%",
+    top: "20%",
+    width: 96,
+    height: 96,
+    animation: "giftIn .42s cubic-bezier(.16,1,.3,1) both, giftIdle 2.8s ease-in-out .42s infinite",
   },
   giftCanvas: { width: "100%", height: "100%" },
   giftCaption: {
     position: "absolute",
-    left: "50%",
-    bottom: -2,
-    transform: "translateX(-50%)",
-    display: "grid",
-    gap: 3,
-    width: "min(280px, 92vw)",
-    padding: "10px 14px",
+    right: 0,
+    bottom: -6,
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    width: "max-content",
+    maxWidth: "190px",
+    padding: "6px 9px",
     borderRadius: 999,
     border: "1px solid rgba(255,255,255,.14)",
     background: "rgba(5,7,13,.8)",
     color: "#fff",
     textAlign: "center",
-    fontSize: 12,
+    fontSize: 10,
     backdropFilter: "blur(14px)",
   },
   performerCard: {

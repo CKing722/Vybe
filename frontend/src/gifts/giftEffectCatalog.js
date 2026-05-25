@@ -13,7 +13,7 @@ export const GIFT_EFFECT_CATALOG = [
   {
     id: "neon_rose",
     displayName: "Neon Rose",
-    sparkCost: 25,
+    sparkCost: 5,
     tier: "low",
     durationMs: 2400,
     audienceScope: "room",
@@ -71,7 +71,7 @@ export const GIFT_EFFECT_CATALOG = [
   {
     id: "crown_drop",
     displayName: "Crown Drop",
-    sparkCost: 250,
+    sparkCost: 500,
     tier: "high",
     durationMs: 6000,
     audienceScope: "room",
@@ -140,7 +140,7 @@ export const GIFT_EFFECT_CATALOG = [
   {
     id: "private_key",
     displayName: "Private Key",
-    sparkCost: 500,
+    sparkCost: 5000,
     tier: "high",
     durationMs: 8000,
     audienceScope: "platform",

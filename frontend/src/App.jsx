@@ -608,15 +608,19 @@ function LB({user,onPerf,onWallet,cat,setCat,onMenu}){
 function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const [pn,setPn]=useState(null);const [gm,setGm]=useState(null);
   const settingsPreview=typeof window!=="undefined"&&new URLSearchParams(window.location.search).get("settingsPreview")==="1";
-  const [media,setMedia]=useState({paused:false,muted:false,settings:settingsPreview,captions:false,pip:false,quality:"1080p",layout:"Theater"});
+  const [media,setMedia]=useState({paused:false,muted:false,volume:72,volumeOpen:false,fullscreen:false,settings:settingsPreview,captions:false,pip:false,quality:"1080p",layout:"Theater"});
   const [ch,setCh]=useState([{user:"VYBE",msg:`Welcome — ${perf.name} is live. You are known here.`,vip:false,id:0}]);
   const [ci,setCi]=useState("");const [chH,setChH]=useState(false);
   const [anims,setAnims]=useState([]);const [reqFx,setReqFx]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
   const [pendingReq,setPendingReq]=useState([{id:1,user:"test",name:"Ultimate Fantasy",desc:"You design it, she delivers",sparks:5000,status:"pending"}]);
-  const aid=useRef(0);const CP=[{user:"NightOwl",msg:"Let's go"},{user:"VelvetKing",msg:"Crown incoming",vip:true},{user:"AceHigh",msg:"All in",vip:true},{user:"DiamondJay",msg:"Here we go",vip:true}];
+  const roomRef=useRef(null);const aid=useRef(0);const CP=[{user:"NightOwl",msg:"Let's go"},{user:"VelvetKing",msg:"Crown incoming",vip:true},{user:"AceHigh",msg:"All in",vip:true},{user:"DiamondJay",msg:"Here we go",vip:true}];
   useEffect(()=>{const t=setInterval(()=>{if(!media.paused)setTm(p=>Math.max(0,p-1))},1000);return()=>clearInterval(t)},[media.paused]);
   useEffect(()=>{const t=setInterval(()=>{setCh(p=>[...p.slice(-39),{...CP[Math.floor(Math.random()*4)],id:Date.now()}])},5000);return()=>clearInterval(t)},[]);
+  useEffect(()=>{const level=media.muted?0:Math.max(0,Math.min(100,media.volume))/100;document.querySelectorAll("video,audio").forEach(el=>{el.volume=level;el.muted=media.muted||media.volume===0})},[media.volume,media.muted]);
+  useEffect(()=>{const onFs=()=>{if(!document.fullscreenElement)setMedia(p=>({...p,fullscreen:false,volumeOpen:false}))};document.addEventListener("fullscreenchange",onFs);return()=>document.removeEventListener("fullscreenchange",onFs)},[]);
   const fmt=s=>`${Math.floor(s/60)}:${(s%60).toString().padStart(2,"0")}`;
+  const setVolume=v=>{const volume=Math.max(0,Math.min(100,Number(v)||0));setMedia(p=>({...p,volume,muted:volume===0}))};
+  const toggleFullscreen=async()=>{const entering=!media.fullscreen;if(entering){setPn(null);setGm(null);setChH(true);setMedia(p=>({...p,fullscreen:true,settings:false,volumeOpen:false}));try{const el=roomRef.current||document.documentElement,req=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;if(req)await req.call(el)}catch(e){}}else{setMedia(p=>({...p,fullscreen:false,volumeOpen:false}));try{const exit=document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen;if((document.fullscreenElement||document.webkitFullscreenElement||document.msFullscreenElement)&&exit)await exit.call(document)}catch(e){}}};
   const tog=n=>{setPn(p=>p===n?null:n);if(n)setGm(null)};
   const sg=g=>{if(user.sparks<g.cost)return;onSC(-g.cost);const id=++aid.current,x=68+Math.random()*20,y=18+Math.random()*24;
     const effectId=getEffectForCost(g.cost).id;
@@ -629,17 +633,17 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const addReq=r=>{if(user.sparks<r.sparks)return;onSC(-r.sparks);const item={id:Date.now(),user:user.name,name:r.name,desc:r.desc,sparks:r.sparks,status:"pending"};setPendingReq(p=>[item,...p].slice(0,5));setCh(p=>[...p.slice(-39),{user:user.name,msg:`requested ${r.name} - pending performer approval`,vip:true,id:Date.now()}]);setPn(null)};
   const avG=GAMES.filter(g=>perf.caps.games.includes(g.id));
 
-  return<div style={{position:"relative",width:"100%",height:"100vh",overflow:"hidden",background:"#050810"}}>
+  return<div ref={roomRef} style={{position:"relative",width:"100%",height:"100vh",overflow:"hidden",background:"#050810"}}>
     <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse at 45% 65%,${perf.accent}15,transparent 50%),radial-gradient(ellipse at 55% 35%,rgba(0,212,255,.06),transparent 50%),linear-gradient(180deg,#080e1c,#0a0814 50%,#0d061a)`}}>
-      <div style={{position:"absolute",bottom:0,left:"50%",transform:"translateX(-50%)",width:"min(300px,36%)",height:"72%"}}>
-        <div style={{position:"absolute",top:"4%",left:"50%",transform:"translateX(-50%)",width:64,height:64,borderRadius:"50%",background:"radial-gradient(circle,#e8c4a8 55%,#c49070)"}}/>
-        <div style={{position:"absolute",bottom:"-3%",left:"50%",transform:"translateX(-50%)",width:160,height:"70%",borderRadius:"42% 42% 20px 20px",background:`linear-gradient(170deg,${perf.accent} 15%,var(--vi) 50%,#0a0e1a 90%)`}}/></div>
+      <div style={{position:"absolute",bottom:0,left:"50%",transform:"translateX(-50%)",width:media.fullscreen?"min(520px,44vw)":"min(300px,36%)",height:media.fullscreen?"86%":"72%",transition:"width .45s ease,height .45s ease"}}>
+        <div style={{position:"absolute",top:"4%",left:"50%",transform:"translateX(-50%)",width:media.fullscreen?88:64,height:media.fullscreen?88:64,borderRadius:"50%",background:"radial-gradient(circle,#e8c4a8 55%,#c49070)",transition:"width .45s ease,height .45s ease"}}/>
+        <div style={{position:"absolute",bottom:"-3%",left:"50%",transform:"translateX(-50%)",width:media.fullscreen?250:160,height:"70%",borderRadius:"42% 42% 20px 20px",background:`linear-gradient(170deg,${perf.accent} 15%,var(--vi) 50%,#0a0e1a 90%)`,transition:"width .45s ease"}}/></div>
       {anims.map(g=><div key={g.id} className="gpa" style={{left:`${g.x}%`,top:`${g.y}%`}}><I n={g.icon} s={g.cost>=500?40:g.cost>=150?32:24} c={g.color}/></div>)}
       {reqFx.map(r=><RequestMoment key={r.id} item={r} perf={perf}/>)}
     </div>
     {notif&&<div className="ai" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:50,padding:"7px 16px",borderRadius:9,background:notif.includes("refunded")?"rgba(255,171,0,.1)":"rgba(34,197,94,.1)",border:"1px solid "+(notif.includes("refunded")?"var(--am)":"var(--gn)"),fontWeight:800,fontSize:".82rem",color:notif.includes("refunded")?"var(--am)":"var(--gn)"}}>{notif}</div>}
     {/* Top */}
-    <div style={{position:"absolute",top:0,left:0,right:0,display:"flex",justifyContent:"space-between",alignItems:"start",padding:"9px 10px",zIndex:10}}>
+    {!media.fullscreen&&<div style={{position:"absolute",top:0,left:0,right:0,display:"flex",justifyContent:"space-between",alignItems:"start",padding:"9px 10px",zIndex:10}}>
       <G style={{padding:"6px 9px",display:"flex",alignItems:"center",gap:6}}>
         <button onClick={onBack} style={{background:"none",border:"none",color:"var(--tx)",cursor:"pointer",padding:0,display:"flex"}}><I n="back" s={14}/></button>
         <div><div style={{display:"flex",alignItems:"center",gap:4}}><Lv/><span style={{fontWeight:800,fontSize:".8rem"}}>{perf.name}</span></div>
@@ -647,9 +651,9 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
             <span><I n="users" s={8} c="var(--mt)"/> {perf.viewers}</span><span>{fmt(tm)}</span></div></div></G>
       <div style={{display:"flex",gap:3}}>
         <G onClick={onWallet} style={{padding:"4px 7px",display:"flex",alignItems:"center",gap:2,cursor:"pointer"}}><I n="spark" s={10} c="var(--am)"/><span style={{fontWeight:800,fontSize:".76rem",color:"var(--am)"}}>{user.sparks.toLocaleString()}</span><I n="plus" s={7} c="var(--mt)"/></G>
-      </div></div>
+      </div></div>}
     {/* Room signal + chat */}
-    {!chH&&<div style={{position:"absolute",top:76,left:12,bottom:88,zIndex:8,width:"clamp(280px,28vw,360px)",display:"flex",flexDirection:"column",gap:10,pointerEvents:"auto"}}>
+    {!media.fullscreen&&!chH&&<div style={{position:"absolute",top:76,left:12,bottom:88,zIndex:8,width:"clamp(280px,28vw,360px)",display:"flex",flexDirection:"column",gap:10,pointerEvents:"auto"}}>
       <G style={{padding:12,borderRadius:12,background:"linear-gradient(180deg,rgba(8,10,16,.54),rgba(8,10,16,.86))",boxShadow:"0 22px 70px rgba(0,0,0,.28)"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
           <div style={{fontSize:".66rem",fontWeight:900,letterSpacing:".12em",textTransform:"uppercase",color:"var(--mt)"}}>Room heat</div>
@@ -682,15 +686,15 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
           <button onClick={sc} style={{background:"var(--pk)",border:"none",borderRadius:999,padding:"0 11px",cursor:"pointer",color:"#fff",fontWeight:800,fontSize:".68rem"}}>Send</button></div>
       </G>
     </div>}
-    {chH&&<button type="button" title="Show chat" aria-label="Show chat" onClick={()=>setChH(false)} style={{position:"absolute",left:12,top:96,zIndex:14,height:36,padding:"0 12px",borderRadius:18,border:"1px solid rgba(255,255,255,.12)",background:"linear-gradient(135deg,rgba(10,14,24,.78),rgba(8,10,16,.92))",color:"var(--tx)",display:"inline-flex",alignItems:"center",gap:7,cursor:"pointer",boxShadow:"0 18px 55px rgba(0,0,0,.34)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",fontWeight:900,fontSize:".66rem",letterSpacing:".04em"}}><I n="chat" s={13} c="var(--cy)"/>Chat</button>}
+    {!media.fullscreen&&chH&&<button type="button" title="Show chat" aria-label="Show chat" onClick={()=>setChH(false)} style={{position:"absolute",left:12,top:96,zIndex:14,height:36,padding:"0 12px",borderRadius:18,border:"1px solid rgba(255,255,255,.12)",background:"linear-gradient(135deg,rgba(10,14,24,.78),rgba(8,10,16,.92))",color:"var(--tx)",display:"inline-flex",alignItems:"center",gap:7,cursor:"pointer",boxShadow:"0 18px 55px rgba(0,0,0,.34)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",fontWeight:900,fontSize:".66rem",letterSpacing:".04em"}}><I n="chat" s={13} c="var(--cy)"/>Chat</button>}
     {media.captions&&<div className="ai" style={{position:"absolute",left:"50%",bottom:76,transform:"translateX(-50%)",zIndex:13,maxWidth:"min(520px,62vw)",padding:"8px 13px",borderRadius:12,border:"1px solid rgba(255,45,120,.34)",background:"linear-gradient(135deg,rgba(10,14,24,.78),rgba(7,9,16,.92))",boxShadow:"0 20px 70px rgba(0,0,0,.42),0 0 30px rgba(255,45,120,.12)",backdropFilter:"blur(14px)",WebkitBackdropFilter:"blur(14px)",color:"#fff",fontWeight:800,fontSize:".78rem",lineHeight:1.35,textAlign:"center",pointerEvents:"none"}}>
       <span style={{color:"var(--pk)",fontWeight:1000,marginRight:6}}>CC</span>{perf.name.split(" ")[0]}: Welcome in. Keep your eyes here.
     </div>}
     {/* Panels */}
-    {pn==="board"&&<Pn onClose={()=>setPn(null)} title="Leaderboard" icon="trophy" ic="var(--am)" style={{position:"absolute",right:12,top:88,zIndex:22,width:230,maxHeight:"calc(100vh - 180px)",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
+    {!media.fullscreen&&pn==="board"&&<Pn onClose={()=>setPn(null)} title="Leaderboard" icon="trophy" ic="var(--am)" style={{position:"absolute",right:12,top:88,zIndex:22,width:230,maxHeight:"calc(100vh - 180px)",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
       {VWR.map((v,i)=><div key={v.name} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",fontSize:".7rem",borderBottom:i<4?"1px solid var(--bd)":"none"}}>
         <span style={{display:"flex",alignItems:"center",gap:3}}>{i===0&&<I n="crown" s={8} c="var(--am)"/>}{v.badge&&<I n={v.badge} s={8} c="var(--am)"/>}{v.name}</span><span style={{fontWeight:700,color:"var(--pk)"}}>{v.score}</span></div>)}</Pn>}
-    {pn==="gifts"&&<G className="ai" style={{position:"absolute",left:10,right:10,bottom:56,zIndex:14,padding:"9px 10px",borderRadius:12,background:"rgba(15,18,29,.92)"}}>
+    {!media.fullscreen&&pn==="gifts"&&<G className="ai" style={{position:"absolute",left:10,right:10,bottom:56,zIndex:14,padding:"9px 10px",borderRadius:12,background:"rgba(15,18,29,.92)"}}>
       <div style={{display:"flex",alignItems:"center",gap:8}}>
         <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:2,flex:1}}>
           {GIFTS.map(g=><button key={g.id} onClick={()=>sg(g)} disabled={user.sparks<g.cost} style={{minWidth:78,height:72,padding:"7px 5px",borderRadius:9,border:"1px solid "+(user.sparks>=g.cost?g.color+"55":"var(--bd)"),background:user.sparks>=g.cost?"rgba(255,255,255,.055)":"rgba(255,255,255,.025)",cursor:user.sparks>=g.cost?"pointer":"not-allowed",textAlign:"center",opacity:user.sparks>=g.cost?1:.34,display:"grid",placeItems:"center",gap:1,flexShrink:0}}>
@@ -699,7 +703,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
         <button onClick={()=>setPn(null)} aria-label="Close gifts" style={{width:34,height:34,borderRadius:17,border:"1px solid var(--bd)",background:"rgba(255,255,255,.07)",color:"var(--mt)",cursor:"pointer",display:"grid",placeItems:"center",flexShrink:0}}><I n="close" s={14}/></button>
       </div>
     </G>}
-    {pn==="games"&&<Pn onClose={()=>setPn(null)} title="Games" icon="gamepad" ic="var(--cy)" style={{position:"absolute",right:12,top:88,bottom:76,zIndex:22,width:"min(390px,34vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
+    {!media.fullscreen&&pn==="games"&&<Pn onClose={()=>setPn(null)} title="Games" icon="gamepad" ic="var(--cy)" style={{position:"absolute",right:12,top:88,bottom:76,zIndex:22,width:"min(390px,34vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
       <div style={{padding:9,borderRadius:10,border:"1px solid rgba(0,212,255,.18)",background:"rgba(0,212,255,.055)",marginBottom:9}}>
         <div style={{fontWeight:900,fontSize:".78rem"}}>VYBE game direction</div>
         <p style={{fontSize:".66rem",lineHeight:1.45,color:"var(--mt)",marginTop:3}}>Games are spark-backed. Higher-value rewards require higher stakes, and performer-control outcomes still need acceptance.</p>
@@ -708,14 +712,14 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
         <div style={{display:"flex",alignItems:"center",gap:3}}><I n={g.icon} s={11} c={g.color}/><span style={{fontWeight:700,fontSize:".7rem"}}>{g.name}</span></div>
         <p style={{fontSize:".6rem",color:"var(--mt)",lineHeight:1.3,marginTop:1}}>{g.desc}</p>
         <div style={{marginTop:5,fontSize:".56rem",fontWeight:900,color:"var(--am)",display:"flex",alignItems:"center",gap:2}}><I n="spark" s={8} c="var(--am)"/>{gameEconomyLine(g.type)}</div></button>)}</div></Pn>}
-    {pn==="requests"&&<Pn onClose={()=>setPn(null)} title="Requests" icon="request" ic="var(--am)" style={{position:"absolute",right:12,top:88,bottom:76,zIndex:22,width:"min(390px,34vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
+    {!media.fullscreen&&pn==="requests"&&<Pn onClose={()=>setPn(null)} title="Requests" icon="request" ic="var(--am)" style={{position:"absolute",right:12,top:88,bottom:76,zIndex:22,width:"min(390px,34vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
       <div style={{padding:9,borderRadius:10,border:"1px solid rgba(255,171,0,.22)",background:"rgba(255,171,0,.06)",fontSize:".66rem",lineHeight:1.45,color:"var(--mt)",marginBottom:8}}>Requests are held in spark escrow. Performer accepts to fulfill or declines to refund.</div>
       <div style={{overflowY:"auto",maxHeight:"calc(100% - 76px)",paddingRight:3}}>{(perf.requests||[]).map((r,i)=><button key={i} onClick={()=>addReq(r)} disabled={user.sparks<r.sparks} style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%",padding:"8px 0",background:"none",border:"none",borderBottom:i<perf.requests.length-1?"1px solid var(--bd)":"none",cursor:user.sparks>=r.sparks?"pointer":"not-allowed",opacity:user.sparks>=r.sparks?1:.35,color:"var(--tx)",textAlign:"left"}}>
         <div><div style={{fontWeight:700,fontSize:".8rem"}}>{r.name}</div><div style={{fontSize:".66rem",color:"var(--mt)"}}>{r.desc}</div></div>
         <span style={{fontWeight:800,fontSize:".76rem",color:"var(--am)",display:"flex",alignItems:"center",gap:2,flexShrink:0}}><I n="spark" s={10} c="var(--am)"/>{r.sparks.toLocaleString()}</span></button>)}</div></Pn>}
-    {gm&&<GE game={gm} sparks={user.sparks} onSpend={onSC} onClose={()=>setGm(null)} onSB={sb}/>}
+    {!media.fullscreen&&gm&&<GE game={gm} sparks={user.sparks} onSpend={onSC} onClose={()=>setGm(null)} onSB={sb}/>}
     {/* Action Bar */}
-    <div style={{position:"absolute",bottom:0,left:0,right:0,zIndex:15}}>
+    {!media.fullscreen&&<div style={{position:"absolute",bottom:0,left:0,right:0,zIndex:15}}>
       <div style={{display:"grid",gridTemplateColumns:"minmax(210px,1fr) auto minmax(210px,1fr)",alignItems:"center",gap:12,padding:"8px 12px",background:"linear-gradient(to top,rgba(5,8,16,.96) 68%,transparent)"}}>
         <div style={{display:"flex",alignItems:"center",gap:6}}>
           <button type="button" title={media.paused?"Resume feed":"Pause feed"} onClick={()=>setMedia(p=>({...p,paused:!p.paused}))} style={{height:36,padding:"0 10px",borderRadius:18,border:"1px solid var(--bd)",background:media.paused?"rgba(255,171,0,.16)":"rgba(255,255,255,.07)",color:"#fff",display:"inline-flex",alignItems:"center",gap:6,cursor:"pointer",fontWeight:900,fontSize:".66rem"}}><I n={media.paused?"play":"pause"} s={13}/>{media.paused?"Resume":"Pause"}</button>
@@ -729,19 +733,40 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
               <I n={b.i} s={13}/><span style={{fontSize:".46rem",fontWeight:700,color:pn===b.k?"var(--pk)":"var(--mt)"}}>{b.l}</span></button>)}
         </div>
         <div style={{display:"flex",justifyContent:"flex-end",alignItems:"center",gap:8,position:"relative"}}>
-          <MediaButton label="Settings" active={media.settings} onClick={()=>setMedia(p=>({...p,settings:!p.settings}))}><I n="gear" s={16}/></MediaButton>
-          <MediaButton label="Fullscreen"><I n="fullscreen" s={16}/></MediaButton>
-          <MediaButton label={media.muted?"Unmute":"Mute"} onClick={()=>setMedia(p=>({...p,muted:!p.muted}))}><I n={media.muted?"volumeoff":"volume"} s={17}/></MediaButton>
+          <MediaButton label="Settings" active={media.settings} onClick={()=>setMedia(p=>({...p,settings:!p.settings,volumeOpen:false}))}><I n="gear" s={16}/></MediaButton>
+          <MediaButton label="Fullscreen" onClick={toggleFullscreen}><I n="fullscreen" s={16}/></MediaButton>
+          <MediaButton label={`Volume ${media.muted?0:media.volume}%`} active={media.volumeOpen} onClick={()=>setMedia(p=>({...p,volumeOpen:!p.volumeOpen,settings:false}))}><I n={media.muted||media.volume===0?"volumeoff":"volume"} s={17}/></MediaButton>
+          {media.volumeOpen&&<VolumePopover media={media} setMedia={setMedia} setVolume={setVolume}/>}
           {media.settings&&<MediaSettings media={media} setMedia={setMedia}/>}
         </div>
       </div>
-    </div></div>;}
+    </div>}
+    {media.fullscreen&&<div style={{position:"absolute",right:18,bottom:18,zIndex:30,display:"flex",alignItems:"center",gap:8,padding:6,borderRadius:22,border:"1px solid rgba(255,255,255,.12)",background:"linear-gradient(135deg,rgba(10,14,24,.54),rgba(7,9,16,.82))",boxShadow:"0 22px 70px rgba(0,0,0,.38)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)"}}>
+      <button type="button" onClick={toggleFullscreen} style={{height:34,padding:"0 12px",borderRadius:17,border:"1px solid rgba(255,255,255,.14)",background:"rgba(255,255,255,.08)",color:"#fff",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:7,fontWeight:900,fontSize:".66rem"}}><I n="fullscreen" s={14}/>Exit</button>
+      <div style={{position:"relative"}}>
+        <MediaButton label={`Volume ${media.muted?0:media.volume}%`} active={media.volumeOpen} onClick={()=>setMedia(p=>({...p,volumeOpen:!p.volumeOpen}))}><I n={media.muted||media.volume===0?"volumeoff":"volume"} s={17}/></MediaButton>
+        {media.volumeOpen&&<VolumePopover media={media} setMedia={setMedia} setVolume={setVolume}/>}
+      </div>
+    </div>}
+  </div>;}
 
 /* ═══ AUTH — Login / Register ═══ */
 function MediaButton({children,label,onClick,active=false}) {
   return <button type="button" aria-label={label} title={label} onClick={onClick} style={{width:36,height:36,borderRadius:18,border:"1px solid "+(active?"rgba(255,255,255,.24)":"var(--bd)"),background:active?"rgba(255,255,255,.16)":"rgba(255,255,255,.07)",color:"#fff",display:"grid",placeItems:"center",cursor:"pointer",boxShadow:active?"0 0 24px rgba(255,255,255,.08)":"none",flexShrink:0}}>
     {children}
   </button>;
+}
+
+function VolumePopover({media,setMedia,setVolume}) {
+  const shown=media.muted?0:media.volume;
+  return <G className="ai" style={{position:"absolute",right:0,bottom:44,width:210,padding:12,borderRadius:13,background:"rgba(42,42,46,.97)",border:"1px solid rgba(255,255,255,.14)",boxShadow:"0 24px 80px rgba(0,0,0,.5)",zIndex:90}}>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:10}}>
+      <div style={{display:"flex",alignItems:"center",gap:7,fontSize:".76rem",fontWeight:900}}><I n={shown===0?"volumeoff":"volume"} s={15} c="var(--am)"/>Volume</div>
+      <button type="button" onClick={()=>setMedia(p=>p.muted?{...p,muted:false,volume:p.volume>0?p.volume:60}:{...p,muted:true})} style={{height:24,padding:"0 9px",borderRadius:999,border:"1px solid rgba(255,255,255,.12)",background:shown===0?"rgba(255,45,120,.16)":"rgba(255,255,255,.07)",color:shown===0?"var(--pk)":"rgba(255,255,255,.72)",fontSize:".58rem",fontWeight:1000,cursor:"pointer"}}>{shown===0?"Muted":"Mute"}</button>
+    </div>
+    <input aria-label="Volume" type="range" min="0" max="100" value={shown} onChange={e=>setVolume(e.target.value)} style={{width:"100%",accentColor:shown===0?"var(--pk)":"var(--am)",cursor:"pointer"}}/>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:6,fontSize:".58rem",fontWeight:900,color:"rgba(255,255,255,.5)"}}><span>0</span><span style={{color:shown===0?"var(--pk)":"var(--am)"}}>{shown}%</span><span>100</span></div>
+  </G>;
 }
 
 function MediaSettings({media,setMedia}) {

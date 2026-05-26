@@ -197,7 +197,7 @@ const AUCTION_TIERS=[
   {min:4000,label:"Premium Scene Route",reward:"Custom moment slot with top billing and extended acknowledgement."},
   {min:10000,label:"Signature Jackpot",reward:"Exclusive post-show follow-up plus premium room credit if accepted."}
 ];
-const auctionTier=bid=>AUCTION_TIERS.filter(t=>bid>=t.min).at(-1)||AUCTION_TIERS[0];
+const auctionTier=bid=>AUCTION_TIERS.filter(t=>bid>=t.min).slice(-1)[0]||AUCTION_TIERS[0];
 const requestPalette=name=>{
   const n=(name||"").toLowerCase();
   if(n.includes("ultimate"))return {a:"#fbbf24",b:"#8b5cf6",c:"#ff2d78",label:"signature"};

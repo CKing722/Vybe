@@ -225,6 +225,32 @@ paths:
         "404":
           $ref: "#/components/responses/ApiError"
 
+  /api/me/profile:
+    put:
+      tags: [viewer]
+      summary: Update viewer profile fields
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ViewerProfileUpdateRequest"
+      responses:
+        "200":
+          description: Updated viewer profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ViewerMeResponse"
+        "400":
+          $ref: "#/components/responses/ApiError"
+        "401":
+          $ref: "#/components/responses/ApiError"
+        "404":
+          $ref: "#/components/responses/ApiError"
+
   /api/me/history/{performerId}:
     get:
       tags: [viewer]
@@ -596,6 +622,23 @@ components:
           items:
             $ref: "#/components/schemas/ViewerPerformerHistoryEntry"
       required: [user, viewer, performerHistory]
+
+    ViewerProfileUpdateRequest:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        display_name:
+          type: ["string", "null"]
+          minLength: 1
+          maxLength: 50
+        avatar:
+          type: ["string", "null"]
+          maxLength: 2048
+          pattern: "^https?://"
+        bio:
+          type: ["string", "null"]
+          maxLength: 2000
 
     SparkBalance:
       type: object

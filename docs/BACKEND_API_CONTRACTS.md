@@ -168,6 +168,22 @@ Query parameters:
 
 Returns a `summary` of the viewer's relationship with the performer plus a `gifts` list suitable for the "Your History" UI section.
 
+### `PUT /api/me/profile`
+
+Requires auth.
+
+Request:
+
+```json
+{
+  "display_name": "NeonVelvet",
+  "avatar": "https://cdn.vybe.local/avatars/neon.png",
+  "bio": "I only gift in cinematic."
+}
+```
+
+Response: same shape as `GET /api/me` with updated `user` fields.
+
 ## Performers
 
 ### `GET /api/performers`
@@ -284,5 +300,22 @@ Request:
 {
   "theme": "spark storm",
   "count": 5
+}
+```
+
+Response:
+
+```json
+{
+  "provider": "local",
+  "paidProviderUsed": false,
+  "rawProviderApisEnabled": false,
+  "questions": [
+    {
+      "q": "What makes a Spark Storm feel communal?",
+      "opts": ["Shared progress", "Hidden scores", "Muted chat", "Static UI"],
+      "ans": 0
+    }
+  ]
 }
 ```

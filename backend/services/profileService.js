@@ -1,11 +1,27 @@
 const { hasDatabase, query } = require('../config/db');
-const { notFound } = require('../utils/errors');
+const { badRequest, notFound } = require('../utils/errors');
 const { getMemoryState, LOYALTY_TIERS } = require('./memoryStore');
 
 function loyaltyForSpend(totalSpent) {
   return [...LOYALTY_TIERS]
     .reverse()
     .find((tier) => Number(totalSpent || 0) >= tier.min);
+}
+
+function normalizeOptionalString(value, { maxLength } = {}) {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+
+  if (typeof value !== 'string') {
+    throw badRequest('Profile fields must be strings');
+  }
+
+  const trimmed = value.trim();
+  if (trimmed.length === 0) return null;
+  if (Number.isFinite(maxLength) && trimmed.length > maxLength) {
+    throw badRequest(`Profile fields must be at most ${maxLength} characters long`);
+  }
+  return trimmed;
 }
 
 function publicViewerProfile(user, profile) {
@@ -98,8 +114,72 @@ async function getCurrentViewer(userId) {
   };
 }
 
+async function updateViewerProfile(userId, updates) {
+  const nextDisplayNameRaw = normalizeOptionalString(updates.displayName, { maxLength: 50 });
+  const nextAvatarUrl = normalizeOptionalString(updates.avatarUrl, { maxLength: 2048 });
+  const nextBio = normalizeOptionalString(updates.bio, { maxLength: 2000 });
+
+  const nextDisplayName = nextDisplayNameRaw === null ? undefined : nextDisplayNameRaw;
+
+  if (nextDisplayName === undefined && nextAvatarUrl === undefined && nextBio === undefined) {
+    throw badRequest('No profile updates provided');
+  }
+
+  if (!hasDatabase()) {
+    const state = getMemoryState();
+    const user = state.users.get(userId);
+    const profile = state.viewerProfiles.get(userId);
+    if (!user || !profile || user.role !== 'viewer') {
+      throw notFound('Viewer profile not found');
+    }
+
+    const updatedUser = { ...user };
+    if (nextDisplayName !== undefined) updatedUser.display_name = nextDisplayName;
+    if (nextAvatarUrl !== undefined) updatedUser.avatar_url = nextAvatarUrl;
+    if (nextBio !== undefined) updatedUser.bio = nextBio;
+    updatedUser.updated_at = new Date().toISOString();
+
+    state.users.set(userId, updatedUser);
+    return getCurrentViewer(userId);
+  }
+
+  const setClauses = [];
+  const params = [userId];
+  let paramIndex = params.length;
+
+  if (nextDisplayName !== undefined) {
+    params.push(nextDisplayName);
+    paramIndex += 1;
+    setClauses.push(`display_name = $${paramIndex}`);
+  }
+
+  if (nextAvatarUrl !== undefined) {
+    params.push(nextAvatarUrl);
+    paramIndex += 1;
+    setClauses.push(`avatar_url = $${paramIndex}`);
+  }
+
+  if (nextBio !== undefined) {
+    params.push(nextBio);
+    paramIndex += 1;
+    setClauses.push(`bio = $${paramIndex}`);
+  }
+
+  setClauses.push(`updated_at = NOW()`);
+
+  await query(
+    `UPDATE users
+     SET ${setClauses.join(', ')}
+     WHERE id = $1 AND role = 'viewer' AND is_active = TRUE`,
+    params
+  );
+
+  return getCurrentViewer(userId);
+}
+
 module.exports = {
   getCurrentViewer,
   loyaltyForSpend,
   publicViewerProfile,
+  updateViewerProfile,
 };

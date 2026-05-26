@@ -720,7 +720,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
         </div>
         <div style={{display:"flex",justifyContent:"center",gap:3,overflowX:"auto",maxWidth:"min(620px,48vw)",paddingBottom:1}}>
           {[{i:"gift",l:"Gift",k:"gifts"},{i:"gamepad",l:"Games",k:"games"},{i:"request",l:"Request",k:"requests"},{i:"trophy",l:"Board",k:"board"},
-            {i:"bookmark",l:"Book",action:onBook},{i:"crown",l:"VIP",action:onVip},{i:"wallet",l:"Top Up",action:onWallet},
+            {i:"bookmark",l:"Book",action:onBook},{i:"crown",l:"VIP",action:onVip},
             {i:chH?"eye":"eyeoff",l:chH?"Chat":"Hide",action:()=>setChH(!chH)}].map(b=>
             <button key={b.l} onClick={()=>{if(b.action)b.action();else if(b.k)tog(b.k)}} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,padding:"4px 7px",borderRadius:7,border:"1px solid "+(pn===b.k?"var(--pk)":"var(--bd)"),background:pn===b.k?"rgba(255,45,120,.06)":"var(--gl)",color:"var(--tx)",cursor:"pointer",minWidth:38,flexShrink:0}}>
               <I n={b.i} s={13}/><span style={{fontSize:".46rem",fontWeight:700,color:pn===b.k?"var(--pk)":"var(--mt)"}}>{b.l}</span></button>)}

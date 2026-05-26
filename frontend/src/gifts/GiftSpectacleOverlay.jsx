@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { GIFT_EFFECT_MAP, PLATFORM_BANNER_THRESHOLD_SPARKS } from "./giftEffectCatalog.js";
 import useReducedMotion from "./useReducedMotion.js";
 import CanvasParticleRenderer from "./CanvasParticleRenderer.jsx";
+import useGiftAudio from "./useGiftAudio.js";
 
 const GIFT_STAGE_ANCHOR = {
   top: "22%",
@@ -17,15 +18,17 @@ const GIFT_STAGE_ANCHOR = {
      visible  - boolean, mount/unmount trigger
      onDone   - callback fired when animation cycle completes
    ----------------------------------------------------------------------- */
-export default function GiftSpectacleOverlay({ giftId, sender = "Someone", recipient = "this room", visible, onDone }) {
+export default function GiftSpectacleOverlay({ giftId, sender = "Someone", recipient = "this room", visible, onDone, muted = false }) {
   const [phase, setPhase] = useState("idle"); // idle | entry | hold | exit | done
   const timers = useRef([]);
   const reducedMotion = useReducedMotion();
+  const { playGiftSound } = useGiftAudio({ muted });
 
   const effect = giftId ? GIFT_EFFECT_MAP[giftId] : null;
 
   useEffect(() => {
     if (!visible || !effect) return;
+    playGiftSound(effect.tier);
 
     timers.current.forEach(clearTimeout);
     timers.current = [];

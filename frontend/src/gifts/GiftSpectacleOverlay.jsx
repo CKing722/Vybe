@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { GIFT_EFFECT_MAP, PLATFORM_BANNER_THRESHOLD_SPARKS } from "./giftEffectCatalog.js";
 import useReducedMotion from "./useReducedMotion.js";
 import CanvasParticleRenderer from "./CanvasParticleRenderer.jsx";
@@ -586,32 +586,35 @@ function DiamondGlyph({ pal, style }) {
    Budget-capped, tier-aware. Renders only during active phases.
    ----------------------------------------------------------------------- */
 function ParticleBurst({ pal, budget, phase }) {
+  // Particle positions are memoized on budget identity so phase transitions
+  // don't snap particles to new random positions mid-animation.
+  const particles = useMemo(() => {
+    if (!budget) return [];
+    const count = Math.min(budget.count, 24); // DOM cap
+    const spread = budget.spread || "radial-tight";
+    return Array.from({ length: count }, (_, i) => {
+      const angle = (i / count) * 360;
+      const radius = spread === "cascade-down"
+        ? 60 + Math.random() * 80
+        : spread === "matrix-fall"
+          ? 40 + Math.random() * 120
+          : 30 + Math.random() * 60;
+      const rad = (angle * Math.PI) / 180;
+      const tx = Math.cos(rad) * radius;
+      const ty = spread === "cascade-down"
+        ? Math.abs(Math.sin(rad) * radius) + 30
+        : spread === "matrix-fall"
+          ? Math.sin(rad) * radius + (Math.random() > 0.5 ? 80 : -40)
+          : Math.sin(rad) * radius;
+      const size = Math.max(2, Math.min(budget.maxRadius || 6, 3 + Math.random() * 4));
+      const delay = (i / count) * 0.6;
+      const duration = 0.8 + Math.random() * 0.6;
+      const keyframeId = "p" + i;
+      return { tx, ty, size, delay, duration, keyframeId };
+    });
+  }, [budget?.count, budget?.spread, budget?.maxRadius]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!budget || phase === "exit") return null;
-
-  const count = Math.min(budget.count, 24); // DOM cap - canvas handles full budget in renderer
-  const spread = budget.spread || "radial-tight";
-
-  const particles = Array.from({ length: count }, (_, i) => {
-    const angle = (i / count) * 360;
-    const radius = spread === "cascade-down"
-      ? 60 + Math.random() * 80
-      : spread === "matrix-fall"
-        ? 40 + Math.random() * 120
-        : 30 + Math.random() * 60;
-    const rad = (angle * Math.PI) / 180;
-    const tx = Math.cos(rad) * radius;
-    const ty = spread === "cascade-down"
-      ? Math.abs(Math.sin(rad) * radius) + 30
-      : spread === "matrix-fall"
-        ? Math.sin(rad) * radius + (Math.random() > 0.5 ? 80 : -40)
-        : Math.sin(rad) * radius;
-    const size = Math.max(2, Math.min(budget.maxRadius || 6, 3 + Math.random() * 4));
-    const delay = (i / count) * 0.6;
-    const duration = 0.8 + Math.random() * 0.6;
-
-    const keyframeId = "p" + i;
-    return { tx, ty, size, delay, duration, keyframeId };
-  });
 
   const containerStyle = {
     position: "absolute",

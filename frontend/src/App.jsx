@@ -34,7 +34,7 @@ streak:<svg viewBox="0 0 24 24" style={p}><path d="M12 2c0 4-5 5-5 11a5 5 0 0010
 live:<svg viewBox="0 0 24 24" style={p}><circle cx="12" cy="12" r="4" fill={c}/><circle cx="12" cy="12" r="8" fill="none" stroke={c} strokeWidth="1.2" opacity=".4"/></svg>,
 chat:<svg viewBox="0 0 24 24" style={p}><path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z" fill="none" stroke={c} strokeWidth="1.5"/></svg>,
 trophy:<svg viewBox="0 0 24 24" style={p}><path d="M8 3h8v6a4 4 0 01-8 0V3z" fill="none" stroke={c} strokeWidth="1.5"/><path d="M8 5H5a2 2 0 00-2 2v1a3 3 0 003 3h2M16 5h3a2 2 0 012 2v1a3 3 0 01-3 3h-2" fill="none" stroke={c} strokeWidth="1.2"/><line x1="12" y1="13" x2="12" y2="17" stroke={c} strokeWidth="1.5"/><rect x="8" y="17" width="8" height="2" rx="1" fill="none" stroke={c} strokeWidth="1.2"/></svg>,
-gear:<svg viewBox="0 0 24 24" style={p}><circle cx="12" cy="12" r="3" fill="none" stroke={c} strokeWidth="1.5"/><path d="M12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
+gear:<svg viewBox="0 0 24 24" style={p}><path d="M9.4 3.2l.6-1.2h4l.6 1.2 2.1.9 1.3-.4 2 3.4-.9 1a7.7 7.7 0 010 2.4l.9 1-2 3.4-1.3-.4-2.1.9-.6 1.2h-4l-.6-1.2-2.1-.9-1.3.4-2-3.4.9-1a7.7 7.7 0 010-2.4l-.9-1 2-3.4 1.3.4 2.1-.9z" fill="none" stroke={c} strokeWidth="1.35" strokeLinejoin="round"/><circle cx="12" cy="9.3" r="2.7" fill="none" stroke={c} strokeWidth="1.45"/></svg>,
 play:<svg viewBox="0 0 24 24" style={p}><path d="M8 5v14l11-7z" fill={c}/></svg>,
 pause:<svg viewBox="0 0 24 24" style={p}><rect x="6" y="4" width="4" height="16" rx="1" fill={c}/><rect x="14" y="4" width="4" height="16" rx="1" fill={c}/></svg>,
 refresh:<svg viewBox="0 0 24 24" style={p}><path d="M20 7v5h-5M4 17v-5h5" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M18 12a6 6 0 00-10-4.5L4 11M6 12a6 6 0 0010 4.5l4-3.5" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
@@ -135,6 +135,8 @@ const PAYMENT_RAILS=[
   {id:"crypto",name:"Crypto",detail:"Bitcoin, EVM, Solana, Tron, Cosmos, Sui, Aptos, and routed chains",icon:"crypto",color:"var(--vi)"},
 ];
 const CRYPTO_RAILS=["Universal router","Bitcoin","Ethereum / EVM","Solana","Tron","Cosmos","Sui","Aptos","Other chain"];
+const WATCH_GRAD="linear-gradient(135deg,var(--pk),var(--am))";
+const CAPTION_LANGUAGES=["English (US) original","Auto-translate","Afrikaans","Albanian","Amharic","Arabic","Armenian","Azerbaijani","Basque","Belarusian","Bengali","Bulgarian","Burmese","Cantonese/Hong Kong","Central Khmer","Chinese","Czech","Danish","Dutch","Estonian","Farsi","Filipino","Finnish","French","Galician","Georgian","German","Greek","Gujarati","Hebrew","Hindi","Hungarian","Icelandic","Indonesian","Italian","Japanese","Javanese","Kannada","Korean","Lao","Latvian","Lithuanian","Macedonian","Malay","Malayalam","Marathi","Mongolian","Nepali","Norwegian","Polish","Portuguese","Punjabi","Romanian","Russian","Sinhalese","Slovak","Spanish","Sundanese","Swahili","Swedish","Tamil","Telugu","Thai","Turkish","Ukrainian","Urdu","Uzbek","Vietnamese","Zulu"];
 const BOOK=[{id:"q",name:"Quick Play",mins:15,sparks:250},{id:"m",name:"Main Event",mins:30,sparks:450,pop:true},{id:"s",name:"Neon Suite",mins:45,sparks:650},{id:"e",name:"VIP Extended",mins:60,sparks:800}];
 const VIPPK=[
   {id:"vp",name:"VIP Private",mins:60,sparks:1500,desc:"Private room, custom pace."},
@@ -817,7 +819,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const initialGame=GAMES.find(g=>(g.id===roomParams.get("game")||g.type===roomParams.get("game"))&&perf.caps.games.includes(g.id))||null;
   const [pn,setPn]=useState(initialGame?null:(roomParams.get("panel")==="games"?"games":null));const [gm,setGm]=useState(initialGame);
   const settingsPreview=roomParams.get("settingsPreview")==="1";
-  const [media,setMedia]=useState({paused:false,replay:false,replayLeft:0,muted:false,volume:72,volumeOpen:false,fullscreen:false,settings:settingsPreview,captions:false,pip:false,quality:"1080p",layout:"Theater"});
+  const [media,setMedia]=useState({paused:false,replay:false,replayLeft:0,muted:false,volume:72,volumeOpen:false,fullscreen:false,settings:settingsPreview,captions:false,captionLang:"English (US) original",quality:"1080p",layout:"Wide",theater:false});
   const [ch,setCh]=useState([{user:"VYBE",msg:`Welcome — ${perf.name} is live. You are known here.`,vip:false,id:0}]);
   const [ci,setCi]=useState("");const [chH,setChH]=useState(false);
   const [reqFx,setReqFx]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
@@ -832,6 +834,8 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   useEffect(()=>{const onFs=()=>{if(!document.fullscreenElement)setMedia(p=>({...p,fullscreen:false,volumeOpen:false}))};document.addEventListener("fullscreenchange",onFs);return()=>document.removeEventListener("fullscreenchange",onFs)},[]);
   const fmt=s=>`${Math.floor(s/60)}:${(s%60).toString().padStart(2,"0")}`;
   const setVolume=v=>{const volume=Math.max(0,Math.min(100,Number(v)||0));setMedia(p=>({...p,volume,muted:volume===0}))};
+  const setTheaterMode=on=>{if(on){setChH(true);setPn(null);setGm(null)}setMedia(p=>({...p,theater:on,volumeOpen:false}))};
+  const switchLayout=()=>setMedia(p=>({...p,layout:p.layout==="Wide"?"Vertical":"Wide"}));
   const setViewingPaused=paused=>setMedia(p=>({...p,paused,settings:false,volumeOpen:false}));
   const goLive=()=>{setMedia(p=>({...p,paused:false,replay:false,replayLeft:0,settings:false,volumeOpen:false}));setNotif("Returned to live");setTimeout(()=>setNotif(null),1400)};
   const startReplay=()=>{if(!perf.caps.replay){setNotif("Replay is not enabled for this room");setTimeout(()=>setNotif(null),1600);return}setPn(null);setGm(null);setMedia(p=>({...p,paused:false,replay:true,replayLeft:15,settings:false,volumeOpen:false}));setNotif("Instant replay - 15 seconds behind live");setTimeout(()=>setNotif(null),1600)};
@@ -848,12 +852,19 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const avG=GAMES.filter(g=>perf.caps.games.includes(g.id));
   const topAcceptedReq=requestPins.filter(r=>r.status==="accepted").reduce((best,r)=>!best||r.sparks>best.sparks||(r.sparks===best.sparks&&r.pinId>best.pinId)?r:best,null);
   const latestDeclinedReq=requestPins.filter(r=>r.status==="declined").reduce((best,r)=>!best||r.pinId>best.pinId?r:best,null);
+  const theaterView=media.fullscreen||media.theater;
+  const verticalLayout=media.layout==="Vertical";
+  const stageWidth=media.fullscreen?verticalLayout?"min(430px,36vw)":"min(760px,58vw)":theaterView?verticalLayout?"min(360px,34vw)":"min(680px,58vw)":verticalLayout?"min(250px,30%)":"min(300px,36%)";
+  const stageHeight=media.fullscreen?"88%":theaterView?"82%":"72%";
+  const bodyWidth=media.fullscreen?verticalLayout?190:320:theaterView?verticalLayout?168:275:160;
+  const headSize=media.fullscreen?verticalLayout?84:94:theaterView?76:64;
+  const captionLang=media.captionLang==="Auto-translate"?"Auto-translated":media.captionLang.replace(" original","");
 
   return<div ref={roomRef} style={{position:"relative",width:"100%",height:"100vh",overflow:"hidden",background:"#050810"}}>
     <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse at 45% 65%,${perf.accent}15,transparent 50%),radial-gradient(ellipse at 55% 35%,rgba(0,212,255,.06),transparent 50%),linear-gradient(180deg,#080e1c,#0a0814 50%,#0d061a)`}}>
-      <div style={{position:"absolute",bottom:0,left:"50%",transform:"translateX(-50%)",width:media.fullscreen?"min(520px,44vw)":"min(300px,36%)",height:media.fullscreen?"86%":"72%",transition:"width .45s ease,height .45s ease"}}>
-        <div style={{position:"absolute",top:"4%",left:"50%",transform:"translateX(-50%)",width:media.fullscreen?88:64,height:media.fullscreen?88:64,borderRadius:"50%",background:"radial-gradient(circle,#e8c4a8 55%,#c49070)",transition:"width .45s ease,height .45s ease"}}/>
-        <div style={{position:"absolute",bottom:"-3%",left:"50%",transform:"translateX(-50%)",width:media.fullscreen?250:160,height:"70%",borderRadius:"42% 42% 20px 20px",background:`linear-gradient(170deg,${perf.accent} 15%,var(--vi) 50%,#0a0e1a 90%)`,transition:"width .45s ease"}}/></div>
+      <div style={{position:"absolute",bottom:0,left:theaterView&&!verticalLayout?"55%":"50%",transform:"translateX(-50%)",width:stageWidth,height:stageHeight,transition:"width .45s ease,height .45s ease,left .45s ease"}}>
+        <div style={{position:"absolute",top:"4%",left:"50%",transform:"translateX(-50%)",width:headSize,height:headSize,borderRadius:"50%",background:"radial-gradient(circle,#e8c4a8 55%,#c49070)",transition:"width .45s ease,height .45s ease"}}/>
+        <div style={{position:"absolute",bottom:"-3%",left:"50%",transform:"translateX(-50%)",width:bodyWidth,height:theaterView&&!verticalLayout?"66%":"70%",borderRadius:theaterView&&!verticalLayout?"46% 46% 24px 24px":"42% 42% 20px 20px",background:`linear-gradient(170deg,${perf.accent} 15%,var(--vi) 50%,#0a0e1a 90%)`,transition:"width .45s ease,height .45s ease,border-radius .45s ease"}}/></div>
       {(media.paused||media.replay)&&<div className="ai" style={{position:"absolute",top:media.fullscreen?18:58,left:"50%",transform:"translateX(-50%)",zIndex:18,display:"flex",alignItems:"center",gap:12,padding:"8px 10px",borderRadius:999,border:"1px solid rgba(255,255,255,.14)",background:"linear-gradient(135deg,rgba(10,14,24,.68),rgba(7,9,16,.9))",boxShadow:"0 22px 70px rgba(0,0,0,.36)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",pointerEvents:"auto"}}>
         <span style={{width:8,height:8,borderRadius:8,background:media.paused?"var(--am)":"var(--cy)",boxShadow:`0 0 18px ${media.paused?"var(--am)":"var(--cy)"}`}}/>
         <div style={{minWidth:0}}><div style={{fontSize:".68rem",fontWeight:1000,letterSpacing:".08em",textTransform:"uppercase",color:media.paused?"var(--am)":"var(--cy)"}}>{media.paused?"Viewing paused":"Instant replay"}</div>
@@ -910,8 +921,8 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
       </G>
     </div>}
     {!media.fullscreen&&chH&&<button type="button" title="Show chat" aria-label="Show chat" onClick={()=>setChH(false)} style={{position:"absolute",left:12,top:96,zIndex:14,height:36,padding:"0 12px",borderRadius:18,border:"1px solid rgba(255,255,255,.12)",background:"linear-gradient(135deg,rgba(10,14,24,.78),rgba(8,10,16,.92))",color:"var(--tx)",display:"inline-flex",alignItems:"center",gap:7,cursor:"pointer",boxShadow:"0 18px 55px rgba(0,0,0,.34)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",fontWeight:900,fontSize:".66rem",letterSpacing:".04em"}}><I n="chat" s={13} c="var(--cy)"/>Chat</button>}
-    {media.captions&&<div className="ai" style={{position:"absolute",left:"50%",bottom:76,transform:"translateX(-50%)",zIndex:13,maxWidth:"min(520px,62vw)",padding:"8px 13px",borderRadius:12,border:"1px solid rgba(255,45,120,.34)",background:"linear-gradient(135deg,rgba(10,14,24,.78),rgba(7,9,16,.92))",boxShadow:"0 20px 70px rgba(0,0,0,.42),0 0 30px rgba(255,45,120,.12)",backdropFilter:"blur(14px)",WebkitBackdropFilter:"blur(14px)",color:"#fff",fontWeight:800,fontSize:".78rem",lineHeight:1.35,textAlign:"center",pointerEvents:"none"}}>
-      <span style={{color:"var(--pk)",fontWeight:1000,marginRight:6}}>CC</span>{perf.name.split(" ")[0]}: Welcome in. Keep your eyes here.
+    {media.captions&&<div className="ai" style={{position:"absolute",left:"50%",bottom:76,transform:"translateX(-50%)",zIndex:13,maxWidth:"min(560px,62vw)",padding:"8px 13px",borderRadius:12,border:"1px solid rgba(255,45,120,.34)",background:"linear-gradient(135deg,rgba(10,14,24,.78),rgba(7,9,16,.92))",boxShadow:"0 20px 70px rgba(0,0,0,.42),0 0 30px rgba(255,45,120,.12)",backdropFilter:"blur(14px)",WebkitBackdropFilter:"blur(14px)",color:"#fff",fontWeight:800,fontSize:".78rem",lineHeight:1.35,textAlign:"center",pointerEvents:"none"}}>
+      <span style={{color:"var(--pk)",fontWeight:1000,marginRight:6}}>CC</span><span style={{color:"var(--am)",fontSize:".62rem",fontWeight:1000,marginRight:7}}>{captionLang}</span>{perf.name.split(" ")[0]}: Welcome in. Keep your eyes here.
     </div>}
     {/* Panels */}
     {!media.fullscreen&&pn==="board"&&<Pn onClose={()=>setPn(null)} title="Leaderboard" icon="trophy" ic="var(--am)" style={{position:"absolute",right:12,top:88,zIndex:22,width:230,maxHeight:"calc(100vh - 180px)",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
@@ -945,8 +956,8 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
     {!media.fullscreen&&<div style={{position:"absolute",bottom:0,left:0,right:0,zIndex:15}}>
       <div style={{display:"grid",gridTemplateColumns:"minmax(210px,1fr) auto minmax(210px,1fr)",alignItems:"center",gap:12,padding:"8px 12px",background:"linear-gradient(to top,rgba(5,8,16,.96) 68%,transparent)"}}>
         <div style={{display:"flex",alignItems:"center",gap:6}}>
-          <button type="button" title={media.paused?"Resume local feed":"Pause local feed"} onClick={()=>setViewingPaused(!media.paused)} style={{height:36,padding:"0 10px",borderRadius:18,border:"1px solid var(--bd)",background:media.paused?"rgba(255,171,0,.16)":"rgba(255,255,255,.07)",color:"#fff",display:"inline-flex",alignItems:"center",gap:6,cursor:"pointer",fontWeight:900,fontSize:".66rem"}}><I n={media.paused?"play":"pause"} s={13}/>{media.paused?"Resume":"Pause"}</button>
-          <button type="button" title={media.replay?"Return to live":"Replay last 15 seconds"} disabled={!perf.caps.replay} onClick={media.replay?goLive:startReplay} style={{height:36,padding:"0 10px",borderRadius:18,border:"1px solid "+(media.replay?"rgba(0,212,255,.4)":"var(--bd)"),background:media.replay?"rgba(0,212,255,.14)":perf.caps.replay?"rgba(255,255,255,.07)":"rgba(255,255,255,.035)",color:perf.caps.replay?"#fff":"rgba(255,255,255,.34)",display:"inline-flex",alignItems:"center",gap:6,cursor:perf.caps.replay?"pointer":"not-allowed",fontWeight:900,fontSize:".66rem"}}><I n={media.replay?"live":"refresh"} s={14}/>{media.replay?"Live":"Replay"}</button>
+          <button type="button" title={media.paused?"Resume local feed":"Pause local feed"} onClick={()=>setViewingPaused(!media.paused)} style={{height:36,padding:"0 11px",borderRadius:18,border:"1px solid rgba(255,255,255,.2)",background:WATCH_GRAD,color:"#fff",display:"inline-flex",alignItems:"center",gap:6,cursor:"pointer",fontWeight:900,fontSize:".66rem",boxShadow:"0 12px 34px rgba(255,45,120,.2)"}}><I n={media.paused?"play":"pause"} s={13} c="#fff"/>{media.paused?"Resume":"Pause"}</button>
+          <button type="button" title={media.replay?"Return to live":"Replay last 15 seconds"} disabled={!perf.caps.replay} onClick={media.replay?goLive:startReplay} style={{height:36,padding:"0 11px",borderRadius:18,border:"1px solid rgba(255,255,255,.2)",background:WATCH_GRAD,color:"#fff",display:"inline-flex",alignItems:"center",gap:6,cursor:perf.caps.replay?"pointer":"not-allowed",fontWeight:900,fontSize:".66rem",boxShadow:"0 12px 34px rgba(255,45,120,.2)",opacity:perf.caps.replay?1:.42}}><I n={media.replay?"live":"refresh"} s={14} c="#fff"/>{media.replay?"Live":"Replay"}</button>
           <span style={{color:media.replay?"var(--cy)":"rgba(255,255,255,.74)",fontSize:".82rem",fontWeight:900,fontVariantNumeric:"tabular-nums"}}>{media.replay?`-${media.replayLeft || 15}s`:fmt(1800-tm)}</span>
         </div>
         <div style={{display:"flex",justifyContent:"center",gap:3,overflowX:"auto",maxWidth:"min(620px,48vw)",paddingBottom:1}}>
@@ -956,16 +967,18 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
               <I n={b.i} s={13}/><span style={{fontSize:".46rem",fontWeight:700,color:pn===b.k?"var(--pk)":"var(--mt)"}}>{b.l}</span></button>)}
         </div>
         <div style={{display:"flex",justifyContent:"flex-end",alignItems:"center",gap:8,position:"relative"}}>
+          <MediaButton label="Captions / CC" active={media.captions} onClick={()=>setMedia(p=>({...p,captions:!p.captions,settings:false,volumeOpen:false}))}><I n="cc" s={16}/></MediaButton>
           <MediaButton label="Settings" active={media.settings} onClick={()=>setMedia(p=>({...p,settings:!p.settings,volumeOpen:false}))}><I n="gear" s={16}/></MediaButton>
           <MediaButton label="Fullscreen" onClick={toggleFullscreen}><I n="fullscreen" s={16}/></MediaButton>
           <MediaButton label={`Volume ${media.muted?0:media.volume}%`} active={media.volumeOpen} onClick={()=>setMedia(p=>({...p,volumeOpen:!p.volumeOpen,settings:false}))}><I n={media.muted||media.volume===0?"volumeoff":"volume"} s={17}/></MediaButton>
           {media.volumeOpen&&<VolumePopover media={media} setMedia={setMedia} setVolume={setVolume}/>}
-          {media.settings&&<MediaSettings media={media} setMedia={setMedia}/>}
+          {media.settings&&<MediaSettings media={media} setMedia={setMedia} setTheaterMode={setTheaterMode} switchLayout={switchLayout}/>}
         </div>
       </div>
     </div>}
     {media.fullscreen&&<div style={{position:"absolute",right:18,bottom:18,zIndex:30,display:"flex",alignItems:"center",gap:8,padding:6,borderRadius:22,border:"1px solid rgba(255,255,255,.12)",background:"linear-gradient(135deg,rgba(10,14,24,.54),rgba(7,9,16,.82))",boxShadow:"0 22px 70px rgba(0,0,0,.38)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)"}}>
-      <button type="button" onClick={toggleFullscreen} style={{height:34,padding:"0 12px",borderRadius:17,border:"1px solid rgba(255,255,255,.14)",background:"rgba(255,255,255,.08)",color:"#fff",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:7,fontWeight:900,fontSize:".66rem"}}><I n="fullscreen" s={14}/>Exit</button>
+      <button type="button" onClick={toggleFullscreen} style={{height:34,padding:"0 12px",borderRadius:17,border:"1px solid rgba(255,255,255,.2)",background:WATCH_GRAD,color:"#fff",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:7,fontWeight:900,fontSize:".66rem",boxShadow:"0 12px 34px rgba(255,45,120,.22)"}}><I n="fullscreen" s={14} c="#fff"/>Exit</button>
+      <MediaButton label="Captions / CC" active={media.captions} onClick={()=>setMedia(p=>({...p,captions:!p.captions,volumeOpen:false}))}><I n="cc" s={16}/></MediaButton>
       <div style={{position:"relative"}}>
         <MediaButton label={`Volume ${media.muted?0:media.volume}%`} active={media.volumeOpen} onClick={()=>setMedia(p=>({...p,volumeOpen:!p.volumeOpen}))}><I n={media.muted||media.volume===0?"volumeoff":"volume"} s={17}/></MediaButton>
         {media.volumeOpen&&<VolumePopover media={media} setMedia={setMedia} setVolume={setVolume}/>}
@@ -975,7 +988,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
 
 /* ═══ AUTH — Login / Register ═══ */
 function MediaButton({children,label,onClick,active=false}) {
-  return <button type="button" aria-label={label} title={label} onClick={onClick} style={{width:36,height:36,borderRadius:18,border:"1px solid "+(active?"rgba(255,255,255,.24)":"var(--bd)"),background:active?"rgba(255,255,255,.16)":"rgba(255,255,255,.07)",color:"#fff",display:"grid",placeItems:"center",cursor:"pointer",boxShadow:active?"0 0 24px rgba(255,255,255,.08)":"none",flexShrink:0}}>
+  return <button type="button" aria-label={label} title={label} onClick={onClick} style={{width:36,height:36,borderRadius:18,border:"1px solid rgba(255,255,255,.2)",background:WATCH_GRAD,color:"#fff",display:"grid",placeItems:"center",cursor:"pointer",boxShadow:active?"0 0 0 2px rgba(255,255,255,.18),0 14px 38px rgba(255,45,120,.28)":"0 12px 34px rgba(255,45,120,.2)",flexShrink:0}}>
     {children}
   </button>;
 }
@@ -992,19 +1005,23 @@ function VolumePopover({media,setMedia,setVolume}) {
   </G>;
 }
 
-function MediaSettings({media,setMedia}) {
+function MediaSettings({media,setMedia,setTheaterMode,switchLayout}) {
   const toggle=on=><span aria-hidden="true" style={{width:44,height:24,borderRadius:999,padding:3,display:"inline-flex",alignItems:"center",justifyContent:on?"flex-end":"flex-start",background:on?"linear-gradient(135deg,var(--pk),var(--am))":"rgba(255,255,255,.14)",border:"1px solid "+(on?"rgba(255,45,120,.62)":"rgba(255,255,255,.14)"),boxShadow:on?"0 0 18px rgba(255,45,120,.28)":"inset 0 0 0 1px rgba(0,0,0,.18)",transition:"background .2s ease, box-shadow .2s ease"}}>
     <span style={{width:18,height:18,borderRadius:"50%",background:"#fff",boxShadow:"0 3px 10px rgba(0,0,0,.34)",display:"block"}}/>
   </span>;
   const row=(icon,label,value,onClick)=><button type="button" onClick={onClick} style={{display:"grid",gridTemplateColumns:"22px minmax(0,1fr) auto",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",border:"none",borderRadius:9,background:"transparent",color:"#f7f7f7",textAlign:"left",cursor:"pointer",font:"inherit",fontSize:".78rem",fontWeight:800}}>
-    <I n={icon} s={16} c="rgba(255,255,255,.82)"/><span>{label}</span><span style={{color:"rgba(255,255,255,.58)",fontSize:".72rem",fontWeight:900}}>{value}</span>
+    <I n={icon} s={16} c="var(--am)"/><span>{label}</span><span style={{color:"rgba(255,255,255,.66)",fontSize:".72rem",fontWeight:900}}>{value}</span>
   </button>;
-  return <G className="ai" style={{position:"fixed",right:110,bottom:58,width:274,padding:7,borderRadius:12,background:"rgba(42,42,46,.97)",border:"1px solid rgba(255,255,255,.14)",boxShadow:"0 24px 80px rgba(0,0,0,.5)",zIndex:80}}>
+  return <G className="ai" style={{position:"fixed",right:110,bottom:58,width:314,padding:7,borderRadius:12,background:"rgba(42,42,46,.97)",border:"1px solid rgba(255,255,255,.14)",boxShadow:"0 24px 80px rgba(0,0,0,.5)",zIndex:80}}>
     {row("cc","Show captions / CC",toggle(media.captions),()=>setMedia(p=>({...p,captions:!p.captions})))}
-    {row("orientation","Orientation",media.layout,()=>setMedia(p=>({...p,layout:p.layout==="Theater"?"Vertical":"Theater"})))}
+    {media.captions&&<div style={{padding:"0 12px 10px 44px"}}>
+      <select aria-label="Caption language" value={media.captionLang} onChange={e=>setMedia(p=>({...p,captionLang:e.target.value,captions:true}))} style={{height:34,fontSize:".68rem",fontWeight:900,borderRadius:8,border:"1px solid rgba(255,171,0,.3)",background:"rgba(255,171,0,.08)",color:"#fff",padding:"0 8px"}}>
+        {CAPTION_LANGUAGES.map(l=><option key={l} value={l}>{l}</option>)}
+      </select>
+    </div>}
+    {row("fullscreen","Theater Mode",toggle(media.theater),()=>setTheaterMode(!media.theater))}
     {row("gear","Quality",media.quality,()=>setMedia(p=>({...p,quality:p.quality==="1080p"?"720p":p.quality==="720p"?"540p":"1080p"})))}
-    {row("pip","Picture-in-picture",media.pip?"On":"P",()=>setMedia(p=>({...p,pip:!p.pip})))}
-    {row("fullscreen","Switch layout",media.layout==="Theater"?"Wide":"Tall",()=>setMedia(p=>({...p,layout:p.layout==="Theater"?"Vertical":"Theater"})))}
+    {row("orientation","Switch layout",media.layout,()=>switchLayout())}
   </G>;
 }
 

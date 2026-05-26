@@ -98,8 +98,64 @@ async function getCurrentViewer(userId) {
   };
 }
 
+async function updateViewerProfile(userId, updates) {
+  if (!updates || typeof updates !== 'object') {
+    return getCurrentViewer(userId);
+  }
+
+  if (!hasDatabase()) {
+    const state = getMemoryState();
+    const user = state.users.get(userId);
+    const profile = state.viewerProfiles.get(userId);
+    if (!user || !profile || user.role !== 'viewer') {
+      throw notFound('Viewer profile not found');
+    }
+
+    const nextUser = { ...user };
+    for (const [field, value] of Object.entries(updates)) {
+      if (value === undefined) continue;
+      nextUser[field] = value;
+    }
+    nextUser.updated_at = new Date().toISOString();
+    state.users.set(userId, nextUser);
+
+    return getCurrentViewer(userId);
+  }
+
+  const allowedColumns = new Set(['display_name', 'avatar_url', 'banner_url', 'bio']);
+  const setClauses = [];
+  const values = [userId];
+  let index = 2;
+
+  for (const [column, value] of Object.entries(updates)) {
+    if (!allowedColumns.has(column)) continue;
+    if (value === undefined) continue;
+    setClauses.push(`${column} = $${index}`);
+    values.push(value);
+    index += 1;
+  }
+
+  if (setClauses.length === 0) {
+    return getCurrentViewer(userId);
+  }
+
+  const { rowCount } = await query(
+    `UPDATE users
+     SET ${setClauses.join(', ')}, updated_at = NOW()
+     WHERE id = $1 AND role = 'viewer' AND is_active = TRUE`,
+    values
+  );
+
+  if (rowCount === 0) {
+    throw notFound('Viewer profile not found');
+  }
+
+  return getCurrentViewer(userId);
+}
+
 module.exports = {
   getCurrentViewer,
   loyaltyForSpend,
   publicViewerProfile,
+  updateViewerProfile,
 };

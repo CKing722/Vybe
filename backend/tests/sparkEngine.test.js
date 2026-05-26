@@ -81,6 +81,21 @@ test('demo API exposes viewer, performer, and spark contracts for frontend integ
     assert.equal(me.user.displayName, 'VelvetKing');
     assert.equal(me.viewer.sparks, 10000);
 
+    const profileUpdateResponse = await fetch(`${baseUrl}/api/me/profile`, {
+      method: 'PUT',
+      headers: { ...headers, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        display_name: 'VelvetQueen',
+        avatar_url: 'https://example.com/avatar.png',
+        bio: 'Profile update smoke test',
+      }),
+    });
+    assert.equal(profileUpdateResponse.status, 200);
+    const updatedProfile = await profileUpdateResponse.json();
+    assert.equal(updatedProfile.user.displayName, 'VelvetQueen');
+    assert.equal(updatedProfile.user.avatarUrl, 'https://example.com/avatar.png');
+    assert.equal(updatedProfile.user.bio, 'Profile update smoke test');
+
     const performersResponse = await fetch(`${baseUrl}/api/performers?live=true`);
     assert.equal(performersResponse.status, 200);
     const performers = await performersResponse.json();

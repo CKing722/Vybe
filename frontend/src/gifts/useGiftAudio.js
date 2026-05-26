@@ -35,7 +35,7 @@ function scheduleOsc(ctx, { type = "sine", freq, freqEnd, startT, stopT, peakGai
 /*
   useGiftAudio
   Provides tier-appropriate synthetic audio feedback for gift spectacle events.
-  Uses Web Audio API oscillators — no external assets, no network requests.
+  Uses Web Audio API oscillators - no external assets, no network requests.
 
   Props (object):
     muted - boolean, skip all sound when true (e.g. user toggled mute)

@@ -535,7 +535,7 @@ function MidTierBurst({ effect, pal, typo, sender, phase, reducedMotion }) {
       <div style={cardStyle}>
         {!reducedMotion && (
           <div style={{ position: "absolute", inset: 0, overflow: "hidden", borderRadius: "36px", pointerEvents: "none" }}>
-            <ParticleBurst pal={pal} budget={effect.particleBudget} phase={phase} />
+            <CanvasParticleRenderer pal={pal} budget={effect.particleBudget} phase={phase} />
           </div>
         )}
         <div style={{ ...gemStyle, width: 54, height: 54, transformStyle: "preserve-3d" }}>

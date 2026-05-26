@@ -50,7 +50,9 @@ export default function PlatformBanner({ giftId, sender = "Someone", recipient =
 
   const pal = effect.palette;
   const typo = effect.typography;
-  const headline = sender + " sent " + effect.displayName + " to " + recipient;
+  const headline = typo.bannerHeadline
+    ? typo.bannerHeadline.replace("{sender}", sender)
+    : sender + " sent " + effect.displayName + " to " + recipient;
   const isCinematic = effect.sparkCost >= 5000;
 
   const bannerStyle = {

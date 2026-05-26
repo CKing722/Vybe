@@ -1070,7 +1070,7 @@ export default function App(){
 
   const {current:demoGift,enqueue:enqueueDemoGift,advance:advanceDemoGift}=useGiftQueue();
   const [giftEvents,setGiftEvents]=useState([]);
-  const DEMO_GIFTS=["neon_rose","crown_drop","private_key"];
+  const DEMO_GIFTS=["neon_rose","fire_shot","velvet_kiss","diamond_rain","crown_drop","champagne_pour","private_key"];
   let _demoIdx=useRef(0);
   const triggerDemoGift=useCallback((giftId)=>{
     const recipient=pf?.name||PERFS[0].name;

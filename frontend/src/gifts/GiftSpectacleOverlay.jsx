@@ -88,17 +88,17 @@ function LowTierToast({ effect, pal, typo, sender, phase, reducedMotion }) {
 
   const s = {
     position: "fixed",
-    bottom: "80px",
-    right: "16px",
+    bottom: "88px",
+    right: "18px",
     zIndex: 1200,
     display: "flex",
     alignItems: "center",
-    gap: "8px",
-    padding: "8px 14px",
-    borderRadius: "24px",
-    background: "rgba(20,20,28,0.88)",
+    gap: "10px",
+    padding: "9px 14px 9px 9px",
+    borderRadius: "26px",
+    background: "linear-gradient(135deg,rgba(18,20,29,0.9),rgba(6,7,13,0.82))",
     border: "1px solid " + pal.primary + "55",
-    boxShadow: "0 0 16px " + (pal.glow || pal.primary + "44"),
+    boxShadow: "0 18px 46px rgba(0,0,0,.36), 0 0 22px " + (pal.glow || pal.primary + "44"),
     color: pal.text || "#fff",
     fontFamily: typo.displayFont === "monospace" ? "monospace" : "inherit",
     fontWeight: typo.weight || 500,
@@ -111,26 +111,19 @@ function LowTierToast({ effect, pal, typo, sender, phase, reducedMotion }) {
     maxWidth: "220px",
   };
 
-  const dot = {
-    width: "8px",
-    height: "8px",
-    borderRadius: "50%",
-    background: pal.primary,
-    boxShadow: "0 0 6px " + pal.primary,
-    flexShrink: 0,
-    animation: holding ? "vybe-toast-dot-pulse 1.1s ease-in-out infinite" : "none",
-  };
-
   return (
     <div style={s} aria-live="polite" aria-label={sender + " sent " + effect.displayName}>
       {holding && (
-        <style>{`@keyframes vybe-toast-dot-pulse{0%,100%{box-shadow:0 0 6px ${pal.primary};transform:scale(1)}50%{box-shadow:0 0 14px ${pal.primary},0 0 26px ${pal.primary}55;transform:scale(1.3)}}`}</style>
+        <style>{`@keyframes vybe-low-object-drift{0%,100%{transform:translateY(0) rotateY(-12deg)}50%{transform:translateY(-4px) rotateY(14deg)}}`}</style>
       )}
       {!reducedMotion && <ParticleBurst pal={pal} budget={effect.particleBudget} phase={phase} />}
-      <span style={dot} />
-      <span style={{ color: pal.primary, fontWeight: 600 }}>{sender}</span>
-      <span style={{ opacity: 0.75 }}>sent</span>
-      <span style={{ fontWeight: 600 }}>{effect.displayName}</span>
+      <div style={{ width: 38, height: 38, flexShrink: 0, transformStyle: "preserve-3d", animation: holding ? "vybe-low-object-drift 1.8s ease-in-out infinite" : "none" }}>
+        <GiftObjectMesh kind={effect.objectKind || effect.id} pal={pal} />
+      </div>
+      <div style={{ minWidth: 0, display: "grid", gap: "1px" }}>
+        <span style={{ color: pal.primary, fontWeight: 800, fontSize: "12px" }}>{sender}</span>
+        <span style={{ fontWeight: 700, color: "#fff", fontSize: "13px" }}>{effect.displayName}</span>
+      </div>
     </div>
   );
 }
@@ -177,18 +170,19 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, isBanner, phase
 
   const labelStyle = {
     position: "absolute",
-    right: 0,
-    bottom: isKey ? "-2px" : "8px",
-    minWidth: "min(220px, 52vw)",
-    maxWidth: "min(260px, 58vw)",
-    padding: "7px 10px",
-    borderRadius: "999px",
-    border: "1px solid " + pal.primary + "66",
-    background: "rgba(5,7,13,0.82)",
-    boxShadow: "0 18px 42px rgba(0,0,0,0.36), 0 0 24px " + (pal.glow || pal.primary + "33"),
+    right: "50%",
+    bottom: isKey ? "-8px" : "0",
+    transform: "translateX(50%)",
+    minWidth: "min(210px, 52vw)",
+    maxWidth: "min(240px, 58vw)",
+    padding: "7px 11px",
+    borderRadius: "11px",
+    border: "1px solid rgba(255,255,255,.14)",
+    background: "linear-gradient(135deg,rgba(255,255,255,.1),rgba(5,7,13,0.82))",
+    boxShadow: "0 18px 42px rgba(0,0,0,0.34), 0 0 20px " + (pal.glow || pal.primary + "22"),
     color: "#fff",
     textAlign: "center",
-    fontSize: "10px",
+    fontSize: "10.5px",
     fontWeight: 800,
     letterSpacing: "0.03em",
     backdropFilter: "blur(12px)",
@@ -198,11 +192,12 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, isBanner, phase
   const metaStyle = {
     display: "inline-flex",
     alignItems: "center",
-    gap: "7px",
+    gap: "6px",
+    justifyContent: "center",
     color: pal.primary,
     marginTop: "3px",
-    fontSize: "9px",
-    letterSpacing: "0.16em",
+    fontSize: "8.5px",
+    letterSpacing: "0.12em",
     textTransform: "uppercase",
   };
 
@@ -232,7 +227,7 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, isBanner, phase
       <div style={labelStyle}>
         <div>{headline}</div>
         <div style={metaStyle}>
-          <span>{isBanner ? "Platform banner live" : "Room gift"}</span>
+          <span>{effect.audienceScope === "platform" ? "platform moment" : "room moment"}</span>
           {typo.showSparkCount && <span>{effect.sparkCost.toLocaleString()} sparks</span>}
         </div>
       </div>
@@ -241,10 +236,11 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, isBanner, phase
 }
 
 function Gift3DObject({ effect, pal, reducedMotion }) {
+  const kind = effect.objectKind || effect.id;
   const objectStyle = {
     position: "relative",
-    width: effect.id === "private_key" ? "180px" : "154px",
-    height: effect.id === "private_key" ? "180px" : "154px",
+    width: effect.id === "private_key" || kind === "champagne" ? "180px" : "154px",
+    height: effect.id === "private_key" || kind === "champagne" ? "180px" : "154px",
     transformStyle: "preserve-3d",
     animation: reducedMotion ? "none" : (effect.id === "crown_drop" ? "vybe-gift-crown-drop 900ms cubic-bezier(0.16,1,0.3,1) both, vybe-gift-orbit 2.6s ease-in-out 900ms infinite" : "vybe-gift-orbit 2.8s ease-in-out infinite"),
     filter: "drop-shadow(0 22px 32px rgba(0,0,0,0.52)) drop-shadow(0 0 24px " + (pal.glow || pal.primary + "55") + ")",
@@ -266,10 +262,20 @@ function Gift3DObject({ effect, pal, reducedMotion }) {
     <>
       <div style={ringStyle} />
       <div style={objectStyle}>
-        {effect.id === "private_key" ? <KeyMesh pal={pal} /> : <CrownMesh pal={pal} />}
+        <GiftObjectMesh kind={kind} pal={pal} />
       </div>
     </>
   );
+}
+
+function GiftObjectMesh({ kind, pal }) {
+  if (kind === "key" || kind === "private_key") return <KeyMesh pal={pal} />;
+  if (kind === "champagne" || kind === "champagne_pour") return <ChampagneMesh pal={pal} />;
+  if (kind === "diamond" || kind === "diamond_rain") return <DiamondMesh pal={pal} />;
+  if (kind === "rose" || kind === "neon_rose") return <RoseMesh pal={pal} />;
+  if (kind === "flame" || kind === "fire_shot") return <FlameMesh pal={pal} />;
+  if (kind === "silk" || kind === "velvet_kiss") return <SilkMesh pal={pal} />;
+  return <CrownMesh pal={pal} />;
 }
 
 function CrownMesh({ pal }) {
@@ -313,6 +319,127 @@ function KeyMesh({ pal }) {
         <rect x="187" y="89" width="15" height="22" rx="5" fill="url(#vybeKeyFace)" />
         <path d="M34 101 C74 126 139 121 197 91" fill="none" stroke="#dfffee" strokeWidth="5" opacity="0.3" />
       </g>
+    </svg>
+  );
+}
+
+function ChampagneMesh({ pal }) {
+  return (
+    <svg viewBox="0 0 220 190" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <linearGradient id="vybeChampGlass" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.92" />
+          <stop offset="0.28" stopColor={pal.secondary || "#fff6d6"} stopOpacity="0.65" />
+          <stop offset="0.72" stopColor={pal.primary} stopOpacity="0.48" />
+          <stop offset="1" stopColor="#7a5117" stopOpacity="0.74" />
+        </linearGradient>
+        <linearGradient id="vybeChampLiquid" x1="0" x2="1">
+          <stop offset="0" stopColor="#fff4c2" />
+          <stop offset="0.48" stopColor={pal.primary} />
+          <stop offset="1" stopColor="#b67b18" />
+        </linearGradient>
+        <linearGradient id="vybeBottle" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.7" />
+          <stop offset="0.2" stopColor="#244e35" />
+          <stop offset="0.72" stopColor="#0b1c15" />
+          <stop offset="1" stopColor="#050907" />
+        </linearGradient>
+      </defs>
+      <g transform="translate(20,34) rotate(-18 55 70)" opacity="0.95">
+        <path d="M50 0 L75 0 L71 72 C82 81 88 104 81 126 C73 149 32 149 24 126 C17 104 23 81 34 72 Z" fill="url(#vybeBottle)" stroke="rgba(255,255,255,.38)" strokeWidth="2" />
+        <rect x="50" y="0" width="25" height="26" rx="5" fill={pal.primary} opacity="0.8" />
+        <path d="M40 76 C55 86 67 86 80 76" fill="none" stroke="#fff" strokeWidth="3" opacity="0.22" />
+        <path d="M33 95 C51 105 67 105 81 95" fill="none" stroke="#fff" strokeWidth="2" opacity="0.16" />
+      </g>
+      <path d="M65 42 C68 96 80 120 102 124 L102 158 L78 166 L142 166 L118 158 L118 124 C140 120 152 96 155 42 Z" fill="rgba(255,255,255,.11)" stroke="rgba(255,255,255,.55)" strokeWidth="3" />
+      <path d="M73 72 C80 93 91 103 110 104 C129 103 140 93 147 72 C132 80 88 80 73 72 Z" fill="url(#vybeChampLiquid)" opacity="0.9" />
+      <ellipse cx="110" cy="42" rx="45" ry="10" fill="rgba(255,255,255,.2)" stroke="rgba(255,255,255,.7)" strokeWidth="2" />
+      <path d="M61 46 C78 58 142 58 159 46" fill="none" stroke="#fff" strokeWidth="3" opacity="0.48" />
+      <g opacity="0.9">
+        {[74,91,113,132,148].map((x, i) => <circle key={i} cx={x} cy={26 - (i % 2) * 7} r={4 + (i % 2)} fill={pal.secondary || "#fff6d6"} />)}
+      </g>
+      <path d="M42 48 C76 14 124 8 188 34" fill="none" stroke={pal.primary} strokeWidth="5" strokeLinecap="round" opacity="0.48" />
+      <path d="M47 58 C88 34 132 30 190 52" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
+      <path d="M82 29 C112 8 146 7 182 19" fill="none" stroke="#fff6d6" strokeWidth="2" strokeLinecap="round" opacity="0.34" />
+    </svg>
+  );
+}
+
+function DiamondMesh({ pal }) {
+  return (
+    <svg viewBox="0 0 180 180" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <linearGradient id="vybeDiamondDeep" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset="0.28" stopColor={pal.secondary || "#dff8ff"} />
+          <stop offset="0.72" stopColor={pal.primary} />
+          <stop offset="1" stopColor="#246b83" />
+        </linearGradient>
+      </defs>
+      <polygon points="90,16 153,61 90,164 27,61" fill="url(#vybeDiamondDeep)" stroke="#fff" strokeWidth="3" strokeLinejoin="round" opacity="0.96" />
+      <polyline points="27,61 90,84 153,61" fill="none" stroke="#fff" strokeWidth="2" opacity="0.56" />
+      <polyline points="54,61 90,164 126,61" fill="none" stroke="#ffffff" strokeWidth="1.5" opacity="0.34" />
+      <polygon points="90,16 54,61 90,84 126,61" fill="#fff" opacity="0.16" />
+      <ellipse cx="90" cy="166" rx="44" ry="8" fill={pal.primary} opacity="0.12" />
+    </svg>
+  );
+}
+
+function RoseMesh({ pal }) {
+  return (
+    <svg viewBox="0 0 140 160" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <radialGradient id="vybeRosePetal" cx="42%" cy="30%" r="70%">
+          <stop offset="0" stopColor="#ffd3e2" />
+          <stop offset="0.44" stopColor={pal.primary} />
+          <stop offset="1" stopColor="#7a1037" />
+        </radialGradient>
+        <linearGradient id="vybeRoseStem" x1="0" x2="1">
+          <stop offset="0" stopColor="#0d6f4a" />
+          <stop offset="1" stopColor="#6fffc0" />
+        </linearGradient>
+      </defs>
+      <path d="M70 74 C67 102 65 126 62 148" fill="none" stroke="url(#vybeRoseStem)" strokeWidth="7" strokeLinecap="round" />
+      <path d="M67 112 C46 103 34 118 27 132 C48 134 59 127 67 112 Z" fill="#36d78f" opacity="0.55" />
+      <path d="M73 103 C94 92 109 103 118 116 C98 121 82 116 73 103 Z" fill="#36d78f" opacity="0.42" />
+      <path d="M70 22 C50 25 31 42 34 62 C38 88 62 94 81 80 C107 60 98 21 70 22 Z" fill="url(#vybeRosePetal)" stroke="#ffd2e1" strokeWidth="2" />
+      <path d="M66 35 C47 42 48 67 67 71 C86 75 96 56 84 42 C78 35 72 33 66 35 Z" fill="#ff7eb1" opacity="0.72" />
+      <path d="M78 42 C62 43 58 59 70 64 C81 69 89 57 78 42 Z" fill="#fff" opacity="0.22" />
+    </svg>
+  );
+}
+
+function FlameMesh({ pal }) {
+  return (
+    <svg viewBox="0 0 150 170" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <radialGradient id="vybeFlameOuter" cx="42%" cy="36%" r="72%">
+          <stop offset="0" stopColor="#fff4b8" />
+          <stop offset="0.38" stopColor={pal.primary} />
+          <stop offset="1" stopColor="#8b1d00" />
+        </radialGradient>
+      </defs>
+      <path d="M80 10 C86 49 38 60 42 108 C45 143 72 158 98 147 C127 135 133 103 116 75 C107 60 98 51 98 31 C86 53 75 63 70 82 C64 62 65 38 80 10 Z" fill="url(#vybeFlameOuter)" stroke="#ffd28c" strokeWidth="2" />
+      <path d="M78 76 C65 93 62 123 82 133 C101 142 116 125 107 105 C101 91 88 88 92 63 C84 72 80 75 78 76 Z" fill="#fff3b0" opacity="0.78" />
+      <ellipse cx="79" cy="151" rx="38" ry="9" fill={pal.primary} opacity="0.14" />
+    </svg>
+  );
+}
+
+function SilkMesh({ pal }) {
+  return (
+    <svg viewBox="0 0 180 130" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <linearGradient id="vybeSilk" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#fff0f8" />
+          <stop offset="0.4" stopColor={pal.primary} />
+          <stop offset="1" stopColor="#5a1235" />
+        </linearGradient>
+      </defs>
+      <path d="M18 78 C43 23 78 44 91 68 C106 39 143 22 164 78 C138 112 103 105 91 82 C76 106 43 112 18 78 Z" fill="url(#vybeSilk)" stroke="#ffd1e6" strokeWidth="2" opacity="0.94" />
+      <path d="M22 78 C55 86 75 82 91 68 C107 82 131 86 160 78" fill="none" stroke="#fff" strokeWidth="3" opacity="0.38" />
+      <path d="M47 64 C57 49 71 53 80 66" fill="none" stroke="#fff" strokeWidth="3" opacity="0.28" />
+      <path d="M101 66 C111 52 127 50 139 64" fill="none" stroke="#fff" strokeWidth="3" opacity="0.24" />
     </svg>
   );
 }
@@ -406,7 +533,9 @@ function MidTierBurst({ effect, pal, typo, sender, phase, reducedMotion }) {
             <ParticleBurst pal={pal} budget={effect.particleBudget} phase={phase} />
           </div>
         )}
-        <DiamondGlyph pal={pal} style={gemStyle} />
+        <div style={{ ...gemStyle, width: 54, height: 54, transformStyle: "preserve-3d" }}>
+          <GiftObjectMesh kind={effect.objectKind || effect.id} pal={pal} />
+        </div>
         <div style={textWrap}>
           <span style={senderStyle}>{sender}</span>
           <span style={nameStyle}>{effect.displayName}</span>

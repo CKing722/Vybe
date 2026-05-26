@@ -21,6 +21,8 @@ export const GIFT_EFFECT_CATALOG = [
     audienceScope: "room",
     platformWideBanner: false,
 
+    objectKind: "rose",
+
     palette: {
       primary: "#FF2D78",   // hot pink
       secondary: "#FF8FBA", // blush
@@ -71,25 +73,113 @@ export const GIFT_EFFECT_CATALOG = [
   },
 
   {
-    id: "velvet_spark",
-    displayName: "Velvet Spark",
-    sparkCost: 100,
-    tier: "mid",
-    durationMs: 3200,
+    id: "fire_shot",
+    displayName: "Fire Shot",
+    sparkCost: 25,
+    tier: "low",
+    durationMs: 2600,
     audienceScope: "room",
     platformWideBanner: false,
 
+    objectKind: "flame",
+
     palette: {
-      primary: "#9B5CFF",   // royal violet
-      secondary: "#C49EFF", // lilac shimmer
-      glow: "#9B5CFF44",    // violet bloom
+      primary: "#FF6A22",
+      secondary: "#FFD08A",
+      glow: "#FF6A2255",
       text: "#FFFFFF",
     },
 
     particleBudget: {
-      count: 40,
+      count: 26,
+      maxRadius: 8,
+      spread: "ember-rise",
+      trailFade: true,
+      glitterEnabled: true,
+    },
+
+    typography: {
+      displayFont: "inherit",
+      weight: 600,
+      size: "sm",
+      letterSpacing: "0.04em",
+      casing: "none",
+      showSenderLabel: true,
+      showSparkCount: false,
+    },
+
+    effectPhases: [
+      { phase: "entry", durationMs: 320, animation: "fade-rise", scale: 0.92, opacity: [0, 1] },
+      { phase: "hold", durationMs: 1700, animation: "ember-waver", glowIntensity: 0.55, particleEmit: true },
+      { phase: "exit", durationMs: 580, animation: "fade-fall", scale: 0.9, opacity: [1, 0] },
+    ],
+  },
+
+  {
+    id: "velvet_kiss",
+    displayName: "Blow Kiss",
+    sparkCost: 50,
+    tier: "low",
+    durationMs: 2800,
+    audienceScope: "room",
+    platformWideBanner: false,
+
+    objectKind: "silk",
+
+    palette: {
+      primary: "#FF4D9E",
+      secondary: "#FFD1E6",
+      glow: "#FF4D9E55",
+      text: "#FFFFFF",
+    },
+
+    particleBudget: {
+      count: 30,
+      maxRadius: 7,
+      spread: "silk-float",
+      trailFade: true,
+      glitterEnabled: true,
+    },
+
+    typography: {
+      displayFont: "inherit",
+      weight: 600,
+      size: "sm",
+      letterSpacing: "0.04em",
+      casing: "none",
+      showSenderLabel: true,
+      showSparkCount: false,
+    },
+
+    effectPhases: [
+      { phase: "entry", durationMs: 340, animation: "fade-rise", scale: 0.9, opacity: [0, 1] },
+      { phase: "hold", durationMs: 1800, animation: "silk-drift", glowIntensity: 0.52, particleEmit: true },
+      { phase: "exit", durationMs: 660, animation: "fade-fall", scale: 0.88, opacity: [1, 0] },
+    ],
+  },
+
+  {
+    id: "diamond_rain",
+    displayName: "Diamond Rain",
+    sparkCost: 150,
+    tier: "mid",
+    durationMs: 3600,
+    audienceScope: "room",
+    platformWideBanner: false,
+
+    objectKind: "diamond",
+
+    palette: {
+      primary: "#8BE9FF",
+      secondary: "#FFFFFF",
+      glow: "#8BE9FF55",
+      text: "#FFFFFF",
+    },
+
+    particleBudget: {
+      count: 54,
       maxRadius: 9,
-      spread: "radial-tight",
+      spread: "crystal-fall",
       trailFade: true,
       glitterEnabled: true,
     },
@@ -107,21 +197,21 @@ export const GIFT_EFFECT_CATALOG = [
     effectPhases: [
       {
         phase: "entry",
-        durationMs: 300,
-        animation: "pop-scale",
+        durationMs: 360,
+        animation: "crystal-arrive",
         scale: 0.78,
         opacity: [0, 1],
       },
       {
         phase: "hold",
-        durationMs: 2200,
-        animation: "pulse-glow",
-        glowIntensity: 0.65,
+        durationMs: 2500,
+        animation: "crystal-rain",
+        glowIntensity: 0.7,
         particleEmit: true,
       },
       {
         phase: "exit",
-        durationMs: 700,
+        durationMs: 740,
         animation: "fade-sink",
         scale: 0.9,
         opacity: [1, 0],
@@ -137,6 +227,8 @@ export const GIFT_EFFECT_CATALOG = [
     durationMs: 6000,
     audienceScope: "room",
     platformWideBanner: true,   // 500+ spark banner eligible
+
+    objectKind: "crown",
 
     palette: {
       primary: "#FFD700",   // gold
@@ -199,6 +291,52 @@ export const GIFT_EFFECT_CATALOG = [
   },
 
   {
+    id: "champagne_pour",
+    displayName: "Champagne",
+    sparkCost: 2500,
+    tier: "high",
+    durationMs: 6400,
+    audienceScope: "room",
+    platformWideBanner: true,
+
+    objectKind: "champagne",
+
+    palette: {
+      primary: "#F6D47A",
+      secondary: "#FFF6D6",
+      glow: "#F6D47A66",
+      text: "#14100A",
+      bannerBackground: "linear-gradient(135deg, #181007 0%, #4A3210 50%, #181007 100%)",
+    },
+
+    particleBudget: {
+      count: 100,
+      maxRadius: 10,
+      spread: "champagne-spray",
+      trailFade: true,
+      glitterEnabled: true,
+    },
+
+    typography: {
+      displayFont: "inherit",
+      weight: 700,
+      size: "xl",
+      letterSpacing: "0.10em",
+      casing: "uppercase",
+      showSenderLabel: true,
+      showSparkCount: true,
+      bannerHeadline: "{sender} opened Champagne",
+    },
+
+    effectPhases: [
+      { phase: "cinematic-open", durationMs: 520, animation: "glass-rise", overlayDim: 0.18, scale: 1, opacity: [0, 1] },
+      { phase: "pour", durationMs: 1600, animation: "spray-arc", particleEmit: true, cameraShake: { intensityPx: 2, durationMs: 220 } },
+      { phase: "hold-glory", durationMs: 3100, animation: "glass-shimmer", glowIntensity: 0.82, particleEmit: true },
+      { phase: "exit", durationMs: 1180, animation: "fade-ascend", overlayDim: 0, opacity: [1, 0] },
+    ],
+  },
+
+  {
     id: "private_key",
     displayName: "Private Key",
     sparkCost: 5000,
@@ -206,6 +344,8 @@ export const GIFT_EFFECT_CATALOG = [
     durationMs: 8000,
     audienceScope: "platform",
     platformWideBanner: true,   // 500+ spark banner eligible
+
+    objectKind: "key",
 
     palette: {
       primary: "#00FFB2",   // crypto mint
@@ -340,6 +480,7 @@ export function getEffectForCost(sparks) {
  * @property {number} durationMs
  * @property {"sender"|"room"|"platform"} audienceScope
  * @property {boolean} platformWideBanner
+ * @property {"rose"|"flame"|"silk"|"diamond"|"crown"|"champagne"|"key"} [objectKind]
  * @property {Record<string, string>} palette
  * @property {ParticleBudget} particleBudget
  * @property {Record<string, unknown>} typography

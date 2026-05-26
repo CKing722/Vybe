@@ -67,7 +67,7 @@ export default function PlatformBanner({ giftId, sender = "Someone", recipient =
     rowGap: "4px",
     minHeight: "46px",
     padding: "7px 16px",
-    background: "linear-gradient(90deg, rgba(5,6,12,0.96), " + pal.primary + "24, rgba(5,6,12,0.96))",
+    background: pal.bannerBackground || ("linear-gradient(90deg, rgba(5,6,12,0.96), " + pal.primary + "24, rgba(5,6,12,0.96))"),
     borderBottom: "1px solid " + pal.primary + "77",
     boxShadow: "0 12px 36px rgba(0,0,0,0.38), 0 0 34px " + (pal.glow || pal.primary + "44"),
     transition: reducedMotion ? "opacity 0.15s ease" : "opacity 0.45s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1)",
@@ -150,7 +150,7 @@ export default function PlatformBanner({ giftId, sender = "Someone", recipient =
         <>
           <div style={dividerStyle} />
           <span style={sparkStyle}>
-            <span>&#9889;</span>
+          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: pal.secondary || pal.primary, boxShadow: "0 0 10px " + (pal.secondary || pal.primary), display: "inline-block" }} />
             <span>{effect.sparkCost.toLocaleString()}</span>
           </span>
         </>

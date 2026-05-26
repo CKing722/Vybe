@@ -13,12 +13,30 @@ function spawnParticles(budget, w, h) {
     const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
     let x, y, vx, vy;
 
-    if (spread === "cascade-down") {
+    if (spread === "cascade-down" || spread === "crystal-fall") {
       x = cx + (Math.random() - 0.5) * w * 0.5;
       y = cy - 30;
       const sp = 1.8 + Math.random() * 2.2;
       vx = (Math.random() - 0.5) * sp * 1.3;
       vy = -(sp * 0.6 + Math.random() * sp * 0.4);
+    } else if (spread === "champagne-spray") {
+      x = cx - w * 0.16 + Math.random() * w * 0.1;
+      y = cy + h * 0.1 + Math.random() * h * 0.06;
+      const sp = 2.2 + Math.random() * 3.2;
+      vx = sp * (0.8 + Math.random() * 1.4);
+      vy = -(sp * (0.65 + Math.random() * 0.75));
+    } else if (spread === "ember-rise") {
+      x = cx + (Math.random() - 0.5) * w * 0.2;
+      y = cy + h * 0.18 + Math.random() * h * 0.12;
+      const sp = 0.8 + Math.random() * 1.6;
+      vx = (Math.random() - 0.5) * sp;
+      vy = -(1.1 + Math.random() * 2.4);
+    } else if (spread === "silk-float") {
+      x = cx + (Math.random() - 0.5) * w * 0.24;
+      y = cy + (Math.random() - 0.5) * h * 0.2;
+      const sp = 0.8 + Math.random() * 1.8;
+      vx = (Math.random() > 0.5 ? 1 : -1) * sp;
+      vy = -(0.5 + Math.random() * 1.4);
     } else if (spread === "matrix-fall") {
       x = w * 0.05 + Math.random() * w * 0.9;
       y = -(10 + Math.random() * h * 0.3);
@@ -128,7 +146,12 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
         p.life -= p.decay;
         if (p.isGlitter) p.rot += p.rotV;
 
-        if (spread === "cascade-down") p.vy += 0.07;
+        if (spread === "cascade-down" || spread === "crystal-fall") p.vy += 0.07;
+        if (spread === "champagne-spray") p.vy += 0.052;
+        if (spread === "ember-rise" || spread === "silk-float") {
+          p.vx += Math.sin(p.y * 0.035) * 0.012;
+          p.vy -= 0.002;
+        }
         if (spread === "matrix-fall") p.vy += 0.014;
 
         // trailFade=false: full opacity until last 20% of life

@@ -665,7 +665,10 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
         </div>
       </G>
       <G style={{padding:12,borderRadius:12,background:"linear-gradient(180deg,rgba(8,10,16,.5),rgba(8,10,16,.9))",boxShadow:"0 22px 70px rgba(0,0,0,.28)",minHeight:0,display:"flex",flexDirection:"column",flex:1}}>
-        <div style={{fontSize:".68rem",fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",color:"var(--mt)",marginBottom:8}}>Room</div>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,marginBottom:8}}>
+          <div style={{fontSize:".68rem",fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",color:"var(--mt)"}}>Room</div>
+          <button type="button" title="Hide chat" aria-label="Hide chat" onClick={()=>setChH(true)} style={{width:28,height:28,borderRadius:14,border:"1px solid var(--bd)",background:"rgba(255,255,255,.055)",color:"var(--mt)",cursor:"pointer",display:"grid",placeItems:"center",flexShrink:0}}><I n="eyeoff" s={13}/></button>
+        </div>
         {pendingReq.filter(r=>r.status==="pending").map(r=><div key={r.id} style={{padding:10,borderRadius:10,border:"1px solid rgba(255,171,0,.28)",background:"linear-gradient(135deg,rgba(255,171,0,.09),rgba(255,45,120,.05))",marginBottom:8}}>
           <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"start"}}><div><div style={{fontSize:".58rem",letterSpacing:".12em",textTransform:"uppercase",color:"var(--am)",fontWeight:900}}>Pending request</div><div style={{fontWeight:900,fontSize:".82rem",marginTop:3}}>{r.name}</div><div style={{fontSize:".66rem",color:"var(--mt)",marginTop:2}}>{r.user} escrowed {r.sparks.toLocaleString()} sparks</div></div><I n="request" s={18} c="var(--am)"/></div>
           <div style={{display:"flex",gap:6,marginTop:9}}><button onClick={()=>acceptReq(r.id)} style={{flex:1,height:30,border:0,borderRadius:8,background:"var(--gn)",color:"#04110a",fontWeight:900,cursor:"pointer"}}>Accept</button><button onClick={()=>declineReq(r.id)} style={{flex:1,height:30,border:"1px solid rgba(255,255,255,.12)",borderRadius:8,background:"rgba(255,255,255,.06)",color:"var(--tx)",fontWeight:900,cursor:"pointer"}}>Decline + refund</button></div>
@@ -679,6 +682,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
           <button onClick={sc} style={{background:"var(--pk)",border:"none",borderRadius:999,padding:"0 11px",cursor:"pointer",color:"#fff",fontWeight:800,fontSize:".68rem"}}>Send</button></div>
       </G>
     </div>}
+    {chH&&<button type="button" title="Show chat" aria-label="Show chat" onClick={()=>setChH(false)} style={{position:"absolute",left:12,top:96,zIndex:14,height:36,padding:"0 12px",borderRadius:18,border:"1px solid rgba(255,255,255,.12)",background:"linear-gradient(135deg,rgba(10,14,24,.78),rgba(8,10,16,.92))",color:"var(--tx)",display:"inline-flex",alignItems:"center",gap:7,cursor:"pointer",boxShadow:"0 18px 55px rgba(0,0,0,.34)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",fontWeight:900,fontSize:".66rem",letterSpacing:".04em"}}><I n="chat" s={13} c="var(--cy)"/>Chat</button>}
     {/* Panels */}
     {pn==="board"&&<Pn onClose={()=>setPn(null)} title="Leaderboard" icon="trophy" ic="var(--am)" style={{position:"absolute",right:12,top:88,zIndex:22,width:230,maxHeight:"calc(100vh - 180px)",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
       {VWR.map((v,i)=><div key={v.name} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",fontSize:".7rem",borderBottom:i<4?"1px solid var(--bd)":"none"}}>
@@ -720,8 +724,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
         </div>
         <div style={{display:"flex",justifyContent:"center",gap:3,overflowX:"auto",maxWidth:"min(620px,48vw)",paddingBottom:1}}>
           {[{i:"gift",l:"Gift",k:"gifts"},{i:"gamepad",l:"Games",k:"games"},{i:"request",l:"Request",k:"requests"},{i:"trophy",l:"Board",k:"board"},
-            {i:"bookmark",l:"Book",action:onBook},{i:"crown",l:"VIP",action:onVip},
-            {i:chH?"eye":"eyeoff",l:chH?"Chat":"Hide",action:()=>setChH(!chH)}].map(b=>
+            {i:"bookmark",l:"Book",action:onBook},{i:"crown",l:"VIP",action:onVip}].map(b=>
             <button key={b.l} onClick={()=>{if(b.action)b.action();else if(b.k)tog(b.k)}} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,padding:"4px 7px",borderRadius:7,border:"1px solid "+(pn===b.k?"var(--pk)":"var(--bd)"),background:pn===b.k?"rgba(255,45,120,.06)":"var(--gl)",color:"var(--tx)",cursor:"pointer",minWidth:38,flexShrink:0}}>
               <I n={b.i} s={13}/><span style={{fontSize:".46rem",fontWeight:700,color:pn===b.k?"var(--pk)":"var(--mt)"}}>{b.l}</span></button>)}
         </div>

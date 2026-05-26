@@ -819,9 +819,10 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const initialGame=GAMES.find(g=>(g.id===roomParams.get("game")||g.type===roomParams.get("game"))&&perf.caps.games.includes(g.id))||null;
   const [pn,setPn]=useState(initialGame?null:(roomParams.get("panel")==="games"?"games":null));const [gm,setGm]=useState(initialGame);
   const settingsPreview=roomParams.get("settingsPreview")==="1";
-  const [media,setMedia]=useState({paused:false,replay:false,replayLeft:0,muted:false,volume:72,volumeOpen:false,fullscreen:false,settings:settingsPreview,captions:false,captionLang:"English (US) original",quality:"1080p",layout:"Wide",theater:false});
+  const theaterPreview=roomParams.get("theaterPreview")==="1";
+  const [media,setMedia]=useState({paused:false,replay:false,replayLeft:0,muted:false,volume:72,volumeOpen:false,fullscreen:false,settings:settingsPreview,captions:roomParams.get("captionsPreview")==="1",captionLang:roomParams.get("captionLang")||"English (US) original",quality:"1080p",layout:roomParams.get("layout")==="vertical"?"Vertical":"Wide",theater:theaterPreview});
   const [ch,setCh]=useState([{user:"VYBE",msg:`Welcome — ${perf.name} is live. You are known here.`,vip:false,id:0}]);
-  const [ci,setCi]=useState("");const [chH,setChH]=useState(false);
+  const [ci,setCi]=useState("");const [chH,setChH]=useState(theaterPreview||roomParams.get("chatHidden")==="1");
   const [reqFx,setReqFx]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
   const [pendingReq,setPendingReq]=useState([{id:1,user:"test",name:"Ultimate Fantasy",desc:"You design it, she delivers",sparks:5000,status:"pending"}]);
   const [requestPins,setRequestPins]=useState([]);

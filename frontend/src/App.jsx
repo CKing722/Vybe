@@ -50,6 +50,10 @@ users:<svg viewBox="0 0 24 24" style={p}><circle cx="9" cy="7" r="3" fill="none"
 gift:<svg viewBox="0 0 24 24" style={p}><rect x="3" y="10" width="18" height="11" rx="2" fill="none" stroke={c} strokeWidth="1.5"/><line x1="12" y1="10" x2="12" y2="21" stroke={c} strokeWidth="1.2"/><path d="M12 10C12 7 9 5 7 7s2 3 5 3M12 10c0-3 3-5 5-3s-2 3-5 3" fill="none" stroke={c} strokeWidth="1.3"/></svg>,
 gamepad:<svg viewBox="0 0 24 24" style={p}><path d="M6 9h12a5 5 0 01-1 10H7A5 5 0 016 9z" fill="none" stroke={c} strokeWidth="1.5"/><line x1="8" y1="13" x2="8" y2="15" stroke={c} strokeWidth="1.5" strokeLinecap="round"/><line x1="7" y1="14" x2="9" y2="14" stroke={c} strokeWidth="1.5" strokeLinecap="round"/><circle cx="15" cy="13" r=".8" fill={c}/><circle cx="17" cy="15" r=".8" fill={c}/></svg>,
 wallet:<svg viewBox="0 0 24 24" style={p}><rect x="2" y="6" width="20" height="14" rx="2" fill="none" stroke={c} strokeWidth="1.5"/><path d="M2 10h20" stroke={c} strokeWidth="1"/><circle cx="17" cy="14" r="1.5" fill={c} opacity=".6"/></svg>,
+mail:<svg viewBox="0 0 24 24" style={p}><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke={c} strokeWidth="1.5"/><path d="M4 7l8 6 8-6" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+phone:<svg viewBox="0 0 24 24" style={p}><path d="M8 3h8a2 2 0 012 2v14a2 2 0 01-2 2H8a2 2 0 01-2-2V5a2 2 0 012-2z" fill="none" stroke={c} strokeWidth="1.5"/><circle cx="12" cy="18" r="1" fill={c}/></svg>,
+card:<svg viewBox="0 0 24 24" style={p}><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke={c} strokeWidth="1.5"/><path d="M3 10h18" stroke={c} strokeWidth="1.5"/><path d="M7 15h4M14 15h3" stroke={c} strokeWidth="1.3" strokeLinecap="round"/></svg>,
+crypto:<svg viewBox="0 0 24 24" style={p}><circle cx="12" cy="12" r="9" fill="none" stroke={c} strokeWidth="1.5"/><path d="M9 7h4.5a2.5 2.5 0 010 5H9V7zm0 5h5a2.5 2.5 0 010 5H9v-5zM8 7h2M8 17h2M11 5v2M14 5v2M11 17v2M14 17v2" fill="none" stroke={c} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
 user:<svg viewBox="0 0 24 24" style={p}><circle cx="12" cy="8" r="4" fill="none" stroke={c} strokeWidth="1.5"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7" fill="none" stroke={c} strokeWidth="1.5"/></svg>,
 check:<svg viewBox="0 0 24 24" style={p}><polyline points="6 12 10 16 18 8" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
 clock:<svg viewBox="0 0 24 24" style={p}><circle cx="12" cy="12" r="9" fill="none" stroke={c} strokeWidth="1.5"/><polyline points="12,7 12,12 16,14" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
@@ -124,6 +128,13 @@ const SPARK_PKGS=[
   {sparks:10000,price:"$499.99",bonus:100,label:"Whale"},
   {sparks:25000,price:"$999.99",bonus:150,label:"VIP Drop"},
 ];
+const PAYMENT_RAILS=[
+  {id:"card",name:"Cards",detail:"Visa, Mastercard, Amex, Discover",icon:"card",color:"var(--am)"},
+  {id:"wallets",name:"Digital wallets",detail:"Apple Pay, Google Pay, PayPal, Cash App",icon:"wallet",color:"var(--cy)"},
+  {id:"bank",name:"Bank & debit",detail:"ACH, debit, instant bank transfer",icon:"shield",color:"var(--gn)"},
+  {id:"crypto",name:"Crypto",detail:"Bitcoin, EVM, Solana, Tron, Cosmos, Sui, Aptos, and routed chains",icon:"crypto",color:"var(--vi)"},
+];
+const CRYPTO_RAILS=["Universal router","Bitcoin","Ethereum / EVM","Solana","Tron","Cosmos","Sui","Aptos","Other chain"];
 const BOOK=[{id:"q",name:"Quick Play",mins:15,sparks:250},{id:"m",name:"Main Event",mins:30,sparks:450,pop:true},{id:"s",name:"Neon Suite",mins:45,sparks:650},{id:"e",name:"VIP Extended",mins:60,sparks:800}];
 const VIPPK=[
   {id:"vp",name:"VIP Private",mins:60,sparks:1500,desc:"Private room, custom pace."},
@@ -187,7 +198,7 @@ body,#root{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:va
 @keyframes bf{0%,100%{background:var(--cd)}50%{background:rgba(255,45,120,.15)}}
 @keyframes rainDown{0%{opacity:1;transform:translateY(-20px)}100%{opacity:0;transform:translateY(60px)}}
 .ai{animation:fi .3s ease both}.gpa{animation:gp 1.8s ease forwards;position:absolute;pointer-events:none;z-index:9}
-input[type=text]{background:var(--cd);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:8px 12px;font:inherit;outline:none;width:100%}input[type=text]:focus{border-color:var(--cy)}
+input[type=text],input[type=email],input[type=tel],input[type=password],select{background:var(--cd);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:8px 12px;font:inherit;outline:none;width:100%}input[type=text]:focus,input[type=email]:focus,input[type=tel]:focus,input[type=password]:focus,select:focus{border-color:var(--cy)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}`;
 
 /* ═══ SHARED ═══ */
@@ -241,41 +252,69 @@ function HM({open,onClose,cat,setCat,onProfile}){if(!open)return null;
     </div></div>;}
 
 /* ═══ VIEWER PROFILE — "You Are Known" ═══ */
-function ViewerProfile({user,onClose}){const tier=gl(user.spent);
+function ViewerProfile({user,onClose,onSave,onWallet}){const tier=gl(user.spent);const [tab,setTab]=useState("overview");const [saved,setSaved]=useState(null);
+  const [form,setForm]=useState({name:user.name||"",email:user.email||"",phone:user.phone||"",twoFactor:!!user.twoFactor,password:"",confirm:"",primaryRail:user.primaryRail||"card",cryptoNetwork:user.cryptoNetwork||"Universal router",cryptoWallet:user.cryptoWallet||""});
+  const pay=user.paymentMethods||[];
+  const up=(k,v)=>setForm(p=>({...p,[k]:v}));
+  const save=()=>{if(form.password&&form.password!==form.confirm){setSaved("Passwords do not match");return}onSave&&onSave({name:form.name,email:form.email,phone:form.phone,twoFactor:form.twoFactor,primaryRail:form.primaryRail,cryptoNetwork:form.cryptoNetwork,cryptoWallet:form.cryptoWallet,passwordUpdated:!!form.password});setSaved("Saved");setTimeout(()=>setSaved(null),1800)};
+  const field=(label,key,type="text",hint)=> <label style={{display:"block"}}><span style={{fontSize:".62rem",fontWeight:900,letterSpacing:".08em",textTransform:"uppercase",color:"var(--mt)"}}>{label}</span><input type={type} value={form[key]} onChange={e=>up(key,e.target.value)} placeholder={hint||label} style={{marginTop:5}}/></label>;
+  const tabBtn=(id,label,icon)=><button type="button" onClick={()=>setTab(id)} style={{height:34,padding:"0 10px",borderRadius:9,border:"1px solid "+(tab===id?"rgba(255,45,120,.55)":"var(--bd)"),background:tab===id?"rgba(255,45,120,.12)":"rgba(255,255,255,.035)",color:tab===id?"#fff":"var(--mt)",fontWeight:900,fontSize:".66rem",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:6}}><I n={icon} s={12} c={tab===id?"var(--pk)":"var(--mt)"}/>{label}</button>;
   return<div className="ai" style={{position:"fixed",inset:0,zIndex:40,background:"rgba(0,0,0,.6)",display:"flex",alignItems:"center",justifyContent:"center"}} onClick={e=>{if(e.target===e.currentTarget)onClose()}}>
-    <Pn onClose={onClose} title="Your Identity" icon="badge" ic="var(--cy)" style={{maxWidth:460,width:"92%",maxHeight:"80vh",background:"var(--sf)"}}>
-      <div style={{textAlign:"center",padding:16,borderRadius:12,background:"linear-gradient(135deg,rgba(0,212,255,.06),rgba(255,45,120,.04))",border:"1px solid var(--bd)",marginBottom:12}}>
-        <div style={{width:56,height:56,borderRadius:14,background:"linear-gradient(135deg,var(--cy),var(--pk))",margin:"0 auto 8px",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="user" s={28} c="#fff"/></div>
-        <div style={{fontWeight:900,fontSize:"1.1rem"}}>{user.name}</div>
-        <Tag color={tier.color}><I n="shield" s={9} c={tier.color}/> {tier.name} Tier</Tag>
-        {tier.back>0&&<Tag color="var(--gn)"> {tier.back}% spark-back</Tag>}
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginBottom:12}}>
-        {[{l:"Games Played",v:user.gamesPlayed,i:"gamepad"},{l:"Win Rate",v:user.winRate+"%",i:"trophy"},{l:"Sparks Earned",v:user.sparksEarned,i:"spark"},{l:"Sessions",v:user.totalSessions,i:"clock"},{l:"Top Streak",v:user.topStreak,i:"streak"},{l:"Performers",v:user.perfCount,i:"users"}].map(s=>
-          <div key={s.l} style={{textAlign:"center",padding:8,borderRadius:8,border:"1px solid var(--bd)"}}>
-            <I n={s.i} s={14} c="var(--am)"/><div style={{fontWeight:800,fontSize:".9rem"}}>{s.v}</div><div style={{fontSize:".55rem",color:"var(--mt)"}}>{s.l}</div></div>)}
-      </div>
-      <Kk>Achievements</Kk>
-      <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
-        {user.badges.map(b=><Tag key={b} color="var(--am)"><I n="badge" s={9} c="var(--am)"/> {b}</Tag>)}
-      </div>
-      <Kk>Favorite Performers</Kk>
-      <div style={{display:"flex",gap:6}}>
-        {user.favPerfs.map(id=>{const p=PERFS.find(x=>x.id===id);return p?<div key={id} style={{padding:6,borderRadius:8,border:"1px solid var(--bd)",textAlign:"center",flex:1}}>
+    <Pn onClose={onClose} title="Your Identity" icon="badge" ic="var(--cy)" style={{maxWidth:720,width:"92%",maxHeight:"84vh",background:"var(--sf)"}}>
+      <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>{tabBtn("overview","Reputation","badge")}{tabBtn("account","Account","user")}{tabBtn("payments","Payments","wallet")}</div>
+      {tab==="overview"&&<>
+        <div style={{textAlign:"center",padding:16,borderRadius:12,background:"linear-gradient(135deg,rgba(0,212,255,.06),rgba(255,45,120,.04))",border:"1px solid var(--bd)",marginBottom:12}}>
+          <div style={{width:56,height:56,borderRadius:14,background:"linear-gradient(135deg,var(--cy),var(--pk))",margin:"0 auto 8px",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="user" s={28} c="#fff"/></div>
+          <div style={{fontWeight:900,fontSize:"1.1rem"}}>{user.name}</div>
+          <Tag color={tier.color}><I n="shield" s={9} c={tier.color}/> {tier.name} Tier</Tag>
+          {tier.back>0&&<Tag color="var(--gn)"> {tier.back}% spark-back</Tag>}
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginBottom:12}}>
+          {[{l:"Games Played",v:user.gamesPlayed,i:"gamepad"},{l:"Win Rate",v:user.winRate+"%",i:"trophy"},{l:"Sparks Earned",v:user.sparksEarned,i:"spark"},{l:"Sessions",v:user.totalSessions,i:"clock"},{l:"Top Streak",v:user.topStreak,i:"streak"},{l:"Performers",v:user.perfCount,i:"users"}].map(s=>
+            <div key={s.l} style={{textAlign:"center",padding:8,borderRadius:8,border:"1px solid var(--bd)"}}>
+              <I n={s.i} s={14} c="var(--am)"/><div style={{fontWeight:800,fontSize:".9rem"}}>{s.v}</div><div style={{fontSize:".55rem",color:"var(--mt)"}}>{s.l}</div></div>)}
+        </div>
+        <Kk>Achievements</Kk>
+        <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>{user.badges.map(b=><Tag key={b} color="var(--am)"><I n="badge" s={9} c="var(--am)"/> {b}</Tag>)}</div>
+        <Kk>Favorite Performers</Kk>
+        <div style={{display:"flex",gap:6}}>{user.favPerfs.map(id=>{const p=PERFS.find(x=>x.id===id);return p?<div key={id} style={{padding:6,borderRadius:8,border:"1px solid var(--bd)",textAlign:"center",flex:1}}>
           <div style={{width:28,height:28,borderRadius:8,background:`${p.accent}20`,margin:"0 auto 3px",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="user" s={14} c={p.accent}/></div>
-          <div style={{fontSize:".68rem",fontWeight:700}}>{p.name.split(" ")[0]}</div></div>:null})}
-      </div>
-      <p style={{fontSize:".6rem",color:"var(--mt)",marginTop:10,textAlign:"center"}}>Your identity is persistent. Every game, every session, every interaction builds your reputation on VYBE.</p>
+          <div style={{fontSize:".68rem",fontWeight:700}}>{p.name.split(" ")[0]}</div></div>:null})}</div>
+        <p style={{fontSize:".6rem",color:"var(--mt)",marginTop:10,textAlign:"center"}}>Your identity is persistent. Every game, every session, every interaction builds your reputation on VYBE.</p>
+      </>}
+      {tab==="account"&&<>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:10,marginBottom:12}}>
+          {field("Display name","name","text","VelvetKing")}{field("Email","email","email","you@example.com")}{field("Phone","phone","tel","Optional unless 2FA is enabled")}
+          <label style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,padding:11,borderRadius:9,border:"1px solid var(--bd)",background:"var(--cd)"}}><span><span style={{display:"block",fontWeight:900,fontSize:".78rem"}}>Two-factor authentication</span><span style={{display:"block",fontSize:".62rem",color:"var(--mt)",marginTop:2}}>SMS/app challenge for high-risk account actions.</span></span><input type="checkbox" checked={form.twoFactor} onChange={e=>up("twoFactor",e.target.checked)} style={{width:18,height:18,accentColor:"var(--pk)"}}/></label>
+        </div>
+        <Kk>Password</Kk>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:10,marginBottom:12}}>{field("New password","password","password","Leave blank to keep current")}{field("Confirm password","confirm","password","Repeat new password")}</div>
+        <div style={{padding:10,borderRadius:10,border:"1px solid rgba(0,212,255,.18)",background:"rgba(0,212,255,.055)",fontSize:".66rem",lineHeight:1.45,color:"var(--mt)",marginBottom:12}}>Phone number stays optional until you enable SMS 2FA, recovery, or high-risk payment verification.</div>
+        <Btn primary onClick={save}>Save Account</Btn>{saved&&<span style={{marginLeft:10,color:saved==="Saved"?"var(--gn)":"var(--pk)",fontWeight:900,fontSize:".72rem"}}>{saved}</span>}
+      </>}
+      {tab==="payments"&&<>
+        <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",marginBottom:10,flexWrap:"wrap"}}><div><Kk>Payment Methods</Kk><p style={{fontSize:".66rem",color:"var(--mt)",lineHeight:1.45}}>Update payment methods here. Wallet uses these methods when buying sparks.</p></div>{onWallet&&<Btn small onClick={onWallet}><I n="wallet" s={11} c="var(--mt)" st={{marginRight:4}}/>Open Wallet</Btn>}</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:8,marginBottom:12}}>{pay.map(m=><div key={m.id} style={{padding:10,borderRadius:10,border:"1px solid var(--bd)",background:"var(--cd)"}}><div style={{display:"flex",alignItems:"center",gap:8}}><I n={m.icon} s={16} c={m.color}/><div><div style={{fontWeight:900,fontSize:".78rem"}}>{m.name}</div><div style={{fontSize:".62rem",color:"var(--mt)"}}>{m.detail}</div></div></div><div style={{marginTop:8,fontSize:".58rem",fontWeight:900,color:m.status==="Primary"?"var(--gn)":"var(--am)"}}>{m.status}</div></div>)}</div>
+        <Kk>Accepted Rails</Kk>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:8,marginBottom:12}}>{PAYMENT_RAILS.map(r=><button type="button" key={r.id} onClick={()=>up("primaryRail",r.id)} style={{padding:10,borderRadius:10,border:"1px solid "+(form.primaryRail===r.id?r.color:"var(--bd)"),background:form.primaryRail===r.id?`${r.color}14`:"rgba(255,255,255,.035)",color:"var(--tx)",cursor:"pointer",textAlign:"left"}}><div style={{display:"flex",alignItems:"center",gap:8}}><I n={r.icon} s={16} c={r.color}/><div><div style={{fontWeight:900,fontSize:".76rem"}}>{r.name}</div><div style={{fontSize:".6rem",color:"var(--mt)",lineHeight:1.35}}>{r.detail}</div></div></div></button>)}</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}><label><span style={{fontSize:".62rem",fontWeight:900,letterSpacing:".08em",textTransform:"uppercase",color:"var(--mt)"}}>Crypto route</span><select value={form.cryptoNetwork} onChange={e=>up("cryptoNetwork",e.target.value)} style={{marginTop:5}}>{CRYPTO_RAILS.map(x=><option key={x}>{x}</option>)}</select></label>{field("Wallet address","cryptoWallet","text","Paste wallet or connect provider")}</div>
+        <div style={{padding:10,borderRadius:10,border:"1px solid rgba(255,171,0,.22)",background:"rgba(255,171,0,.06)",fontSize:".64rem",lineHeight:1.45,color:"var(--mt)",marginBottom:12}}>Production should route fiat and crypto through compliant processors with age, fraud, tax, sanctions, chargeback, and adult-content controls. This UI is the customer-facing surface.</div>
+        <Btn primary onClick={save}>Save Payment Preferences</Btn>{saved&&<span style={{marginLeft:10,color:saved==="Saved"?"var(--gn)":"var(--pk)",fontWeight:900,fontSize:".72rem"}}>{saved}</span>}
+      </>}
     </Pn></div>;}
 
 /* ═══ WALLET ═══ */
-function WL({user,onClose,onBuy}){const tier=gl(user.spent);
+function WL({user,onClose,onBuy,onManagePayments}){const tier=gl(user.spent);const pay=user.paymentMethods||[];
   return<div className="ai" style={{position:"fixed",inset:0,zIndex:40,background:"rgba(0,0,0,.6)",display:"flex",alignItems:"center",justifyContent:"center"}} onClick={e=>{if(e.target===e.currentTarget)onClose()}}>
     <Pn onClose={onClose} title="Wallet" icon="wallet" ic="var(--am)" style={{maxWidth:500,width:"92%",maxHeight:"82vh",background:"var(--sf)"}}>
       <div style={{padding:16,borderRadius:12,background:"linear-gradient(135deg,rgba(255,171,0,.06),rgba(255,45,120,.04))",border:"1px solid var(--bd)",marginBottom:12,textAlign:"center"}}>
         <div style={{fontSize:".62rem",color:"var(--mt)",fontWeight:600,textTransform:"uppercase",letterSpacing:".08em"}}>Balance</div>
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,marginTop:3}}><I n="spark" s={24} c="var(--am)"/><span style={{fontSize:"2rem",fontWeight:900,color:"var(--am)"}}>{user.sparks.toLocaleString()}</span></div>
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:5,marginTop:5}}><Tag color={tier.color}><I n="shield" s={9} c={tier.color}/> {tier.name}</Tag>{tier.back>0&&<Tag color="var(--gn)">{tier.back}% back</Tag>}</div>
+      </div>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:8}}><Kk>Payment Options</Kk>{onManagePayments&&<button type="button" onClick={onManagePayments} style={{height:28,padding:"0 9px",borderRadius:999,border:"1px solid var(--bd)",background:"rgba(255,255,255,.05)",color:"var(--tx)",fontWeight:900,fontSize:".58rem",cursor:"pointer"}}>Manage</button>}</div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:6,marginBottom:12}}>
+        {pay.slice(0,4).map(m=><div key={m.id} style={{padding:8,borderRadius:8,border:"1px solid var(--bd)",background:"rgba(255,255,255,.035)",minHeight:60}}><div style={{display:"flex",alignItems:"center",gap:6}}><I n={m.icon} s={13} c={m.color}/><div style={{minWidth:0}}><div style={{fontWeight:900,fontSize:".66rem",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.name}</div><div style={{fontSize:".54rem",color:"var(--mt)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.detail}</div></div></div></div>)}
       </div>
       <Kk>Buy Sparks</Kk>
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginBottom:10}}>
@@ -1209,7 +1248,9 @@ export default function App(){
   const [authed,setAuthed]=useState(previewMode);const [authUser,setAuthUser]=useState(previewMode?{email:"preview@vybe.local",name:"VelvetKing",role:studioPreview?"performer":"viewer"}:null);
   const [ok,setOk]=useState(previewMode);const [ck,setCk]=useState(previewMode);const [vw,setVw]=useState(previewMode?previewView:"lobby");
   const [pf,setPf]=useState((visualPreview||roomPreview)?PERFS[0]:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
-  const [user,setUser]=useState({name:"VelvetKing",sparks:2500,spent:450,gamesPlayed:87,winRate:72,sparksEarned:1240,totalSessions:23,topStreak:8,perfCount:4,
+  const [user,setUser]=useState({name:"VelvetKing",email:"preview@vybe.local",phone:"",twoFactor:false,primaryRail:"card",cryptoNetwork:"Universal router",cryptoWallet:"",passwordUpdated:false,
+    paymentMethods:[{id:"card-demo",name:"Card",detail:"No card saved yet",status:"Add method",icon:"card",color:"var(--am)"},{id:"wallet-demo",name:"Digital wallet",detail:"Apple/Google/PayPal ready",status:"Available",icon:"wallet",color:"var(--cy)"},{id:"bank-demo",name:"Bank",detail:"ACH/debit connection",status:"Optional",icon:"shield",color:"var(--gn)"},{id:"crypto-demo",name:"Crypto wallet",detail:"Universal router not connected",status:"Connect wallet",icon:"crypto",color:"var(--vi)"}],
+    sparks:2500,spent:450,gamesPlayed:87,winRate:72,sparksEarned:1240,totalSessions:23,topStreak:8,perfCount:4,
     badges:["First Win","5-Game Streak","100 Games","Luna's Top 10","Crown Sender"],
     favPerfs:["luna","jade","raven"],
     perfHistory:{luna:{sessions:12,sparksSpent:3400,since:"Mar 2027"},jade:{sessions:6,sparksSpent:1200,since:"Apr 2027"},raven:{sessions:3,sparksSpent:800,since:"May 2027"}}});
@@ -1234,7 +1275,7 @@ export default function App(){
   const handleSocketGift=useCallback((ev)=>{setGiftEvents(p=>[ev,...p].slice(0,20));enqueueDemoGift(ev);},[enqueueDemoGift]);
   useGiftSocket({roomId:vw==="room"&&pf?pf.id:null,onGiftAnimation:handleSocketGift});
 
-  const handleAuth=(u)=>{setAuthUser(u);setUser(p=>({...p,name:u.name}));setAuthed(true);if(u.role==="performer")setOk(true)};/*performers skip age verify*/
+  const handleAuth=(u)=>{setAuthUser(u);setUser(p=>({...p,name:u.name,email:u.email||p.email}));setAuthed(true);if(u.role==="performer")setOk(true)};/*performers skip age verify*/
   const logout=()=>{setAuthed(false);setAuthUser(null);setOk(false);setVw("lobby")};
   const isPerf=authed&&authUser?.role==="performer";
   const perfSelf=isPerf?PERFS[0]:null;
@@ -1244,6 +1285,7 @@ export default function App(){
   const cs=pk=>{setUser(u=>({...u,sparks:u.sparks-pk.sparks,spent:u.spent+pk.sparks*0.1,totalSessions:u.totalSessions+1}));setMd(null);setVw("room")};
   const by=pk=>{const b=Math.floor(pk.sparks*pk.bonus/100);setUser(u=>({...u,sparks:u.sparks+pk.sparks+b,spent:u.spent+parseFloat(pk.price.replace("$",""))}));setMd(null)};
   const sc=d=>setUser(u=>({...u,sparks:u.sparks+d}));
+  const updateViewer=patch=>{setUser(u=>({...u,...patch,paymentMethods:(u.paymentMethods||[]).map(m=>m.id==="crypto-demo"?{...m,detail:patch.cryptoWallet?`${patch.cryptoNetwork} wallet connected`:"Universal router not connected",status:patch.cryptoWallet?"Connected":"Connect wallet"}:m)}));setAuthUser(a=>a?{...a,name:patch.name||a.name,email:patch.email||a.email}:a)};
 
   if(visualPreview)return <VybeLuxuryPreview/>;
 
@@ -1256,10 +1298,10 @@ export default function App(){
     {authed&&ok&&!isPerf&&vw==="profile"&&pf&&<PF perf={pf} user={user} onBack={bk} onLive={gl2} onBook={gb} onVip={gv} onWallet={()=>setMd("wallet")}/>}
     {authed&&ok&&vw==="room"&&pf&&<RM perf={pf} user={user} onBack={isPerf?()=>setVw("lobby"):bp} onSC={sc} onWallet={()=>setMd("wallet")} onBook={gb} onVip={gv} onGiftSent={triggerDemoGift}/>}
     <HM open={mn} onClose={()=>setMn(false)} cat={cat} setCat={setCat} onProfile={()=>{setMn(false);setMd("viewer")}}/>
-    {md==="wallet"&&<WL user={user} onClose={()=>setMd(null)} onBuy={by}/>}
+    {md==="wallet"&&<WL user={user} onClose={()=>setMd(null)} onBuy={by} onManagePayments={()=>setMd("viewer")}/>}
     {md==="book"&&pf&&<BK perf={pf} sparks={user.sparks} pkgs={BOOK.filter(p=>p.mins<=pf.caps.maxMins)} label="Book Private Session" onOk={cs} onClose={()=>setMd(null)}/>}
     {md==="vip"&&pf&&<BK perf={pf} sparks={user.sparks} pkgs={VIPPK} label="VIP Session" onOk={cs} onClose={()=>setMd(null)}/>}
-    {md==="viewer"&&<ViewerProfile user={user} onClose={()=>setMd(null)}/>}
+    {md==="viewer"&&<ViewerProfile user={user} onClose={()=>setMd(null)} onSave={updateViewer} onWallet={()=>setMd("wallet")}/>}
     {authed&&ok&&!ck&&<CK onOk={()=>setCk(true)}/>}
     <GiftSpectacleOverlay giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={advanceDemoGift}/>
     <PlatformBanner giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={()=>{}}/>

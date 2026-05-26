@@ -192,12 +192,11 @@ const css=`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;6
 body,#root{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--tx)}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-@keyframes gp{0%{opacity:0;transform:translateY(10px) scale(.65)}20%{opacity:1;transform:translateY(0) scale(1)}70%{opacity:1;transform:translateY(-12px) scale(1.08)}100%{opacity:0;transform:translateY(-26px) scale(.72)}}
 @keyframes glow{0%,100%{box-shadow:0 0 20px rgba(255,45,120,.1)}50%{box-shadow:0 0 45px rgba(255,45,120,.25)}}
 @keyframes spin{from{transform:rotate(0)}to{transform:rotate(1080deg)}}
 @keyframes bf{0%,100%{background:var(--cd)}50%{background:rgba(255,45,120,.15)}}
 @keyframes rainDown{0%{opacity:1;transform:translateY(-20px)}100%{opacity:0;transform:translateY(60px)}}
-.ai{animation:fi .3s ease both}.gpa{animation:gp 1.8s ease forwards;position:absolute;pointer-events:none;z-index:9}
+.ai{animation:fi .3s ease both}
 input[type=text],input[type=email],input[type=tel],input[type=password],select{background:var(--cd);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:8px 12px;font:inherit;outline:none;width:100%}input[type=text]:focus,input[type=email]:focus,input[type=tel]:focus,input[type=password]:focus,select:focus{border-color:var(--cy)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}`;
 
@@ -650,9 +649,9 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const [media,setMedia]=useState({paused:false,replay:false,replayLeft:0,muted:false,volume:72,volumeOpen:false,fullscreen:false,settings:settingsPreview,captions:false,pip:false,quality:"1080p",layout:"Theater"});
   const [ch,setCh]=useState([{user:"VYBE",msg:`Welcome — ${perf.name} is live. You are known here.`,vip:false,id:0}]);
   const [ci,setCi]=useState("");const [chH,setChH]=useState(false);
-  const [anims,setAnims]=useState([]);const [reqFx,setReqFx]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
+  const [reqFx,setReqFx]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
   const [pendingReq,setPendingReq]=useState([{id:1,user:"test",name:"Ultimate Fantasy",desc:"You design it, she delivers",sparks:5000,status:"pending"}]);
-  const roomRef=useRef(null);const aid=useRef(0);const CP=[{user:"NightOwl",msg:"Let's go"},{user:"VelvetKing",msg:"Crown incoming",vip:true},{user:"AceHigh",msg:"All in",vip:true},{user:"DiamondJay",msg:"Here we go",vip:true}];
+  const roomRef=useRef(null);const CP=[{user:"NightOwl",msg:"Let's go"},{user:"VelvetKing",msg:"Crown incoming",vip:true},{user:"AceHigh",msg:"All in",vip:true},{user:"DiamondJay",msg:"Here we go",vip:true}];
   useEffect(()=>{const t=setInterval(()=>setTm(p=>Math.max(0,p-1)),1000);return()=>clearInterval(t)},[]);
   useEffect(()=>{const t=setInterval(()=>{setCh(p=>[...p.slice(-39),{...CP[Math.floor(Math.random()*4)],id:Date.now()}])},5000);return()=>clearInterval(t)},[]);
   useEffect(()=>{const level=media.muted?0:Math.max(0,Math.min(100,media.volume))/100;document.querySelectorAll("video,audio").forEach(el=>{el.volume=level;el.muted=media.muted||media.volume===0})},[media.volume,media.muted]);
@@ -666,9 +665,8 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const startReplay=()=>{if(!perf.caps.replay){setNotif("Replay is not enabled for this room");setTimeout(()=>setNotif(null),1600);return}setPn(null);setGm(null);setMedia(p=>({...p,paused:false,replay:true,replayLeft:15,settings:false,volumeOpen:false}));setNotif("Instant replay - 15 seconds behind live");setTimeout(()=>setNotif(null),1600)};
   const toggleFullscreen=async()=>{const entering=!media.fullscreen;if(entering){setPn(null);setGm(null);setChH(true);setMedia(p=>({...p,fullscreen:true,settings:false,volumeOpen:false}));try{const el=roomRef.current||document.documentElement,req=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;if(req)await req.call(el)}catch(e){}}else{setMedia(p=>({...p,fullscreen:false,volumeOpen:false}));try{const exit=document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen;if((document.fullscreenElement||document.webkitFullscreenElement||document.msFullscreenElement)&&exit)await exit.call(document)}catch(e){}}};
   const tog=n=>{setPn(p=>p===n?null:n);if(n)setGm(null)};
-  const sg=g=>{if(user.sparks<g.cost)return;onSC(-g.cost);const id=++aid.current,x=68+Math.random()*20,y=18+Math.random()*24;
+  const sg=g=>{if(user.sparks<g.cost)return;onSC(-g.cost);
     const effectId=getEffectForCost(g.cost).id;
-    setAnims(p=>[...p,{...g,id,x,y}]);setTimeout(()=>setAnims(p=>p.filter(a=>a.id!==id)),2200);
     setCh(p=>[...p.slice(-39),{user:user.name,msg:`sent ${g.name}`,vip:true,id:Date.now()}]);onGiftSent&&onGiftSent(effectId);setPn(null)};
   const sc=()=>{if(!ci.trim())return;setCh(p=>[...p.slice(-39),{user:user.name,msg:ci,vip:true,id:Date.now()}]);setCi("")};
   const sb=a=>{onSC(a);setNotif(`+${a} sparks earned`);setTimeout(()=>setNotif(null),1800)};
@@ -688,7 +686,6 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
           <div style={{fontSize:".58rem",fontWeight:800,color:"rgba(255,255,255,.62)",whiteSpace:"nowrap"}}>{media.paused?"Live keeps moving for the room":`${media.replayLeft || 15}s behind live`}</div></div>
         <button type="button" onClick={media.paused?()=>setViewingPaused(false):goLive} style={{height:28,padding:"0 10px",borderRadius:14,border:"1px solid rgba(255,255,255,.14)",background:"rgba(255,255,255,.08)",color:"#fff",font:"inherit",fontSize:".58rem",fontWeight:1000,cursor:"pointer",whiteSpace:"nowrap"}}>{media.paused?"Resume":"Go Live"}</button>
       </div>}
-      {anims.map(g=><div key={g.id} className="gpa" style={{left:`${g.x}%`,top:`${g.y}%`}}><I n={g.icon} s={g.cost>=500?40:g.cost>=150?32:24} c={g.color}/></div>)}
       {reqFx.map(r=><RequestMoment key={r.id} item={r} perf={perf}/>)}
     </div>
     {notif&&<div className="ai" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:50,padding:"7px 16px",borderRadius:9,background:notif.includes("refunded")?"rgba(255,171,0,.1)":"rgba(34,197,94,.1)",border:"1px solid "+(notif.includes("refunded")?"var(--am)":"var(--gn)"),fontWeight:800,fontSize:".82rem",color:notif.includes("refunded")?"var(--am)":"var(--gn)"}}>{notif}</div>}

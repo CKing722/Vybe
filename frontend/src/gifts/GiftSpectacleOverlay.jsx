@@ -3,6 +3,11 @@ import { GIFT_EFFECT_MAP, PLATFORM_BANNER_THRESHOLD_SPARKS } from "./giftEffectC
 import useReducedMotion from "./useReducedMotion.js";
 import CanvasParticleRenderer from "./CanvasParticleRenderer.jsx";
 
+const GIFT_STAGE_ANCHOR = {
+  top: "22%",
+  right: "max(18px, 7vw)",
+};
+
 /* -----------------------------------------------------------------------
    GiftSpectacleOverlay
    Props:
@@ -88,8 +93,8 @@ function LowTierToast({ effect, pal, typo, sender, phase, reducedMotion }) {
 
   const s = {
     position: "fixed",
-    bottom: "88px",
-    right: "18px",
+    top: GIFT_STAGE_ANCHOR.top,
+    right: GIFT_STAGE_ANCHOR.right,
     zIndex: 1200,
     display: "flex",
     alignItems: "center",
@@ -139,8 +144,8 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, isBanner, phase
 
   const shellStyle = {
     position: "fixed",
-    right: "max(18px, 7vw)",
-    top: isKey ? "24%" : "22%",
+    right: GIFT_STAGE_ANCHOR.right,
+    top: GIFT_STAGE_ANCHOR.top,
     width: isKey ? "min(210px, 28vw)" : "min(180px, 24vw)",
     height: isKey ? "min(210px, 28vw)" : "min(180px, 24vw)",
     zIndex: 2200,
@@ -454,14 +459,14 @@ function MidTierBurst({ effect, pal, typo, sender, phase, reducedMotion }) {
 
   const wrapStyle = {
     position: "fixed",
-    bottom: "22%",
-    left: "50%",
+    top: GIFT_STAGE_ANCHOR.top,
+    right: GIFT_STAGE_ANCHOR.right,
     zIndex: 1600,
     transform: entering
-      ? "translateX(-50%) scale(0.78)"
+      ? "translateY(12px) scale(0.78)"
       : exiting
-        ? "translateX(-50%) scale(0.92) translateY(6px)"
-        : "translateX(-50%) scale(1)",
+        ? "translateY(6px) scale(0.92)"
+        : "translateY(0) scale(1)",
     transition: reducedMotion
       ? "opacity 0.15s ease"
       : "opacity 0.3s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1)",

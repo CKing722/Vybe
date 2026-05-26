@@ -5,8 +5,14 @@ import { GIFT_EFFECT_MAP } from "./giftEffectCatalog.js";
 // Backend uses short slugs ("crown"); catalog uses full ids ("crown_drop").
 const BACKEND_ID_MAP = {
   neon_rose: "neon_rose",
+  fire_shot: "fire_shot",
+  velvet_kiss: "velvet_kiss",
+  velvet_spark: "velvet_kiss",
+  diamond_rain: "diamond_rain",
   crown: "crown_drop",
   crown_drop: "crown_drop",
+  champagne: "champagne_pour",
+  champagne_pour: "champagne_pour",
   private_key: "private_key",
 };
 

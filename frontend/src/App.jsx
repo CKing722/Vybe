@@ -5,6 +5,7 @@ import SparkStormShell from "./gifts/SparkStormShell.jsx";
 import GiftEffectPreviewControls from "./gifts/GiftEffectPreviewControls.jsx";
 import VybeLuxuryPreview from "./gifts/VybeLuxuryPreview.jsx";
 import useGiftQueue from "./gifts/useGiftQueue.js";
+import useGiftSocket from "./gifts/useGiftSocket.js";
 import { getEffectForCost } from "./gifts/giftEffectCatalog.js";
 
 /* ═══ ICONS — 40+ custom SVGs, zero emojis ═══ */
@@ -152,6 +153,16 @@ const gameEconomyLine=type=>{
   if(type==="binary")return `${fsn(e.truth)} truth / ${fsn(e.dare)} dare`;
   if(type==="jackpot")return `${fsn(e.stake)} stake / ${fsn(e.jackpot)} jackpot`;
   return `${fsn(e.stake)} stake / ${fsn(e.reward)} reward`;
+};
+const requestPalette=name=>{
+  const n=(name||"").toLowerCase();
+  if(n.includes("ultimate"))return {a:"#fbbf24",b:"#8b5cf6",c:"#ff2d78",label:"signature"};
+  if(n.includes("fantasy"))return {a:"#8b5cf6",b:"#00d4ff",c:"#f472b6",label:"scenario"};
+  if(n.includes("outfit"))return {a:"#00d4ff",b:"#c6ff00",c:"#ffab00",label:"wardrobe"};
+  if(n.includes("song"))return {a:"#f472b6",b:"#ffab00",c:"#00d4ff",label:"sound"};
+  if(n.includes("game"))return {a:"#c6ff00",b:"#00d4ff",c:"#fbbf24",label:"control"};
+  if(n.includes("dare"))return {a:"#ff2d78",b:"#f97316",c:"#fbbf24",label:"challenge"};
+  return {a:"#ffab00",b:"#00d4ff",c:"#ff2d78",label:"request"};
 };
 const VWR=[{name:"VelvetKing",score:2450,lv:34,badge:"crown"},{name:"DiamondJay",score:1820,lv:28,badge:"diamond"},{name:"AceHigh",score:1340,lv:22,badge:"streak"},{name:"NightOwl",score:890,lv:15,badge:""},{name:"xShadowx",score:620,lv:11,badge:""}];
 const HEAT={warm:"#ffab00",rising:"#f97316",hot:"#ff2d78",finale:"#c6ff00"};
@@ -502,6 +513,39 @@ function GE({game,onClose,onSB,sparks=0,onSpend=()=>{}}){
   </Pn>;}
 
 /* ═══ LOBBY ═══ */
+function RequestMoment({item,perf}){
+  const pal=requestPalette(item.name);
+  return <div className="reqMoment" style={{position:"absolute",right:"max(22px,8vw)",top:"26%",zIndex:12,width:"min(340px,30vw)",minWidth:280,pointerEvents:"none",filter:"drop-shadow(0 30px 70px rgba(0,0,0,.38))"}}>
+    <style>{`
+      @keyframes reqMomentIn{0%{opacity:0;transform:translateY(18px) scale(.88) rotateX(18deg)}16%{opacity:1}68%{opacity:1;transform:translateY(0) scale(1) rotateX(0)}100%{opacity:0;transform:translateY(-12px) scale(.96) rotateX(0)}}
+      @keyframes reqSealTurn{0%,100%{transform:rotateY(-18deg) rotateX(12deg) translateY(0)}50%{transform:rotateY(20deg) rotateX(18deg) translateY(-5px)}}
+      @keyframes reqLineSweep{0%{transform:translateX(-110%);opacity:0}18%{opacity:.75}76%{opacity:.75}100%{transform:translateX(110%);opacity:0}}
+      @keyframes reqPrism{0%,100%{opacity:.28;transform:scale(.92)}50%{opacity:.7;transform:scale(1.04)}}
+    `}</style>
+    <div style={{position:"relative",overflow:"hidden",borderRadius:16,border:`1px solid ${pal.a}66`,background:"linear-gradient(135deg,rgba(255,255,255,.12),rgba(7,9,16,.88) 45%,rgba(255,255,255,.05))",backdropFilter:"blur(18px)",WebkitBackdropFilter:"blur(18px)",animation:"reqMomentIn 5.2s cubic-bezier(.16,1,.3,1) both"}}>
+      <div style={{position:"absolute",inset:-1,background:`radial-gradient(circle at 18% 10%,${pal.a}33,transparent 28%),radial-gradient(circle at 88% 74%,${pal.b}30,transparent 30%)`}}/>
+      <div style={{position:"absolute",left:0,top:0,bottom:0,width:"36%",background:`linear-gradient(100deg,transparent,${pal.a}26,transparent)`,animation:"reqLineSweep 2.2s ease-in-out infinite"}}/>
+      <div style={{position:"relative",display:"grid",gridTemplateColumns:"76px 1fr",gap:14,padding:"16px 17px",alignItems:"center"}}>
+        <div style={{position:"relative",width:76,height:76,perspective:700}}>
+          <div style={{position:"absolute",inset:5,borderRadius:"50%",background:`radial-gradient(circle,${pal.a}44,transparent 64%)`,filter:"blur(10px)",animation:"reqPrism 1.9s ease-in-out infinite"}}/>
+          <div style={{position:"absolute",inset:12,borderRadius:"50%",border:`1px solid ${pal.a}88`,transform:"rotateX(68deg)",boxShadow:`0 0 28px ${pal.a}44`}}/>
+          <div style={{position:"absolute",left:16,top:13,width:44,height:50,borderRadius:"12px 12px 18px 18px",background:`linear-gradient(145deg,rgba(255,255,255,.82),${pal.a} 48%,${pal.b})`,boxShadow:`inset -10px -12px 20px rgba(0,0,0,.26), inset 8px 8px 18px rgba(255,255,255,.34), 0 18px 40px ${pal.a}44`,clipPath:"polygon(50% 0,88% 18%,88% 70%,50% 100%,12% 70%,12% 18%)",animation:"reqSealTurn 2.4s ease-in-out infinite"}}/>
+          <div style={{position:"absolute",left:29,top:26,width:18,height:18,borderRadius:"50%",border:"2px solid rgba(6,8,16,.62)"}}/>
+        </div>
+        <div style={{minWidth:0}}>
+          <div style={{fontSize:".58rem",letterSpacing:".18em",textTransform:"uppercase",fontWeight:1000,color:pal.a}}>Request accepted</div>
+          <div style={{fontSize:"1rem",fontWeight:1000,lineHeight:1.1,marginTop:4,color:"#fff",textShadow:`0 0 22px ${pal.a}44`}}>{item.name}</div>
+          <div style={{fontSize:".66rem",lineHeight:1.4,color:"rgba(255,255,255,.68)",marginTop:5}}>{item.user} locked {fsn(item.sparks)} sparks with {perf.name.split(" ")[0]}</div>
+          <div style={{display:"flex",alignItems:"center",gap:7,marginTop:10}}>
+            <span style={{height:1,flex:1,background:`linear-gradient(90deg,${pal.a},transparent)`}}/>
+            <span style={{fontSize:".56rem",letterSpacing:".16em",textTransform:"uppercase",fontWeight:1000,color:pal.b}}>{pal.label} moment</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
 function LB({user,onPerf,onWallet,cat,setCat,onMenu}){
   const f=cat==="All"?PERFS:PERFS.filter(p=>p.cats.includes(cat));const tier=gl(user.spent);
   return<div style={{minHeight:"100vh",background:"var(--bg)",padding:"12px clamp(10px,3vw,30px)"}}>
@@ -561,7 +605,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const [media,setMedia]=useState({paused:false,muted:false,settings:settingsPreview,captions:false,pip:false,quality:"1080p",layout:"Theater"});
   const [ch,setCh]=useState([{user:"VYBE",msg:`Welcome — ${perf.name} is live. You are known here.`,vip:false,id:0}]);
   const [ci,setCi]=useState("");const [chH,setChH]=useState(false);
-  const [anims,setAnims]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
+  const [anims,setAnims]=useState([]);const [reqFx,setReqFx]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
   const [pendingReq,setPendingReq]=useState([{id:1,user:"test",name:"Ultimate Fantasy",desc:"You design it, she delivers",sparks:5000,status:"pending"}]);
   const aid=useRef(0);const CP=[{user:"NightOwl",msg:"Let's go"},{user:"VelvetKing",msg:"Crown incoming",vip:true},{user:"AceHigh",msg:"All in",vip:true},{user:"DiamondJay",msg:"Here we go",vip:true}];
   useEffect(()=>{const t=setInterval(()=>{if(!media.paused)setTm(p=>Math.max(0,p-1))},1000);return()=>clearInterval(t)},[media.paused]);
@@ -574,8 +618,8 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
     setCh(p=>[...p.slice(-39),{user:user.name,msg:`sent ${g.name}`,vip:true,id:Date.now()}]);onGiftSent&&onGiftSent(effectId);setPn(null)};
   const sc=()=>{if(!ci.trim())return;setCh(p=>[...p.slice(-39),{user:user.name,msg:ci,vip:true,id:Date.now()}]);setCi("")};
   const sb=a=>{onSC(a);setNotif(`+${a} sparks earned`);setTimeout(()=>setNotif(null),1800)};
-  const acceptReq=id=>{const rq=pendingReq.find(r=>r.id===id);setPendingReq(p=>p.map(r=>r.id===id?{...r,status:"accepted"}:r));if(rq)setCh(p=>[...p.slice(-39),{user:"Performer",msg:`accepted ${rq.name}`,vip:false,id:Date.now()}])};
-  const declineReq=id=>{const rq=pendingReq.find(r=>r.id===id);setPendingReq(p=>p.map(r=>r.id===id?{...r,status:"declined"}:r));if(rq){if(rq.user===user.name)onSC(rq.sparks);setCh(p=>[...p.slice(-39),{user:"VYBE",msg:`${rq.name} declined - ${rq.sparks.toLocaleString()} sparks refunded to ${rq.user}`,vip:false,id:Date.now()}]);setNotif(`${rq.sparks.toLocaleString()} sparks refunded to ${rq.user}`)}};
+  const acceptReq=id=>{const rq=pendingReq.find(r=>r.id===id&&r.status==="pending");if(!rq)return;setPendingReq(p=>p.filter(r=>r.id!==id));setNotif(null);const fx={...rq,id:Date.now()};setReqFx(p=>[...p,fx]);setTimeout(()=>setReqFx(p=>p.filter(r=>r.id!==fx.id)),5400);setCh(p=>[...p.slice(-39),{user:"Performer",msg:`accepted ${rq.name}`,vip:false,id:Date.now()}])};
+  const declineReq=id=>{const rq=pendingReq.find(r=>r.id===id&&r.status==="pending");if(!rq)return;setPendingReq(p=>p.filter(r=>r.id!==id));if(rq.user===user.name)onSC(rq.sparks);setCh(p=>[...p.slice(-39),{user:"VYBE",msg:`${rq.name} declined - ${rq.sparks.toLocaleString()} sparks refunded to ${rq.user}`,vip:false,id:Date.now()}]);setNotif(`${rq.sparks.toLocaleString()} sparks refunded to ${rq.user}`);setTimeout(()=>setNotif(null),2200)};
   const addReq=r=>{if(user.sparks<r.sparks)return;onSC(-r.sparks);const item={id:Date.now(),user:user.name,name:r.name,desc:r.desc,sparks:r.sparks,status:"pending"};setPendingReq(p=>[item,...p].slice(0,5));setCh(p=>[...p.slice(-39),{user:user.name,msg:`requested ${r.name} - pending performer approval`,vip:true,id:Date.now()}]);setPn(null)};
   const avG=GAMES.filter(g=>perf.caps.games.includes(g.id));
 
@@ -585,8 +629,9 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
         <div style={{position:"absolute",top:"4%",left:"50%",transform:"translateX(-50%)",width:64,height:64,borderRadius:"50%",background:"radial-gradient(circle,#e8c4a8 55%,#c49070)"}}/>
         <div style={{position:"absolute",bottom:"-3%",left:"50%",transform:"translateX(-50%)",width:160,height:"70%",borderRadius:"42% 42% 20px 20px",background:`linear-gradient(170deg,${perf.accent} 15%,var(--vi) 50%,#0a0e1a 90%)`}}/></div>
       {anims.map(g=><div key={g.id} className="gpa" style={{left:`${g.x}%`,top:`${g.y}%`}}><I n={g.icon} s={g.cost>=500?40:g.cost>=150?32:24} c={g.color}/></div>)}
+      {reqFx.map(r=><RequestMoment key={r.id} item={r} perf={perf}/>)}
     </div>
-    {notif&&<div className="ai" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:50,padding:"7px 16px",borderRadius:9,background:"rgba(34,197,94,.1)",border:"1px solid var(--gn)",fontWeight:800,fontSize:".82rem",color:"var(--gn)"}}>{notif}</div>}
+    {notif&&<div className="ai" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:50,padding:"7px 16px",borderRadius:9,background:notif.includes("refunded")?"rgba(255,171,0,.1)":"rgba(34,197,94,.1)",border:"1px solid "+(notif.includes("refunded")?"var(--am)":"var(--gn)"),fontWeight:800,fontSize:".82rem",color:notif.includes("refunded")?"var(--am)":"var(--gn)"}}>{notif}</div>}
     {/* Top */}
     <div style={{position:"absolute",top:0,left:0,right:0,display:"flex",justifyContent:"space-between",alignItems:"start",padding:"9px 10px",zIndex:10}}>
       <G style={{padding:"6px 9px",display:"flex",alignItems:"center",gap:6}}>
@@ -1138,6 +1183,8 @@ export default function App(){
     triggerDemoGift(giftId);
   },[triggerDemoGift]);
   useEffect(()=>{if(visualPreview){const t=setTimeout(()=>triggerDemoGift("crown_drop"),800);return()=>clearTimeout(t)}},[visualPreview,triggerDemoGift]);
+  const handleSocketGift=useCallback((ev)=>{setGiftEvents(p=>[ev,...p].slice(0,20));enqueueDemoGift(ev);},[enqueueDemoGift]);
+  useGiftSocket({roomId:vw==="room"&&pf?pf.id:null,onGiftAnimation:handleSocketGift});
 
   const handleAuth=(u)=>{setAuthUser(u);setUser(p=>({...p,name:u.name}));setAuthed(true);if(u.role==="performer")setOk(true)};/*performers skip age verify*/
   const logout=()=>{setAuthed(false);setAuthUser(null);setOk(false);setVw("lobby")};

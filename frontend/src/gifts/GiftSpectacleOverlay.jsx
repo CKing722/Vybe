@@ -136,140 +136,177 @@ function LowTierToast({ effect, pal, typo, sender, phase, reducedMotion }) {
 /* -----------------------------------------------------------------------
    High-tier: compact premium 3D room moment, not a full-screen takeover.
    ----------------------------------------------------------------------- */
-function HighTierOverlay({ effect, pal, typo, sender, recipient, isBanner, phase, reducedMotion }) {
-  const entering = !reducedMotion && (phase === "entry" || phase === "cinematic-open");
+/* -----------------------------------------------------------------------
+   High-tier: full-screen cinematic takeover - dims room, centers gift
+   ----------------------------------------------------------------------- */
+function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedMotion }) {
+  const entering = !reducedMotion && (phase === "entry" || phase === "cinematic-open" || phase === "blackout");
   const exiting = !reducedMotion && phase === "exit";
   const isKey = effect.id === "private_key";
-  const headline = sender + " sent " + effect.displayName + " to " + recipient;
+  const headline = typo.bannerHeadline
+    ? typo.bannerHeadline.replace("{sender}", sender)
+    : sender + " sent " + effect.displayName + " to " + recipient;
+
+  // Use the current phase's overlayDim if available, else sensible defaults
+  const curPhaseData = effect.effectPhases.find((p) => p.phase === phase);
+  const dimAmount = curPhaseData?.overlayDim ?? (isKey ? 0.88 : 0.65);
+  // Camera shake: apply when the current phase requests it
+  const shakeMs = !reducedMotion && curPhaseData?.cameraShake
+    ? curPhaseData.cameraShake.durationMs
+    : 0;
+
+  const dimStyle = {
+    position: "fixed",
+    inset: 0,
+    zIndex: 2100,
+    background: "rgba(0,0,0," + (entering || exiting ? 0 : dimAmount) + ")",
+    transition: reducedMotion ? "none" : "background 0.55s ease",
+    pointerEvents: "none",
+  };
 
   const shellStyle = {
     position: "fixed",
-    right: GIFT_STAGE_ANCHOR.right,
-    top: GIFT_STAGE_ANCHOR.top,
-    width: isKey ? "min(210px, 28vw)" : "min(180px, 24vw)",
-    height: isKey ? "min(210px, 28vw)" : "min(180px, 24vw)",
+    inset: 0,
     zIndex: 2200,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    transform: entering
-      ? "translateY(12px) scale(0.72) rotateX(14deg)"
-      : exiting
-        ? "translateY(-8px) scale(0.82) rotateX(0deg)"
-        : "translateY(0) scale(1) rotateX(0deg)",
-    transition: "opacity 0.45s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1)",
+    gap: "0px",
     opacity: entering ? 0 : exiting ? 0 : 1,
-    pointerEvents: "none",
+    transform: entering
+      ? "scale(0.72) rotateX(14deg)"
+      : exiting
+        ? "scale(0.86) rotateX(0deg)"
+        : "scale(1) rotateX(0deg)",
+    transition: reducedMotion ? "opacity 0.15s ease" : "opacity 0.45s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1)",
     perspective: "980px",
+    pointerEvents: "none",
+    animation: shakeMs ? "vybe-cam-shake " + shakeMs + "ms ease-in-out" : "none",
   };
 
   const auraStyle = {
     position: "absolute",
-    inset: "9%",
+    width: "70vmin",
+    height: "70vmin",
     borderRadius: "50%",
-    background: "radial-gradient(circle, " + pal.primary + "22 0%, " + pal.primary + "10 34%, transparent 68%)",
-    filter: "blur(10px)",
-    transform: "translateZ(-80px)",
+    background: "radial-gradient(circle, " + pal.primary + "1a 0%, " + pal.primary + "0a 42%, transparent 72%)",
+    filter: "blur(28px)",
+    pointerEvents: "none",
   };
 
   const labelStyle = {
-    position: "absolute",
-    right: "50%",
-    bottom: isKey ? "-8px" : "0",
-    transform: "translateX(50%)",
-    minWidth: "min(210px, 52vw)",
-    maxWidth: "min(240px, 58vw)",
-    padding: "7px 11px",
-    borderRadius: "11px",
-    border: "1px solid rgba(255,255,255,.14)",
-    background: "linear-gradient(135deg,rgba(255,255,255,.1),rgba(5,7,13,0.82))",
-    boxShadow: "0 18px 42px rgba(0,0,0,0.34), 0 0 20px " + (pal.glow || pal.primary + "22"),
+    marginTop: "22px",
+    maxWidth: "min(480px, 86vw)",
+    padding: "12px 22px",
+    borderRadius: "14px",
+    border: "1px solid rgba(255,255,255,.18)",
+    background: "linear-gradient(135deg,rgba(255,255,255,.1),rgba(5,7,13,0.86))",
+    boxShadow: "0 20px 52px rgba(0,0,0,0.52), 0 0 32px " + (pal.glow || pal.primary + "28"),
     color: "#fff",
     textAlign: "center",
-    fontSize: "10.5px",
+    fontSize: "clamp(0.88rem, 2.4vw, 1.15rem)",
     fontWeight: 800,
     letterSpacing: "0.03em",
-    backdropFilter: "blur(12px)",
-    WebkitBackdropFilter: "blur(12px)",
+    backdropFilter: "blur(16px)",
+    WebkitBackdropFilter: "blur(16px)",
+    fontFamily: typo.displayFont === "monospace" ? "monospace" : "inherit",
   };
 
   const metaStyle = {
     display: "inline-flex",
     alignItems: "center",
-    gap: "6px",
+    gap: "8px",
     justifyContent: "center",
     color: pal.primary,
-    marginTop: "3px",
-    fontSize: "8.5px",
-    letterSpacing: "0.12em",
+    marginTop: "5px",
+    fontSize: "11px",
+    letterSpacing: "0.14em",
     textTransform: "uppercase",
   };
 
   return (
-    <div style={shellStyle} aria-live="assertive" role="status" aria-label={headline}>
-      <style>{`
-        @keyframes vybe-gift-orbit {
-          0% { transform: rotateY(-18deg) rotateX(12deg) translateY(0); }
-          50% { transform: rotateY(20deg) rotateX(16deg) translateY(-9px); }
-          100% { transform: rotateY(-18deg) rotateX(12deg) translateY(0); }
-        }
-        @keyframes vybe-gift-crown-drop {
-          0% { transform: translateY(-42px) rotateX(28deg) rotateZ(-5deg) scale(0.82); opacity: 0; }
-          32% { opacity: 1; }
-          58% { transform: translateY(6px) rotateX(18deg) rotateZ(3deg) scale(1.05); }
-          100% { transform: translateY(0) rotateX(14deg) rotateZ(0deg) scale(1); opacity: 1; }
-        }
-        @keyframes vybe-gift-ring {
-          0% { transform: translate(-50%, -50%) rotateX(70deg) scale(0.72); opacity: 0; }
-          35% { opacity: 0.9; }
-          100% { transform: translate(-50%, -50%) rotateX(70deg) scale(1.28); opacity: 0; }
-        }
-      `}</style>
-      <div style={auraStyle} />
-      {!reducedMotion && <CanvasParticleRenderer pal={pal} budget={effect.particleBudget} phase={phase} />}
-      <Gift3DObject effect={effect} pal={pal} reducedMotion={reducedMotion} />
-      <div style={labelStyle}>
-        <div>{headline}</div>
-        <div style={metaStyle}>
-          <span>{effect.audienceScope === "platform" ? "platform moment" : "room moment"}</span>
-          {typo.showSparkCount && <span>{effect.sparkCost.toLocaleString()} sparks</span>}
+    <>
+      <div style={dimStyle} />
+      <div style={shellStyle} aria-live="assertive" role="status" aria-label={headline}>
+        <style>{`
+          @keyframes vybe-gift-orbit {
+            0% { transform: rotateY(-18deg) rotateX(10deg) translateY(0); }
+            50% { transform: rotateY(20deg) rotateX(14deg) translateY(-14px); }
+            100% { transform: rotateY(-18deg) rotateX(10deg) translateY(0); }
+          }
+          @keyframes vybe-gift-crown-drop {
+            0% { transform: translateY(-70px) rotateX(32deg) rotateZ(-6deg) scale(0.72); opacity: 0; }
+            30% { opacity: 1; }
+            60% { transform: translateY(12px) rotateX(20deg) rotateZ(3deg) scale(1.07); }
+            100% { transform: translateY(0) rotateX(10deg) rotateZ(0deg) scale(1); opacity: 1; }
+          }
+          @keyframes vybe-gift-ring {
+            0% { transform: translate(-50%,-50%) rotateX(72deg) scale(0.6); opacity: 0; }
+            28% { opacity: 0.85; }
+            100% { transform: translate(-50%,-50%) rotateX(72deg) scale(1.55); opacity: 0; }
+          }
+          @keyframes vybe-cam-shake {
+            0%,100% { transform: scale(1) rotateX(0deg) translateX(0); }
+            20% { transform: scale(1) rotateX(0deg) translateX(-7px); }
+            40% { transform: scale(1) rotateX(0deg) translateX(7px); }
+            60% { transform: scale(1) rotateX(0deg) translateX(-5px); }
+            80% { transform: scale(1) rotateX(0deg) translateX(5px); }
+          }
+        `}</style>
+        <div style={auraStyle} />
+        {!reducedMotion && <CanvasParticleRenderer pal={pal} budget={effect.particleBudget} phase={phase} />}
+        <Gift3DObject effect={effect} pal={pal} reducedMotion={reducedMotion} />
+        <div style={labelStyle}>
+          <div>{headline}</div>
+          <div style={metaStyle}>
+            <span>{effect.audienceScope === "platform" ? "platform moment" : "room moment"}</span>
+            {typo.showSparkCount && <span>{effect.sparkCost.toLocaleString()} sparks</span>}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
 function Gift3DObject({ effect, pal, reducedMotion }) {
   const kind = effect.objectKind || effect.id;
+  const isKey = effect.id === "private_key";
+  const isChamp = kind === "champagne" || kind === "champagne_pour";
+  // Center-stage sizing: larger than the old corner widget
+  const objPx = isKey || isChamp ? "min(230px, 44vmin)" : "min(200px, 38vmin)";
+
   const objectStyle = {
     position: "relative",
-    width: effect.id === "private_key" || kind === "champagne" ? "180px" : "154px",
-    height: effect.id === "private_key" || kind === "champagne" ? "180px" : "154px",
+    width: objPx,
+    height: objPx,
     transformStyle: "preserve-3d",
-    animation: reducedMotion ? "none" : (effect.id === "crown_drop" ? "vybe-gift-crown-drop 900ms cubic-bezier(0.16,1,0.3,1) both, vybe-gift-orbit 2.6s ease-in-out 900ms infinite" : "vybe-gift-orbit 2.8s ease-in-out infinite"),
-    filter: "drop-shadow(0 22px 32px rgba(0,0,0,0.52)) drop-shadow(0 0 24px " + (pal.glow || pal.primary + "55") + ")",
+    animation: reducedMotion ? "none" : (effect.id === "crown_drop"
+      ? "vybe-gift-crown-drop 960ms cubic-bezier(0.16,1,0.3,1) both, vybe-gift-orbit 2.8s ease-in-out 960ms infinite"
+      : "vybe-gift-orbit 2.8s ease-in-out infinite"),
+    filter: "drop-shadow(0 28px 44px rgba(0,0,0,0.64)) drop-shadow(0 0 36px " + (pal.glow || pal.primary + "66") + ")",
+    flexShrink: 0,
   };
 
   const ringStyle = {
     position: "absolute",
     left: "50%",
-    top: "55%",
-    width: "210px",
-    height: "64px",
+    top: "56%",
+    width: "130%",
+    height: "32%",
     borderRadius: "50%",
     border: "1px solid " + pal.primary + "66",
-    boxShadow: "0 0 28px " + (pal.glow || pal.primary + "44"),
-    animation: reducedMotion ? "none" : "vybe-gift-ring 1.8s ease-out infinite",
+    boxShadow: "0 0 36px " + (pal.glow || pal.primary + "44"),
+    animation: reducedMotion ? "none" : "vybe-gift-ring 2.0s ease-out infinite",
   };
 
   return (
-    <>
+    <div style={{ position: "relative", width: objPx, height: objPx, flexShrink: 0 }}>
       <div style={ringStyle} />
       <div style={objectStyle}>
         <GiftObjectMesh kind={kind} pal={pal} />
       </div>
-    </>
+    </div>
   );
 }
 

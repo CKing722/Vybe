@@ -117,7 +117,7 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const { cssW: w, cssH: h, dpr } = sizeCanvas(canvas);
+    let { cssW: w, cssH: h, dpr } = sizeCanvas(canvas);
     const ctx = canvas.getContext("2d");
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const spread = budget.spread || "radial-tight";
@@ -204,9 +204,30 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
 
     tick();
 
+    // Re-size canvas and re-spawn on container resize (handles device rotation).
+    let resizeRaf = null;
+    const ro = typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(() => {
+          if (!live_flag) return;
+          cancelAnimationFrame(resizeRaf);
+          resizeRaf = requestAnimationFrame(() => {
+            const sized = sizeCanvas(canvas);
+            w = sized.cssW;
+            h = sized.cssH;
+            dpr = sized.dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            particles = spawnParticles(effectiveBudget, w, h);
+          });
+        })
+      : null;
+
+    if (ro) ro.observe(canvas.parentElement || canvas);
+
     return () => {
       live_flag = false;
       cancelAnimationFrame(animIdRef.current);
+      cancelAnimationFrame(resizeRaf);
+      if (ro) ro.disconnect();
     };
   }, [active]); // eslint-disable-line react-hooks/exhaustive-deps
 

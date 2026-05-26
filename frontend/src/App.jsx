@@ -146,29 +146,58 @@ const FBQ=[{q:"What makes anticipation more exciting than the reward itself?",op
 const WSEGS=["Reveal +1","Dare Card","Bonus Sparks","Wildcard","Tease Moment","Mystery Gift","Double Down","Reset"];
 const TDC=[{t:"Truth",x:"Most daring thing you've done on camera?"},{t:"Dare",x:"Slow dance for 30 seconds."},{t:"Truth",x:"Biggest turn-on that surprises people?"},{t:"Dare",x:"Whisper something seductive to camera."},{t:"Truth",x:"When did you feel most desired?"},{t:"Dare",x:"Show your most confident pose."},{t:"Truth",x:"Ideal intimate evening in 3 words?"},{t:"Dare",x:"Most seductive look for 10 seconds."},{t:"Truth",x:"One thing you've never told a viewer?"},{t:"Dare",x:"Move like nobody's watching, 15 seconds."}];
 const GAME_ECON={
-  trivia:{stake:5,reward:15,label:"answer"},
+  trivia:{miss:5,reward:15,label:"answer"},
   wheel:{stake:25,reward:75,label:"spin"},
-  binary:{truth:10,dare:20,reward:0,label:"prompt"},
-  timed:{stake:10,reward:30,label:"answer"},
-  cards:{stake:20,reward:60,label:"flip"},
-  auction:{minBid:50,label:"escrow bid"},
-  score:{stake:15,reward:45,label:"answer"},
+  binary:{prompt:0,reward:0,label:"prompt"},
+  timed:{miss:10,reward:30,label:"answer"},
+  cards:{miss:20,reward:60,closeReward:20,label:"flip"},
+  auction:{minRaise:1,label:"escrow bid"},
+  score:{miss:15,reward:45,label:"answer"},
   box:{stake:10,reward:50,label:"open"},
-  ladder:{stepStake:15,rewardStep:25,label:"climb"},
+  ladder:{label:"climb"},
   reaction:{stake:20,reward:80,label:"reaction tap"},
-  touch:{trace:5,submit:25,reward:0,label:"trace"},
-  jackpot:{stake:50,jackpot:500,label:"answer"}
+  touch:{submit:25,reward:0,label:"trace"},
+  jackpot:{miss:50,jackpot:500,label:"answer"}
 };
 const fsn=n=>(Number(n)||0).toLocaleString();
 const gameEconomyLine=type=>{
   const e=GAME_ECON[type]||GAME_ECON.trivia;
-  if(type==="auction")return "Bid escrow from spark balance";
-  if(type==="ladder")return `${fsn(e.stepStake)}+ climb stake / ${fsn(e.rewardStep)} per rung`;
-  if(type==="touch")return `${fsn(e.trace)} trace / ${fsn(e.submit)} submit`;
-  if(type==="binary")return `${fsn(e.truth)} truth / ${fsn(e.dare)} dare`;
-  if(type==="jackpot")return `${fsn(e.stake)} stake / ${fsn(e.jackpot)} jackpot`;
+  if(type==="auction")return "Escrow bid / +1 raise";
+  if(type==="ladder")return "Escalating risk / bank anytime";
+  if(type==="touch")return `Free draw / ${fsn(e.submit)} submit`;
+  if(type==="binary")return "Free prompt / performer approval";
+  if(type==="box")return `${fsn(e.stake)} reveal / match-3 jackpot`;
+  if(type==="cards")return `Free flip / -${fsn(e.miss)} bad mismatch`;
+  if(type==="jackpot")return `Free answer / -${fsn(e.miss)} miss / ${fsn(e.jackpot)} jackpot`;
+  if(e.miss)return `Free answer / -${fsn(e.miss)} miss / +${fsn(e.reward)}`;
   return `${fsn(e.stake)} stake / ${fsn(e.reward)} reward`;
 };
+const DROP_SYMBOLS=[
+  {id:"rose",label:"Rose",icon:"rose",color:"var(--pk)",reward:25,weight:5},
+  {id:"diamond",label:"Diamond",icon:"diamond",color:"var(--cy)",reward:150,weight:3},
+  {id:"crown",label:"Crown",icon:"crown",color:"var(--am)",reward:750,weight:2},
+  {id:"key",label:"Private Key",icon:"key",color:"var(--vi)",reward:2500,weight:1},
+  {id:"veil",label:"Veil",icon:"mystery",color:"var(--mt)",reward:0,weight:7}
+];
+const makeDropGrid=()=>{
+  const pool=DROP_SYMBOLS.flatMap(s=>Array(s.weight).fill(s));
+  return Array.from({length:9},(_,i)=>({...pool[Math.floor(Math.random()*pool.length)],slot:i,open:false}));
+};
+const LADDER_RUNGS=[
+  {name:"Glance",cost:90,reward:125,odds:86},
+  {name:"Pulse",cost:140,reward:325,odds:70},
+  {name:"Hold",cost:220,reward:700,odds:52},
+  {name:"Command",cost:360,reward:1400,odds:34},
+  {name:"Finale",cost:600,reward:3200,odds:16}
+];
+const CARD_MOODS=["Velvet","Heat","Whisper","Focus","Afterglow","Control"];
+const AUCTION_TIERS=[
+  {min:0,label:"Room Direction",reward:"Choose the next room prompt, pending performer approval."},
+  {min:1000,label:"Priority Moment",reward:"Your prompt is pinned and reviewed before lower bids."},
+  {min:4000,label:"Premium Scene Route",reward:"Custom moment slot with top billing and extended acknowledgement."},
+  {min:10000,label:"Signature Jackpot",reward:"Exclusive post-show follow-up plus premium room credit if accepted."}
+];
+const auctionTier=bid=>AUCTION_TIERS.filter(t=>bid>=t.min).at(-1)||AUCTION_TIERS[0];
 const requestPalette=name=>{
   const n=(name||"").toLowerCase();
   if(n.includes("ultimate"))return {a:"#fbbf24",b:"#8b5cf6",c:"#ff2d78",label:"signature"};
@@ -432,50 +461,149 @@ function PF({perf,user,onBack,onLive,onBook,onVip,onWallet}){
 /* ═══ GAME ENGINE — 11 Unique Modes ═══ */
 function GE({game,onClose,onSB,sparks=0,onSpend=()=>{}}){
   const [qs,setQs]=useState(FBQ.sort(()=>Math.random()-.5).slice(0,5));
-  const [s,setS]=useState({qi:0,fb:"",m:0,wr:null,sp:false,td:null,tm:15,cP:0,cO:0,bid:170,hb:120,at:20,hs:0,hr:1,
-    bx:[...Array(6)].map((_,i)=>({id:i,op:false,pr:["10 sparks","25 sparks","50 sparks","Reveal +1","Badge","Empty"][i]})),
-    lr:0,lb:false,br:false,bt:null,bres:null,bms:0,jl:3,js:0,jw:false,tc:[]});
+  const [s,setS]=useState({qi:0,fb:"",ft:"info",m:0,wr:null,sp:false,td:null,tp:"",tm:15,cP:null,cO:null,cMood:null,bid:301,hb:300,at:45,hs:0,hr:1,
+    dg:makeDropGrid(),dw:false,lr:0,lb:false,br:false,bt:null,bres:null,bms:0,jl:3,js:0,jw:false,tc:[],drawing:false,tmode:"pulse"});
   const u=(k,v)=>setS(p=>({...p,...(typeof k==="string"?{[k]:v}:k)}));
   const econ=GAME_ECON[game.type]||GAME_ECON.trivia;
   const balance=Math.max(0,Number(sparks)||0);
-  const flash=msg=>{u("fb",msg);setTimeout(()=>u("fb",""),1800)};
+  const flash=(msg,tone="info",ms=1900)=>{u({fb:msg,ft:tone});setTimeout(()=>u("fb",""),ms)};
   const spend=(amount,label=econ.label||"play")=>{
     const cost=Math.max(0,Math.floor(Number(amount)||0));
     if(cost<=0)return true;
-    if(balance<cost){flash(`Need ${fsn(cost)} sparks to ${label}.`);return false}
+    if(balance<cost){flash(`Need ${fsn(cost)} sparks to ${label}.`,"bad");return false}
     onSpend(-cost);
     return true;
   };
-  const award=amount=>{const prize=Math.max(0,Math.floor(Number(amount)||0));if(prize>0)onSB(prize)};
+  const deductMiss=amount=>{
+    const cost=Math.max(0,Math.floor(Number(amount)||0));
+    if(cost<=0)return true;
+    if(balance>=cost){onSpend(-cost);return true}
+    return false;
+  };
+  const award=amount=>{const prize=Math.max(0,Math.floor(Number(amount)||0));if(prize>0)onSpend(prize)};
+  const nextRung=LADDER_RUNGS[s.lr];
+  const currentBank=s.lr>0?LADDER_RUNGS[s.lr-1].reward:0;
+  const bidValue=Math.max(0,Math.floor(Number(s.bid)||0));
+  const tier=auctionTier(bidValue||s.hb);
   const stakeLine=game.type==="auction"
-    ?`Bids come from balance and are held in escrow. Minimum raise ${fsn(econ.minBid)} sparks.`
+    ?`Timer ${s.at}s. Current high bid ${fsn(s.hb)}. Next legal bid is ${fsn(s.hb+(econ.minRaise||1))}.`
     :game.type==="ladder"
-      ?`Next climb costs ${fsn((s.lr+1)*(econ.stepStake||15))}. Banked reward now ${fsn(s.lr*(econ.rewardStep||25))}.`
+      ? nextRung?`Next climb costs ${fsn(nextRung.cost)} for ${nextRung.odds}% odds. Bank now ${fsn(currentBank)}.`:`Top rung reached. Bank ${fsn(currentBank)} before the room resets.`
       :game.type==="touch"
-        ?`Trace points cost ${fsn(econ.trace)}. Sending the trace costs ${fsn(econ.submit)}.`
+        ?`Draw is free. Sending the trace costs ${fsn(econ.submit)} and goes to performer approval.`
         :game.type==="binary"
-          ?`Truth costs ${fsn(econ.truth)}. Dare costs ${fsn(econ.dare)}. Performer approval still applies.`
+          ?`Prompt is free to write. Performer accepts, edits, or declines before it hits the room.`
+          :game.type==="box"
+            ?`Hidden cells cost ${fsn(econ.stake)}. Match three symbols for rewards up to ${fsn(Math.max(...DROP_SYMBOLS.map(d=>d.reward)))}.`
+          :game.type==="cards"
+            ?`Free flip. Tight chemistry pays ${fsn(econ.reward)}; close chemistry pays ${fsn(econ.closeReward)}; bad mismatch deducts ${fsn(econ.miss)}.`
           :game.type==="jackpot"
-            ?`${fsn(econ.stake)} per answer. Jackpot reward ${fsn(econ.jackpot)}.`
-            :`${fsn(econ.stake)} stake per ${econ.label}. Reward up to ${fsn(econ.reward)} sparks.`;
+            ?`Free answers. Wrong answers deduct ${fsn(econ.miss)} sparks and reset the streak. Jackpot ${fsn(econ.jackpot)}.`
+            :econ.miss
+              ?`Free to play. Correct pays ${fsn(econ.reward||econ.closeReward||0)}; misses deduct ${fsn(econ.miss)} sparks.`
+              :`${fsn(econ.stake)} stake per ${econ.label}. Reward up to ${fsn(econ.reward)} sparks.`;
   useEffect(()=>{genQs().then(nq=>{if(nq.length>0)setQs(nq)}).catch(()=>{})},[]);
   useEffect(()=>{if(s.qi>0&&s.qi%4===0)genQs().then(nq=>{if(nq.length>0)setQs(p=>[...p,...nq])}).catch(()=>{})},[s.qi]);
-  useEffect(()=>{if(game.type==="timed"&&s.tm>0){const t=setInterval(()=>u("tm",s.tm-1),1000);return()=>clearInterval(t)}
-    if(game.type==="reaction"&&!s.br&&!s.bres){const t=setTimeout(()=>u({br:true,bt:Date.now()}),2000+Math.random()*4000);return()=>clearTimeout(t)}},[s.tm,s.br,s.bres,game.type]);
+  useEffect(()=>{if(game.type==="timed"&&s.tm>0){const t=setTimeout(()=>u("tm",s.tm-1),1000);return()=>clearTimeout(t)}},[s.tm,game.type]);
+  useEffect(()=>{if(game.type==="auction"&&s.at>0){const t=setTimeout(()=>u("at",s.at-1),1000);return()=>clearTimeout(t)}},[s.at,game.type]);
+  useEffect(()=>{if(game.type==="reaction"&&!s.br&&!s.bres){const t=setTimeout(()=>u({br:true,bt:Date.now()}),2000+Math.random()*4000);return()=>clearTimeout(t)}},[s.br,s.bres,game.type]);
   const q=qs[s.qi%qs.length]||FBQ[0];
-  const ans=(i,cost=econ.stake,prize=econ.reward)=>{if(!spend(cost,"answer"))return false;if(i===q.ans){u({m:Math.min(100,s.m+12),fb:`Correct! +${fsn(prize)}`,qi:s.qi+1});award(prize)}else u({fb:"No payout",qi:s.qi+1});setTimeout(()=>u("fb",""),1800);return true};
+  const answer=(i,{miss=econ.miss||0,reward=econ.reward||0,score=0}={})=>{
+    if(i===q.ans){
+      if(reward)award(reward);
+      u({m:Math.min(100,s.m+12),qi:s.qi+1,hs:s.hs+score});
+      flash(`Correct +${fsn(reward)} sparks${score?`, +${score} score`:""}`,"good");
+      return true;
+    }
+    const paid=deductMiss(miss);
+    u({m:Math.max(0,s.m-7),qi:s.qi+1});
+    flash(paid?`Incorrect -${fsn(miss)} sparks`:"Incorrect. No sparks available to deduct.","bad");
+    return false;
+  };
+  const revealDrop=i=>{
+    const tile=s.dg[i];
+    if(!tile||tile.open||s.dw)return;
+    if(!spend(econ.stake,"reveal tile"))return;
+    const dg=s.dg.map((t,idx)=>idx===i?{...t,open:true}:t);
+    const counts=dg.filter(t=>t.open).reduce((a,t)=>({...a,[t.id]:(a[t.id]||0)+1}),{});
+    const win=DROP_SYMBOLS.find(sym=>sym.id!=="veil"&&counts[sym.id]>=3);
+    if(win){
+      award(win.reward);
+      u({dg,dw:true,m:100});
+      flash(`${win.label} match +${fsn(win.reward)} sparks`,"good",2400);
+    }else if(dg.every(t=>t.open)){
+      u({dg,m:Math.max(0,s.m-10)});
+      flash("No match. Reset the board for another drop.","bad",2200);
+    }else{
+      u({dg,m:Math.min(100,s.m+6)});
+      flash("Tile revealed. Match three symbols to win.","info",1200);
+    }
+  };
+  const climb=()=>{
+    const rung=LADDER_RUNGS[s.lr];
+    if(!rung){flash(`Top rung reached. Bank ${fsn(currentBank)} sparks.`,"good");return}
+    if(!spend(rung.cost,"climb"))return;
+    const ok=Math.random()*100<rung.odds;
+    if(ok){
+      u({lr:s.lr+1,lb:false,m:Math.min(100,(s.lr+1)*20)});
+      flash(`${rung.name} held. Bank is now ${fsn(rung.reward)} sparks.`,"good",2200);
+    }else{
+      u({lr:0,lb:false,m:0});
+      flash(`Missed ${rung.name}. Ladder bank reset.`,"bad",2200);
+    }
+  };
+  const bankLadder=()=>{
+    if(!currentBank){flash("Climb one rung before banking.","info");return}
+    award(currentBank);
+    u({lr:0,lb:true,m:0});
+    flash(`Banked ${fsn(currentBank)} sparks.`,"good",2200);
+  };
+  const flipCards=()=>{
+    const p=Math.floor(Math.random()*13)+2,o=Math.floor(Math.random()*13)+2,mood=CARD_MOODS[Math.floor(Math.random()*CARD_MOODS.length)];
+    const gap=Math.abs(p-o);
+    if(gap<=1){
+      award(econ.reward);
+      u({cP:p,cO:o,cMood:mood,m:Math.min(100,s.m+18)});
+      flash(`Strong chemistry +${fsn(econ.reward)} sparks`,"good",2200);
+    }else if(gap<=3){
+      award(econ.closeReward);
+      u({cP:p,cO:o,cMood:mood,m:Math.min(100,s.m+8)});
+      flash(`Close match +${fsn(econ.closeReward)} sparks`,"good",2000);
+    }else{
+      const paid=deductMiss(econ.miss);
+      u({cP:p,cO:o,cMood:mood,m:Math.max(0,s.m-6)});
+      flash(paid?`Chemistry broke -${fsn(econ.miss)} sparks`:"Chemistry broke. No sparks available to deduct.","bad",2200);
+    }
+  };
+  const placeBid=()=>{
+    const min=s.hb+(econ.minRaise||1);
+    if(s.at<=0){flash("Auction closed. Performer is reviewing the top bid.","bad");return}
+    if(bidValue<min){flash(`Bid must be at least ${fsn(min)} sparks.`,"bad");u("bid",min);return}
+    if(!spend(bidValue,"place bid"))return;
+    u({hb:bidValue,bid:bidValue+1,m:Math.min(100,s.m+7)});
+    flash(`${auctionTier(bidValue).label} held in escrow. Performer approval pending.`,"good",2600);
+  };
+  const pt=e=>{const r=e.currentTarget.getBoundingClientRect();return {x:Math.max(0,Math.min(100,((e.clientX-r.left)/r.width)*100)),y:Math.max(0,Math.min(100,((e.clientY-r.top)/r.height)*100))}};
+  const path=pts=>pts.map((p,i)=>`${i?"L":"M"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
+  const beginTrace=e=>{e.currentTarget.setPointerCapture?.(e.pointerId);const p=pt(e);setS(v=>({...v,drawing:true,tc:[...v.tc.slice(-2),{id:Date.now(),mode:v.tmode,pts:[p]}],m:Math.min(100,v.m+4)}))};
+  const moveTrace=e=>setS(v=>{if(!v.drawing)return v;const p=pt(e),tc=[...v.tc],last=tc[tc.length-1];if(!last)return v;tc[tc.length-1]={...last,pts:[...last.pts,p].slice(-80)};return {...v,tc}});
+  const endTrace=e=>{e.currentTarget.releasePointerCapture?.(e.pointerId);u("drawing",false)};
 
-  return<Pn onClose={onClose} title={game.name} icon={game.icon} ic={game.color} style={{position:"absolute",right:12,top:84,bottom:76,zIndex:24,width:"min(390px,34vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(9,10,18,.9))",boxShadow:"0 30px 90px rgba(0,0,0,.45)"}}>
+  return<Pn onClose={onClose} title={game.name} icon={game.icon} ic={game.color} style={{position:"absolute",right:12,top:84,bottom:76,zIndex:24,width:"min(430px,36vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(9,10,18,.9))",boxShadow:"0 30px 90px rgba(0,0,0,.45)"}}>
     <div style={{height:4,borderRadius:999,background:"rgba(255,255,255,.05)",marginBottom:8}}><div style={{height:"100%",borderRadius:"inherit",width:`${s.m}%`,transition:"width .4s",background:"linear-gradient(90deg,var(--cy),var(--lm),var(--pk))"}}/></div>
     <div style={{display:"grid",gridTemplateColumns:"auto 1fr",gap:8,alignItems:"center",padding:"8px 9px",borderRadius:9,border:"1px solid rgba(255,171,0,.18)",background:"rgba(255,171,0,.055)",marginBottom:9}}>
       <div style={{fontWeight:1000,color:"var(--am)",fontSize:".82rem",display:"flex",alignItems:"center",gap:3}}><I n="spark" s={11} c="var(--am)"/>{fsn(balance)}</div>
       <div style={{fontSize:".62rem",lineHeight:1.35,color:"var(--mt)",fontWeight:700}}>{stakeLine}</div>
     </div>
+    {s.fb&&<div style={{display:"flex",alignItems:"center",gap:7,padding:"7px 9px",borderRadius:8,border:`1px solid ${s.ft==="bad"?"rgba(255,45,120,.35)":s.ft==="good"?"rgba(34,197,94,.35)":"rgba(0,212,255,.28)"}`,background:s.ft==="bad"?"rgba(255,45,120,.08)":s.ft==="good"?"rgba(34,197,94,.08)":"rgba(0,212,255,.07)",color:s.ft==="bad"?"var(--pk)":s.ft==="good"?"var(--gn)":"var(--cy)",fontSize:".72rem",fontWeight:900,marginBottom:9}}>
+      <I n={s.ft==="bad"?"close":s.ft==="good"?"check":"spark"} s={12} c="currentColor"/><span>{s.fb}</span>
+    </div>}
 
-    {game.type==="trivia"&&<div><h4 style={{fontSize:".92rem",fontWeight:700,lineHeight:1.2,marginBottom:7}}>{q.q}</h4>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>ans(i)} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:600,fontSize:".76rem",cursor:"pointer"}}>{o}</button>)}</div></div>}
+    {game.type==="trivia"&&<div><h4 style={{fontSize:".92rem",fontWeight:800,lineHeight:1.2,marginBottom:7}}>{q.q}</h4>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>answer(i)} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:650,fontSize:".76rem",cursor:"pointer"}}>{o}</button>)}</div></div>}
 
     {game.type==="wheel"&&<div style={{textAlign:"center"}}>
+      <div style={{fontSize:".72rem",color:"var(--mt)",lineHeight:1.45,marginBottom:8}}>Spin for a performer-approved room mood. Spark outcomes pay immediately; scene outcomes queue for approval.</div>
       <div style={{position:"relative",width:188,height:188,margin:"2px auto 12px"}}>
         <div style={{position:"absolute",left:"50%",top:-4,transform:"translateX(-50%)",width:0,height:0,borderLeft:"9px solid transparent",borderRight:"9px solid transparent",borderTop:"18px solid #fff",filter:"drop-shadow(0 0 10px rgba(255,255,255,.45))",zIndex:2}}/>
         <div style={{position:"absolute",inset:0,borderRadius:"50%",background:"conic-gradient(from -18deg,#ff2d78 0 44deg,#d6b15e 44deg 88deg,#c6ff00 88deg 132deg,#00d4ff 132deg 176deg,#8b5cf6 176deg 220deg,#ff8aa8 220deg 264deg,#f97316 264deg 308deg,#ff2d78 308deg 360deg)",boxShadow:"0 0 0 1px rgba(255,255,255,.12) inset,0 24px 80px rgba(255,45,120,.18)",animation:s.sp?"spin 2.4s cubic-bezier(.12,.76,.18,1) forwards":"none"}}/>
@@ -485,75 +613,94 @@ function GE({game,onClose,onSB,sparks=0,onSpend=()=>{}}){
       </div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5,marginBottom:10}}>{["Glow","Whisper","Choice","Spotlight"].map(x=><span key={x} style={{padding:"6px 8px",borderRadius:999,border:"1px solid var(--bd)",background:"rgba(255,255,255,.04)",fontSize:".62rem",fontWeight:800,color:"rgba(255,255,255,.72)"}}>{x}</span>)}</div>
       {s.wr&&<div style={{fontWeight:900,fontSize:".86rem",color:"var(--lm)",marginBottom:8}}>{s.wr}</div>}
-      <Btn primary small disabled={s.sp} onClick={()=>{if(!spend(econ.stake,"spin"))return;u("sp",true);setTimeout(()=>{const r=WSEGS[Math.floor(Math.random()*8)],win=r.includes("Sparks");u({sp:false,wr:r,m:Math.min(100,s.m+8),fb:win?`Bonus +${fsn(econ.reward)}`:r});if(win)award(econ.reward);setTimeout(()=>u("fb",""),1500)},2400)}}>{s.sp?"Dialing...":"Spin Velvet Dial"}</Btn></div>}
+      <Btn primary small disabled={s.sp} onClick={()=>{if(!spend(econ.stake,"spin"))return;u("sp",true);setTimeout(()=>{const r=WSEGS[Math.floor(Math.random()*8)],win=r.includes("Sparks");u({sp:false,wr:r,m:Math.min(100,s.m+8)});if(win){award(econ.reward);flash(`Bonus +${fsn(econ.reward)} sparks`,"good")}else flash(`${r} queued for approval`,"info")},2400)}}>{s.sp?"Dialing...":"Spin Velvet Dial"}</Btn></div>}
 
-    {game.type==="binary"&&<div style={{textAlign:"center"}}>
-      {s.td?<div style={{padding:12,borderRadius:8,border:"1px solid var(--bd)",background:"var(--cd)",marginBottom:6}}><Tag color={s.td.t==="Truth"?"var(--cy)":"var(--pk)"}>{s.td.t}</Tag><p style={{marginTop:5,fontWeight:600,fontSize:".85rem",lineHeight:1.4}}>{s.td.x}</p></div>
-      :<p style={{color:"var(--mt)",marginBottom:6,fontSize:".8rem"}}>Pick truth or dare.</p>}
-      <div style={{display:"flex",gap:5,justifyContent:"center"}}>
-        <Btn small onClick={()=>{if(!spend(econ.truth,"open truth"))return;const deck=TDC.filter(c=>c.t==="Truth");u({td:deck[Math.floor(Math.random()*deck.length)],m:Math.min(100,s.m+10),fb:"Truth opened"});setTimeout(()=>u("fb",""),1300)}} style={{border:"1px solid var(--cy)",color:"var(--cy)"}}>Truth</Btn>
-        <Btn small onClick={()=>{if(!spend(econ.dare,"open dare"))return;const deck=TDC.filter(c=>c.t==="Dare");u({td:deck[Math.floor(Math.random()*deck.length)]||TDC[1],m:Math.min(100,s.m+15),fb:"Dare opened"});setTimeout(()=>u("fb",""),1300)}} style={{border:"1px solid var(--pk)",color:"var(--pk)"}}>Dare</Btn></div></div>}
+    {game.type==="binary"&&<div>
+      <p style={{color:"var(--mt)",marginBottom:8,fontSize:".76rem",lineHeight:1.45}}>Write a consent-safe prompt. It becomes a pinned performer request only after she accepts it.</p>
+      <textarea value={s.tp} onChange={e=>u("tp",e.target.value)} placeholder="Write the prompt you want Luna to consider..." style={{width:"100%",minHeight:86,resize:"vertical",borderRadius:9,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",padding:10,font:"inherit",fontSize:".76rem",outline:"none",marginBottom:7}}/>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5,marginBottom:8}}>{["Ask a truth","Set a dare tone","Let Luna edit","Room vote"].map(x=><button key={x} onClick={()=>u("tp",`${s.tp}${s.tp?" ":""}${x}: `)} style={{padding:"7px 8px",borderRadius:999,border:"1px solid var(--bd)",background:"rgba(255,255,255,.04)",color:"rgba(255,255,255,.72)",fontWeight:800,fontSize:".62rem",cursor:"pointer"}}>{x}</button>)}</div>
+      {s.td&&<div style={{padding:10,borderRadius:8,border:"1px solid rgba(0,212,255,.2)",background:"rgba(0,212,255,.055)",fontSize:".74rem",lineHeight:1.45,marginBottom:8}}><Tag color="var(--cy)">Pending prompt</Tag><p style={{marginTop:5,fontWeight:700}}>{s.td.x}</p></div>}
+      <Btn primary small full onClick={()=>{const text=s.tp.trim();if(!text){flash("Write the prompt first.","info");return}u({td:{t:"Prompt",x:text},tp:"",m:Math.min(100,s.m+12)});flash("Prompt sent for performer approval.","good",2200)}}>Submit Prompt</Btn></div>}
 
-    {game.type==="timed"&&<div><div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}><span style={{fontSize:".68rem",color:"var(--mt)"}}>Beat the clock</span><span style={{fontWeight:900,fontSize:"1rem",color:s.tm<5?"var(--pk)":"var(--am)"}}>{s.tm}s</span></div>
-      <h4 style={{fontSize:".9rem",fontWeight:700,lineHeight:1.2,marginBottom:6}}>{q.q}</h4>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>{if(ans(i,econ.stake,econ.reward))u("tm",15)}} disabled={s.tm===0} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:600,fontSize:".76rem",cursor:s.tm===0?"not-allowed":"pointer",opacity:s.tm===0?.4:1}}>{o}</button>)}</div>
+    {game.type==="timed"&&<div><div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}><span style={{fontSize:".68rem",color:"var(--mt)"}}>Timed read</span><span style={{fontWeight:900,fontSize:"1rem",color:s.tm<5?"var(--pk)":"var(--am)"}}>{s.tm}s</span></div>
+      <h4 style={{fontSize:".9rem",fontWeight:800,lineHeight:1.2,marginBottom:6}}>{q.q}</h4>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>{answer(i);u("tm",15)}} disabled={s.tm===0} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:650,fontSize:".76rem",cursor:s.tm===0?"not-allowed":"pointer",opacity:s.tm===0?.4:1}}>{o}</button>)}</div>
       {s.tm===0&&<Btn small primary onClick={()=>u({tm:15,qi:s.qi+1})} style={{marginTop:5}}>Next</Btn>}</div>}
 
-    {game.type==="cards"&&<div style={{textAlign:"center"}}>
-      <div style={{display:"flex",justifyContent:"center",gap:14,marginBottom:8}}>
-        {[[s.cP,"var(--cy)"],[s.cO,"var(--pk)"]].map(([v,c],i)=><div key={i} style={{width:50,height:70,borderRadius:6,border:"1px solid "+c,background:"var(--cd)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:"1.2rem",color:c}}>{v||"?"}</div>)}
-        <div style={{position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)",fontWeight:800,color:"var(--mt)",fontSize:".7rem"}}>VS</div>
+    {game.type==="cards"&&<div>
+      <p style={{fontSize:".74rem",color:"var(--mt)",lineHeight:1.45,marginBottom:9}}>Flip your mood against Luna's. Tight matches pay; wide mismatches cost sparks and reset room heat.</p>
+      <div style={{display:"grid",gridTemplateColumns:"1fr auto 1fr",gap:9,alignItems:"center",marginBottom:10}}>
+        {[["You",s.cP,"var(--cy)"],["Luna",s.cO,"var(--pk)"]].map(([label,v,c],i)=><div key={label} style={{padding:10,borderRadius:10,border:`1px solid ${c}`,background:"linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))",textAlign:"center",minHeight:92}}>
+          <div style={{fontSize:".55rem",letterSpacing:".12em",textTransform:"uppercase",fontWeight:1000,color:c}}>{label}</div>
+          <div style={{fontWeight:1000,fontSize:"1.6rem",marginTop:8,color:c}}>{v||"?"}</div>
+        </div>)}
+        <div style={{width:36,height:36,borderRadius:"50%",display:"grid",placeItems:"center",border:"1px solid var(--bd)",background:"rgba(255,255,255,.035)",fontWeight:1000,fontSize:".68rem",color:"var(--mt)"}}>VS</div>
       </div>
-      <Btn primary small onClick={()=>{if(!spend(econ.stake,"flip"))return;const p=Math.floor(Math.random()*13)+2,o=Math.floor(Math.random()*13)+2;u({cP:p,cO:o,fb:p>o?`You win! +${fsn(econ.reward)}`:p<o?"Opponent wins":"Draw!",m:Math.min(100,s.m+(p>o?10:0))});if(p>o)award(econ.reward)}}>Flip</Btn></div>}
+      <div style={{fontSize:".64rem",color:"var(--mt)",marginBottom:9,textAlign:"center"}}>{s.cMood?`Mood lane: ${s.cMood}`:"Perfect gap pays 60. Close gap pays 20."}</div>
+      <Btn primary small full onClick={flipCards}>Flip Chemistry</Btn></div>}
 
-    {game.type==="auction"&&<div><div style={{padding:8,borderRadius:7,border:"1px solid var(--bd)",background:"var(--cd)",marginBottom:7,textAlign:"center"}}>
-      <div style={{fontSize:".58rem",color:"var(--mt)",textTransform:"uppercase"}}>High Bid</div><div style={{fontWeight:900,fontSize:"1.2rem",color:"var(--am)"}}>{fsn(s.hb)}</div></div>
-      <div style={{display:"flex",gap:4}}><input type="number" min={s.hb+econ.minBid} max={balance} value={s.bid} onChange={e=>u("bid",parseInt(e.target.value)||0)} style={{flex:1,textAlign:"center",fontWeight:700}}/>
-        <Btn primary small onClick={()=>{const bid=Math.floor(Number(s.bid)||0);if(bid<s.hb+econ.minBid){flash(`Raise by at least ${fsn(econ.minBid)} sparks.`);return}if(!spend(bid,"place bid"))return;u({hb:bid,fb:"Top bidder! Bid held in escrow",m:Math.min(100,s.m+5)});setTimeout(()=>u("fb",""),1800)}}>Bid</Btn></div>
-      <p style={{fontSize:".62rem",color:"var(--mt)",lineHeight:1.4,marginTop:7}}>Winning bids are deducted immediately and stay pending until the performer accepts the moment or refunds it.</p></div>}
+    {game.type==="auction"&&<div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr auto",gap:7,marginBottom:7}}>
+        <div style={{padding:9,borderRadius:8,border:"1px solid var(--bd)",background:"var(--cd)",textAlign:"center"}}>
+          <div style={{fontSize:".58rem",color:"var(--mt)",textTransform:"uppercase",fontWeight:900}}>High Bid</div><div style={{fontWeight:1000,fontSize:"1.25rem",color:"var(--am)"}}>{fsn(s.hb)}</div>
+        </div>
+        <div style={{padding:9,borderRadius:8,border:"1px solid rgba(255,45,120,.24)",background:"rgba(255,45,120,.055)",textAlign:"center",minWidth:78}}>
+          <div style={{fontSize:".58rem",color:"var(--mt)",textTransform:"uppercase",fontWeight:900}}>Timer</div><div style={{fontWeight:1000,fontSize:"1.25rem",color:s.at<10?"var(--pk)":"var(--tx)"}}>{s.at}s</div>
+        </div>
+      </div>
+      <div style={{padding:9,borderRadius:9,border:"1px solid rgba(255,171,0,.18)",background:"rgba(255,171,0,.045)",marginBottom:8}}>
+        <div style={{fontSize:".58rem",letterSpacing:".12em",textTransform:"uppercase",fontWeight:1000,color:"var(--am)"}}>{tier.label}</div>
+        <p style={{fontSize:".68rem",lineHeight:1.4,color:"rgba(255,255,255,.68)",marginTop:4}}>{tier.reward}</p>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr auto auto",gap:5}}><input type="number" min={s.hb+1} max={balance} value={s.bid} onFocus={e=>e.currentTarget.select()} onChange={e=>{const raw=e.target.value.replace(/^0+(?=\d)/,"");u("bid",raw===""?"":Math.max(0,parseInt(raw,10)||0))}} style={{minWidth:0,textAlign:"center",fontWeight:900,borderRadius:7,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",font:"inherit",fontSize:".82rem",padding:"0 8px"}}/>
+        <Btn small onClick={()=>u("bid",balance)} style={{color:"var(--am)",borderColor:"rgba(255,171,0,.35)"}}>All In</Btn>
+        <Btn primary small disabled={s.at<=0} onClick={placeBid}>Bid</Btn></div>
+      <p style={{fontSize:".62rem",color:"var(--mt)",lineHeight:1.4,marginTop:7}}>Top bid is held in escrow. If Luna accepts, the moment executes; if she declines, the sparks refund in chat.</p></div>}
 
     {game.type==="score"&&<div><div style={{textAlign:"center",marginBottom:6}}><div style={{fontWeight:900,fontSize:"1.5rem",color:"var(--lm)"}}>{s.hs}</div><div style={{fontSize:".6rem",color:"var(--mt)"}}>Round {s.hr}</div></div>
-      <h4 style={{fontSize:".88rem",fontWeight:700,marginBottom:5}}>{q.q}</h4>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>{if(!spend(econ.stake,"answer"))return;if(i===q.ans){u({hs:s.hs+100,hr:s.hr+1,qi:s.qi+1,fb:`+100 score, +${fsn(econ.reward)}`});award(econ.reward)}else u({hr:s.hr+1,qi:s.qi+1,fb:"0pts"});setTimeout(()=>u("fb",""),1500)}} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:600,fontSize:".76rem",cursor:"pointer"}}>{o}</button>)}</div></div>}
+      <h4 style={{fontSize:".88rem",fontWeight:800,marginBottom:5}}>{q.q}</h4>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>{answer(i,{miss:econ.miss,reward:econ.reward,score:100});u("hr",s.hr+1)}} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:650,fontSize:".76rem",cursor:"pointer"}}>{o}</button>)}</div></div>}
 
-    {game.type==="box"&&<div><p style={{fontSize:".76rem",color:"var(--mt)",marginBottom:6}}>Tap to reveal. 10 sparks each.</p>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:5}}>{s.bx.map((b,i)=><button key={i} onClick={()=>{if(!b.op){if(!spend(econ.stake,"open drop"))return;const nb=[...s.bx];nb[i]={...nb[i],op:true};const prize=b.pr.includes("sparks")?parseInt(b.pr):0;u({bx:nb,m:Math.min(100,s.m+6),fb:prize?`Drop +${fsn(prize)}`:`Revealed ${b.pr}`});if(prize)award(prize);setTimeout(()=>u("fb",""),1400)}}} disabled={b.op} style={{height:55,borderRadius:7,border:"1px solid var(--bd)",background:b.op?"rgba(255,255,255,.02)":"var(--cd)",cursor:b.op?"default":"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",fontSize:".66rem",fontWeight:700,color:b.op?"var(--lm)":"var(--mt)"}}>
-          {b.op?b.pr:<I n="mystery" s={18} c="var(--am)"/>}</button>)}</div></div>}
+    {game.type==="box"&&<div><p style={{fontSize:".76rem",color:"var(--mt)",lineHeight:1.45,marginBottom:8}}>Match three symbols to unlock the reward. Rare symbols pay more; empty veils keep the jackpot unlikely.</p>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:5}}>{s.dg.map((b,i)=><button key={b.slot} onClick={()=>revealDrop(i)} disabled={b.open||s.dw} style={{height:64,borderRadius:8,border:`1px solid ${b.open?b.color:"var(--bd)"}`,background:b.open?"rgba(255,255,255,.035)":"linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.015))",cursor:b.open||s.dw?"default":"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:4,fontSize:".62rem",fontWeight:900,color:b.open?b.color:"var(--mt)"}}>
+          {b.open?<><I n={b.icon} s={18} c={b.color}/><span>{b.label}</span></>:<><I n="mystery" s={18} c="var(--am)"/><span>Hidden</span></>}</button>)}</div>
+      <div style={{display:"flex",gap:6,marginTop:8}}><Btn small onClick={()=>u({dg:makeDropGrid(),dw:false,m:0})}>Reset Drop</Btn><span style={{fontSize:".62rem",color:"var(--mt)",alignSelf:"center"}}>{fsn(econ.stake)} sparks per reveal</span></div></div>}
 
-    {game.type==="ladder"&&<div style={{textAlign:"center"}}>
-      <div style={{display:"flex",flexDirection:"column-reverse",gap:2,marginBottom:8}}>{[1,2,3,4,5].map(r=><div key={r} style={{padding:5,borderRadius:5,border:"1px solid var(--bd)",background:s.lr>=r?"rgba(255,45,120,.08)":"var(--cd)",display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:".72rem"}}>
-        <span style={{fontWeight:700,color:s.lr>=r?"var(--pk)":"var(--mt)"}}>Rung {r}</span><span style={{color:"var(--am)"}}>{r*25}</span>{s.lr>=r&&<I n="check" s={11} c="var(--gn)"/>}</div>)}</div>
-      {!s.lb?<div style={{display:"flex",gap:5,justifyContent:"center"}}><Btn primary small disabled={s.lr>=5} onClick={()=>{const next=s.lr+1,cost=next*econ.stepStake;if(!spend(cost,"climb"))return;u({lr:next,m:Math.min(100,s.m+12),fb:`Rung ${next} locked`});setTimeout(()=>u("fb",""),1200)}}>Climb</Btn>
-        <Btn small disabled={s.lr===0} onClick={()=>{const prize=s.lr*econ.rewardStep;award(prize);u({lb:true,fb:`Banked ${fsn(prize)}!`})}}>Bank</Btn></div>:<p style={{fontWeight:700,color:"var(--gn)"}}>Banked!</p>}</div>}
+    {game.type==="ladder"&&<div>
+      <p style={{fontSize:".74rem",color:"var(--mt)",lineHeight:1.45,marginBottom:8}}>Climb for larger banked rewards. Every rung is riskier than the last. Bank before a miss wipes the ladder.</p>
+      <div style={{display:"flex",flexDirection:"column-reverse",gap:4,marginBottom:9}}>{LADDER_RUNGS.map((r,i)=>{const done=s.lr>i,active=s.lr===i;return <div key={r.name} style={{padding:7,borderRadius:7,border:`1px solid ${active?"rgba(255,171,0,.42)":done?"rgba(34,197,94,.34)":"var(--bd)"}`,background:done?"rgba(34,197,94,.07)":active?"rgba(255,171,0,.07)":"var(--cd)",display:"grid",gridTemplateColumns:"1fr auto auto",gap:7,alignItems:"center",fontSize:".68rem"}}>
+        <span style={{fontWeight:1000,color:active?"var(--am)":done?"var(--gn)":"var(--mt)"}}>{r.name}</span><span style={{color:"var(--am)",fontWeight:900}}>{fsn(r.reward)}</span><span style={{color:"var(--mt)",fontWeight:800}}>{r.odds}%</span></div>})}</div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}><Btn primary small disabled={!nextRung} onClick={climb}>{nextRung?`Climb ${fsn(nextRung.cost)}`:"Top Reached"}</Btn><Btn small disabled={!currentBank} onClick={bankLadder}>Bank {fsn(currentBank)}</Btn></div></div>}
 
     {game.type==="reaction"&&<div style={{textAlign:"center"}}>
-      {!s.bres?<><p style={{fontSize:".78rem",color:"var(--mt)",marginBottom:12}}>Tap when it lights up!</p>
-        <button onClick={()=>{if(s.br){if(!spend(econ.stake,"reaction tap"))return;const ms=Date.now()-s.bt;u({bres:ms<500?"F":"S",bms:ms,br:false});if(ms<500)award(econ.reward)}}} style={{width:80,height:80,borderRadius:"50%",border:"3px solid "+(s.br?"var(--pk)":"var(--bd)"),background:s.br?"rgba(255,45,120,.15)":"var(--cd)",cursor:"pointer",animation:s.br?"bf .3s infinite":"none"}}>
+      {!s.bres?<><p style={{fontSize:".78rem",color:"var(--mt)",marginBottom:12}}>Tap only when the signal lights. Early taps do not count.</p>
+        <button onClick={()=>{if(s.br){if(!spend(econ.stake,"reaction tap"))return;const ms=Date.now()-s.bt;u({bres:ms<500?"F":"S",bms:ms,br:false});if(ms<500){award(econ.reward);flash(`Clean reaction +${fsn(econ.reward)} sparks`,"good")}else flash("Too slow. No reward.","bad")}}} style={{width:80,height:80,borderRadius:"50%",border:"3px solid "+(s.br?"var(--pk)":"var(--bd)"),background:s.br?"rgba(255,45,120,.15)":"var(--cd)",cursor:"pointer",animation:s.br?"bf .3s infinite":"none"}}>
           <span style={{fontWeight:900,fontSize:s.br?".9rem":".72rem",color:s.br?"var(--pk)":"var(--mt)"}}>{s.br?"TAP!":"Wait..."}</span></button></>
       :<div><div style={{fontWeight:900,fontSize:"1.3rem",color:s.bms<500?"var(--gn)":"var(--pk)"}}>{s.bms}ms</div>
         <Btn primary small onClick={()=>u({br:false,bres:null,bms:0})} style={{marginTop:6}}>Again</Btn></div>}</div>}
 
     {game.type==="touch"&&<div>
-      <p style={{fontSize:".74rem",color:"var(--mt)",lineHeight:1.45,marginBottom:8}}>Draw a glow trace over the live frame. The performer sees it as a pending interaction and accepts the one they want to acknowledge.</p>
-      <div onPointerDown={e=>{if(!spend(econ.trace,"place trace"))return;const r=e.currentTarget.getBoundingClientRect(),x=((e.clientX-r.left)/r.width)*100,y=((e.clientY-r.top)/r.height)*100;u({tc:[...s.tc.slice(-7),{x,y,id:Date.now()}],m:Math.min(100,s.m+9),fb:"Trace point held"});setTimeout(()=>u("fb",""),1000)}} style={{position:"relative",height:190,borderRadius:12,border:"1px solid rgba(0,212,255,.24)",overflow:"hidden",cursor:"crosshair",background:"radial-gradient(circle at 50% 34%,rgba(255,196,160,.22),transparent 14%),linear-gradient(180deg,rgba(10,14,24,.9),rgba(14,6,22,.96))"}}>
-        <div style={{position:"absolute",left:"50%",bottom:0,transform:"translateX(-50%)",width:82,height:142,borderRadius:"44% 44% 14px 14px",background:"linear-gradient(170deg,rgba(255,45,120,.76),rgba(139,92,246,.62),rgba(5,8,16,.9))",filter:"blur(.1px)"}}/>
-        {s.tc.map((m,i)=><div key={m.id} style={{position:"absolute",left:`${m.x}%`,top:`${m.y}%`,width:42,height:42,borderRadius:"50%",transform:"translate(-50%,-50%)",border:"1px solid rgba(0,212,255,.7)",background:"radial-gradient(circle,rgba(0,212,255,.28),transparent 68%)",boxShadow:"0 0 30px rgba(0,212,255,.35)",opacity:.45+i*.07}}/>)}
-        <div style={{position:"absolute",left:10,bottom:10,right:10,display:"flex",justifyContent:"space-between",fontSize:".58rem",color:"rgba(255,255,255,.62)",fontWeight:800}}><span>touch map</span><span>{s.tc.length} traces</span></div>
+      <p style={{fontSize:".74rem",color:"var(--mt)",lineHeight:1.45,marginBottom:8}}>Draw one elegant trace on the live frame. It is sent as a performer-approved interaction, not an automatic overlay.</p>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:5,marginBottom:8}}>{["pulse","silk","heat"].map(x=><button key={x} onClick={()=>u("tmode",x)} style={{padding:"7px 8px",borderRadius:999,border:`1px solid ${s.tmode===x?"rgba(0,212,255,.44)":"var(--bd)"}`,background:s.tmode===x?"rgba(0,212,255,.08)":"rgba(255,255,255,.035)",color:s.tmode===x?"var(--cy)":"var(--mt)",fontWeight:900,fontSize:".62rem",textTransform:"capitalize",cursor:"pointer"}}>{x}</button>)}</div>
+      <div onPointerDown={beginTrace} onPointerMove={moveTrace} onPointerUp={endTrace} onPointerCancel={endTrace} style={{position:"relative",height:202,borderRadius:12,border:"1px solid rgba(0,212,255,.24)",overflow:"hidden",cursor:"crosshair",touchAction:"none",background:"radial-gradient(circle at 50% 34%,rgba(255,196,160,.22),transparent 14%),linear-gradient(180deg,rgba(10,14,24,.9),rgba(14,6,22,.96))"}}>
+        <div style={{position:"absolute",left:"50%",bottom:0,transform:"translateX(-50%)",width:82,height:142,borderRadius:"44% 44% 14px 14px",background:"linear-gradient(170deg,rgba(255,45,120,.62),rgba(139,92,246,.52),rgba(5,8,16,.9))",filter:"blur(.1px)"}}/>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none"}}>
+          {s.tc.map((tr,i)=><path key={tr.id} d={path(tr.pts)} fill="none" stroke={tr.mode==="heat"?"#ff2d78":tr.mode==="silk"?"#f8e7c6":"#00d4ff"} strokeWidth={tr.mode==="silk"?1.2:1.8} strokeLinecap="round" strokeLinejoin="round" opacity={.55+i*.16} style={{filter:`drop-shadow(0 0 ${tr.mode==="heat"?10:7}px currentColor)`}}/>)}
+        </svg>
+        <div style={{position:"absolute",left:10,bottom:10,right:10,display:"flex",justifyContent:"space-between",fontSize:".58rem",color:"rgba(255,255,255,.62)",fontWeight:800}}><span>draw trace</span><span>{s.tc.length} path{s.tc.length===1?"":"s"}</span></div>
       </div>
-      <div style={{display:"flex",gap:6,marginTop:8}}><Btn small primary onClick={()=>{if(!s.tc.length){flash("Place a trace first.");return}if(!spend(econ.submit,"send trace"))return;u({fb:"Trace sent for performer approval",m:Math.min(100,s.m+12)})}}>Send Trace</Btn><Btn small onClick={()=>u("tc",[])}>Clear</Btn></div>
+      <div style={{display:"flex",gap:6,marginTop:8}}><Btn small primary onClick={()=>{if(!s.tc.length){flash("Draw a trace first.","info");return}if(!spend(econ.submit,"send trace"))return;u({m:Math.min(100,s.m+12)});flash("Trace sent for performer approval.","good",2200)}}>Send Trace</Btn><Btn small onClick={()=>u("tc",[])}>Clear</Btn></div>
     </div>}
 
     {game.type==="jackpot"&&<div>
       <div style={{display:"flex",justifyContent:"space-between",padding:7,borderRadius:7,background:"linear-gradient(135deg,rgba(251,191,36,.05),rgba(255,45,120,.03))",border:"1px solid rgba(251,191,36,.12)",marginBottom:6}}>
         <div><div style={{fontSize:".5rem",color:"var(--mt)",textTransform:"uppercase"}}>Lives</div><div style={{display:"flex",gap:2,marginTop:1}}>{[0,1,2].map(i=><div key={i} style={{width:9,height:9,borderRadius:"50%",background:i<s.jl?"var(--pk)":"var(--bd)"}}/>)}</div></div>
         <div style={{textAlign:"center"}}><div style={{fontSize:".5rem",color:"var(--mt)",textTransform:"uppercase"}}>Streak</div><div style={{fontWeight:900,fontSize:"1.1rem",color:"var(--am)"}}>{s.js}/10</div></div>
-        <div style={{textAlign:"right"}}><div style={{fontSize:".5rem",color:"var(--mt)",textTransform:"uppercase"}}>Prize</div><div style={{fontWeight:700,fontSize:".65rem",color:"var(--lm)"}}>Free 1-on-1</div></div></div>
+        <div style={{textAlign:"right"}}><div style={{fontSize:".5rem",color:"var(--mt)",textTransform:"uppercase"}}>Prize</div><div style={{fontWeight:700,fontSize:".65rem",color:"var(--lm)"}}>Jackpot credit</div></div></div>
       {s.jw?<div style={{textAlign:"center",padding:14}}><I n="crown" s={32} c="var(--am)"/><div style={{fontWeight:900,fontSize:"1.1rem",color:"var(--am)",marginTop:5}}>JACKPOT!</div></div>
-      :s.jl<=0?<div style={{textAlign:"center",padding:14}}><div style={{fontWeight:900,color:"var(--pk)"}}>Game Over</div></div>
-      :<div><h4 style={{fontSize:".88rem",fontWeight:700,marginBottom:5}}>{q.q}</h4>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>{if(!spend(econ.stake,"play streak"))return;if(i===q.ans){const ns=s.js+1;if(ns>=10){u({js:ns,jw:true,m:100,fb:`Jackpot +${fsn(econ.jackpot)}`});award(econ.jackpot)}else{u({js:ns,m:ns*10,fb:ns+"/10",qi:s.qi+1})}}else{u({jl:s.jl-1,js:0,m:0,fb:"Life lost",qi:s.qi+1})}setTimeout(()=>u("fb",""),1500)}} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:600,fontSize:".76rem",cursor:"pointer"}}>{o}</button>)}</div></div>}</div>}
-
-    {s.fb&&<p style={{marginTop:5,fontWeight:700,fontSize:".76rem",color:s.fb.includes("Correct")||s.fb.includes("win")||s.fb.includes("Bank")||s.fb.includes("/10")||s.fb.includes("Top bidder")||s.fb.includes("+")||s.fb.includes("opened")||s.fb.includes("sent")||s.fb.includes("locked")?"var(--gn)":"var(--pk)"}}>{s.fb}</p>}
+      :s.jl<=0?<div style={{textAlign:"center",padding:14}}><div style={{fontWeight:900,color:"var(--pk)"}}>Game Over</div><Btn small onClick={()=>u({jl:3,js:0,jw:false,m:0,qi:s.qi+1})} style={{marginTop:8}}>Reset Streak</Btn></div>
+      :<div><h4 style={{fontSize:".88rem",fontWeight:800,marginBottom:5}}>{q.q}</h4>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>{if(i===q.ans){const ns=s.js+1;if(ns>=10){u({js:ns,jw:true,m:100});award(econ.jackpot);flash(`Jackpot +${fsn(econ.jackpot)} sparks`,"good",2600)}else{u({js:ns,m:ns*10,qi:s.qi+1});flash(`Streak ${ns}/10`,"good")}}else{const paid=deductMiss(econ.miss);u({jl:s.jl-1,js:0,m:0,qi:s.qi+1});flash(paid?`Miss -${fsn(econ.miss)} sparks. Streak reset.`:"Miss. No sparks available to deduct.","bad",2200)}}} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:650,fontSize:".76rem",cursor:"pointer"}}>{o}</button>)}</div></div>}</div>}
   </Pn>;}
 
 /* ═══ LOBBY ═══ */
@@ -666,8 +813,10 @@ function LB({user,onPerf,onWallet,cat,setCat,onMenu}){
 
 /* ═══ LIVE ROOM ═══ */
 function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
-  const [pn,setPn]=useState(null);const [gm,setGm]=useState(null);
-  const settingsPreview=typeof window!=="undefined"&&new URLSearchParams(window.location.search).get("settingsPreview")==="1";
+  const roomParams=typeof window!=="undefined"?new URLSearchParams(window.location.search):new URLSearchParams();
+  const initialGame=GAMES.find(g=>(g.id===roomParams.get("game")||g.type===roomParams.get("game"))&&perf.caps.games.includes(g.id))||null;
+  const [pn,setPn]=useState(initialGame?null:(roomParams.get("panel")==="games"?"games":null));const [gm,setGm]=useState(initialGame);
+  const settingsPreview=roomParams.get("settingsPreview")==="1";
   const [media,setMedia]=useState({paused:false,replay:false,replayLeft:0,muted:false,volume:72,volumeOpen:false,fullscreen:false,settings:settingsPreview,captions:false,pip:false,quality:"1080p",layout:"Theater"});
   const [ch,setCh]=useState([{user:"VYBE",msg:`Welcome — ${perf.name} is live. You are known here.`,vip:false,id:0}]);
   const [ci,setCi]=useState("");const [chH,setChH]=useState(false);
@@ -780,7 +929,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
     {!media.fullscreen&&pn==="games"&&<Pn onClose={()=>setPn(null)} title="Games" icon="gamepad" ic="var(--cy)" style={{position:"absolute",right:12,top:88,bottom:76,zIndex:22,width:"min(390px,34vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
       <div style={{padding:9,borderRadius:10,border:"1px solid rgba(0,212,255,.18)",background:"rgba(0,212,255,.055)",marginBottom:9}}>
         <div style={{fontWeight:900,fontSize:".78rem"}}>VYBE game direction</div>
-        <p style={{fontSize:".66rem",lineHeight:1.45,color:"var(--mt)",marginTop:3}}>Games are spark-backed. Higher-value rewards require higher stakes, and performer-control outcomes still need acceptance.</p>
+        <p style={{fontSize:".66rem",lineHeight:1.45,color:"var(--mt)",marginTop:3}}>Core answers are free; misses deduct sparks. Higher-value reward modes use explicit stakes or escrow, and performer-control outcomes still need acceptance.</p>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"1fr",gap:5,overflowY:"auto",maxHeight:"calc(100% - 88px)",paddingRight:3}}>{avG.map(g=><button key={g.id} onClick={()=>{setGm(g);setPn(null)}} style={{padding:"9px 8px",borderRadius:8,border:"1px solid var(--bd)",background:"var(--cd)",textAlign:"left",cursor:"pointer"}}>
         <div style={{display:"flex",alignItems:"center",gap:3}}><I n={g.icon} s={11} c={g.color}/><span style={{fontWeight:700,fontSize:".7rem"}}>{g.name}</span></div>

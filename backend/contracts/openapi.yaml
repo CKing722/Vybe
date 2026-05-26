@@ -1,0 +1,1000 @@
+openapi: 3.1.0
+info:
+  title: VYBE Backend API (Demo Contracts)
+  version: 0.1.0
+  description: >
+    Machine-readable contract for the local VYBE backend demo API.
+    This is no-spend by default: game questions are local, and paid AI/provider APIs are disabled unless explicitly enabled server-side.
+servers:
+  - url: http://localhost:4000
+tags:
+  - name: health
+  - name: auth
+  - name: viewer
+  - name: performers
+  - name: sparks
+  - name: gifts
+  - name: banners
+  - name: games
+paths:
+  /health:
+    get:
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  service: { type: string }
+                  environment: { type: string }
+                  persistence: { type: string, enum: [memory, postgresql] }
+                  paidProvidersEnabled:
+                    type: object
+                    properties:
+                      anthropic: { type: boolean }
+                    required: [anthropic]
+                required: [ok, service, environment, persistence, paidProvidersEnabled]
+
+  /api/auth/csrf:
+    get:
+      tags: [auth]
+      summary: Issue CSRF double-submit token
+      description: >
+        Sets the `vybe_csrf` cookie and returns the token that must be echoed in the `x-vybe-csrf` header for
+        cookie-auth endpoints (`/api/auth/refresh`, `/api/auth/logout`).
+      responses:
+        "200":
+          description: CSRF token issued
+          headers:
+            Set-Cookie:
+              description: Sets `vybe_csrf` cookie
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CsrfTokenResponse"
+
+  /api/auth/register:
+    post:
+      tags: [auth]
+      summary: Register a user (viewer/performer)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8, maxLength: 72 }
+                display_name: { type: string, minLength: 2, maxLength: 32 }
+                role:
+                  type: string
+                  enum: [viewer, performer]
+              required: [email, password, display_name]
+      responses:
+        "200":
+          description: Registered and authenticated (refresh cookie set)
+          headers:
+            Set-Cookie:
+              description: Sets `vybe_refresh` cookie
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "409":
+          $ref: "#/components/responses/ApiError"
+
+  /api/auth/login:
+    post:
+      tags: [auth]
+      summary: Login (access token + refresh cookie)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+                twoFactorToken:
+                  type: string
+                  description: Optional 6-8 digit TOTP if 2FA is enabled on the account.
+              required: [email, password]
+      responses:
+        "200":
+          description: Authenticated (refresh cookie set)
+          headers:
+            Set-Cookie:
+              description: Sets `vybe_refresh` cookie
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+
+  /api/auth/2fa/setup:
+    post:
+      tags: [auth]
+      summary: Start TOTP 2FA setup
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: TOTP setup details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TwoFactorSetupResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+
+  /api/auth/2fa/verify:
+    post:
+      tags: [auth]
+      summary: Verify TOTP and enable 2FA
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: 6-8 digit TOTP
+              required: [token]
+      responses:
+        "200":
+          description: 2FA enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TwoFactorVerifyResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+
+  /api/auth/refresh:
+    post:
+      tags: [auth]
+      summary: Rotate refresh token and issue new access token
+      description: >
+        Cookie-auth endpoint. Requires `vybe_refresh` cookie and CSRF double-submit (`vybe_csrf` cookie and `x-vybe-csrf` header).
+      parameters:
+        - name: x-vybe-csrf
+          in: header
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: New access token issued (refresh cookie rotated)
+          headers:
+            Set-Cookie:
+              description: Rotates `vybe_refresh` cookie
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefreshResponse"
+        "403":
+          $ref: "#/components/responses/ApiError"
+
+  /api/auth/logout:
+    post:
+      tags: [auth]
+      summary: Logout (revoke refresh token)
+      description: >
+        Cookie-auth endpoint. Requires CSRF double-submit (`vybe_csrf` cookie and `x-vybe-csrf` header).
+      parameters:
+        - name: x-vybe-csrf
+          in: header
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Logged out
+        "403":
+          $ref: "#/components/responses/ApiError"
+
+  /api/me:
+    get:
+      tags: [viewer]
+      summary: Get current viewer profile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Viewer profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ViewerMeResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+        "404":
+          $ref: "#/components/responses/ApiError"
+
+  /api/me/profile:
+    put:
+      tags: [viewer]
+      summary: Update viewer profile fields
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ViewerProfileUpdateRequest"
+      responses:
+        "200":
+          description: Updated viewer profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ViewerMeResponse"
+        "400":
+          $ref: "#/components/responses/ApiError"
+        "401":
+          $ref: "#/components/responses/ApiError"
+        "404":
+          $ref: "#/components/responses/ApiError"
+
+  /api/me/history/{performerId}:
+    get:
+      tags: [viewer]
+      summary: Get viewer history with performer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: performerId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 25 }
+      responses:
+        "200":
+          description: Performer relationship summary + recent gifts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ViewerHistoryResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+        "404":
+          $ref: "#/components/responses/ApiError"
+
+  /api/performers:
+    get:
+      tags: [performers]
+      summary: List performers
+      parameters:
+        - name: live
+          in: query
+          required: false
+          schema: { type: string, enum: ["true", "false"] }
+        - name: category
+          in: query
+          required: false
+          schema: { type: string }
+        - name: q
+          in: query
+          required: false
+          schema: { type: string }
+        - name: sort
+          in: query
+          required: false
+          schema: { type: string, enum: [viewers, rating] }
+      responses:
+        "200":
+          description: Performers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PerformerListResponse"
+
+  /api/performers/{id}:
+    get:
+      tags: [performers]
+      summary: Get performer by id or slug
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Performer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PerformerResponse"
+        "404":
+          $ref: "#/components/responses/ApiError"
+
+  /api/sparks/balance:
+    get:
+      tags: [sparks]
+      summary: Get spark balance
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Spark balance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SparkBalance"
+        "401":
+          $ref: "#/components/responses/ApiError"
+
+  /api/sparks/transactions:
+    get:
+      tags: [sparks]
+      summary: List spark ledger entries
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 25 }
+      responses:
+        "200":
+          description: Spark transactions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SparkTransactionsResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+
+  /api/gifts/types:
+    get:
+      tags: [gifts]
+      summary: List gift types
+      responses:
+        "200":
+          description: Gift catalog
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GiftTypesResponse"
+
+  /api/gifts/send:
+    post:
+      tags: [gifts]
+      summary: Send a gift (creates room animation + optional platform banner)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                performer_id: { type: string }
+                gift_type_id: { type: string }
+                room_id: { type: string }
+              required: [performer_id, gift_type_id, room_id]
+      responses:
+        "201":
+          description: Gift sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GiftSendResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+        "404":
+          $ref: "#/components/responses/ApiError"
+        "409":
+          $ref: "#/components/responses/ApiError"
+
+  /api/banners/active:
+    get:
+      tags: [banners]
+      summary: List active platform banners
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 10 }
+      responses:
+        "200":
+          description: Active platform banners
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActiveBannersResponse"
+
+  /api/games/questions:
+    post:
+      tags: [games]
+      summary: Get local/mock game questions (no raw provider APIs)
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                theme: { type: string, minLength: 1, maxLength: 64 }
+                count: { type: integer, minimum: 1, maximum: 10, default: 5 }
+      responses:
+        "200":
+          description: Questions generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameQuestionsResponse"
+        "400":
+          $ref: "#/components/responses/ApiError"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    ApiError:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+  schemas:
+    ApiErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }
+            details: { type: object, additionalProperties: true }
+          required: [code, message]
+      required: [error]
+
+    CsrfTokenResponse:
+      type: object
+      properties:
+        csrfToken: { type: string }
+        headerName: { type: string, const: x-vybe-csrf }
+      required: [csrfToken, headerName]
+
+    AuthUser:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        display_name: { type: string }
+        role: { type: string, enum: [viewer, performer] }
+        avatar_url: { type: ["string", "null"] }
+        banner_url: { type: ["string", "null"] }
+        bio: { type: ["string", "null"] }
+        is_verified: { type: boolean }
+        is_active: { type: boolean }
+        two_factor_enabled: { type: boolean }
+        created_at: { type: string }
+      required:
+        - id
+        - email
+        - display_name
+        - role
+        - avatar_url
+        - banner_url
+        - bio
+        - is_verified
+        - is_active
+        - two_factor_enabled
+        - created_at
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/AuthUser"
+        accessToken: { type: string }
+        expiresInSeconds: { type: integer }
+      required: [user, accessToken, expiresInSeconds]
+
+    RefreshResponse:
+      type: object
+      properties:
+        accessToken: { type: string }
+        expiresInSeconds: { type: integer }
+      required: [accessToken, expiresInSeconds]
+
+    TwoFactorSetupResponse:
+      type: object
+      properties:
+        issuer: { type: string }
+        label: { type: string }
+        otpauthUrl: { type: string }
+        secret: { type: string }
+      required: [issuer, label, otpauthUrl, secret]
+
+    TwoFactorVerifyResponse:
+      type: object
+      properties:
+        twoFactorEnabled: { type: boolean, const: true }
+      required: [twoFactorEnabled]
+
+    LoyaltyTier:
+      type: object
+      properties:
+        name: { type: string }
+        min: { type: integer }
+        sparkBack: { type: integer }
+        color: { type: string }
+      required: [name, min, sparkBack, color]
+
+    ViewerMeUser:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        displayName: { type: string }
+        role: { type: string, enum: [viewer, performer] }
+        avatarUrl: { type: ["string", "null"] }
+        bannerUrl: { type: ["string", "null"] }
+        bio: { type: ["string", "null"] }
+        isVerified: { type: boolean }
+      required:
+        - id
+        - email
+        - displayName
+        - role
+        - avatarUrl
+        - bannerUrl
+        - bio
+        - isVerified
+
+    ViewerStats:
+      type: object
+      properties:
+        sparks: { type: integer }
+        totalSpent: { type: integer }
+        gamesPlayed: { type: integer }
+        gamesWon: { type: integer }
+        winRate: { type: integer }
+        topStreak: { type: integer }
+        sparksEarned: { type: integer }
+        totalSessions: { type: integer }
+        reputationScore: { type: integer }
+        loyalty:
+          $ref: "#/components/schemas/LoyaltyTier"
+      required:
+        - sparks
+        - totalSpent
+        - gamesPlayed
+        - gamesWon
+        - winRate
+        - topStreak
+        - sparksEarned
+        - totalSessions
+        - reputationScore
+        - loyalty
+
+    ViewerPerformerHistoryEntry:
+      type: object
+      properties:
+        performerId: { type: string }
+        sessionsCount: { type: integer }
+        sparksSpent: { type: integer }
+        isSubscribed: { type: boolean }
+        firstInteraction: { type: ["string", "null"] }
+        lastInteraction: { type: ["string", "null"] }
+      required:
+        - performerId
+        - sessionsCount
+        - sparksSpent
+        - isSubscribed
+        - firstInteraction
+        - lastInteraction
+
+    ViewerMeResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/ViewerMeUser"
+        viewer:
+          $ref: "#/components/schemas/ViewerStats"
+        performerHistory:
+          type: array
+          items:
+            $ref: "#/components/schemas/ViewerPerformerHistoryEntry"
+      required: [user, viewer, performerHistory]
+
+    ViewerProfileUpdateRequest:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        display_name:
+          type: ["string", "null"]
+          minLength: 1
+          maxLength: 50
+        avatar:
+          type: ["string", "null"]
+          maxLength: 2048
+          pattern: "^https?://"
+        bio:
+          type: ["string", "null"]
+          maxLength: 2000
+
+    SparkBalance:
+      type: object
+      properties:
+        sparks: { type: integer }
+        totalSpent: { type: integer }
+        loyalty:
+          $ref: "#/components/schemas/LoyaltyTier"
+      required: [sparks, totalSpent, loyalty]
+
+    SparkTransaction:
+      type: object
+      properties:
+        id: { type: string }
+        userId: { type: string }
+        type: { type: string }
+        amount: { type: integer }
+        balanceAfter: { type: integer }
+        referenceId: { type: ["string", "null"] }
+        performerId: { type: ["string", "null"] }
+        metadata: { type: ["object", "null"], additionalProperties: true }
+        createdAt: { type: string }
+      required:
+        - id
+        - userId
+        - type
+        - amount
+        - balanceAfter
+        - referenceId
+        - performerId
+        - metadata
+        - createdAt
+
+    SparkTransactionsResponse:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/SparkTransaction"
+      required: [transactions]
+
+    GiftType:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        cost: { type: integer }
+        icon: { type: string }
+        color: { type: string }
+        animationType: { type: string }
+        animationDurationMs: { type: integer }
+        isPlatformBanner: { type: boolean }
+        sortOrder: { type: integer }
+      required:
+        - id
+        - name
+        - cost
+        - icon
+        - color
+        - animationType
+        - animationDurationMs
+        - isPlatformBanner
+        - sortOrder
+
+    GiftTypesResponse:
+      type: object
+      properties:
+        gifts:
+          type: array
+          items:
+            $ref: "#/components/schemas/GiftType"
+      required: [gifts]
+
+    GiftAnimation:
+      type: object
+      properties:
+        giftId: { type: string }
+        senderName: { type: string }
+        gift:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            cost: { type: integer }
+            color: { type: string }
+            icon: { type: string }
+          required: [id, name, cost, color, icon]
+        animationType: { type: string }
+        durationMs: { type: integer }
+        spectacleTier: { type: string, enum: [standard, major, cinematic] }
+      required: [giftId, senderName, gift, animationType, durationMs, spectacleTier]
+
+    PlatformBanner:
+      type: object
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [gift] }
+        senderName: { type: string }
+        performerName: { type: string }
+        performerId: { type: string }
+        giftName: { type: string }
+        sparkAmount: { type: integer }
+        expiresAt: { type: string }
+        createdAt: { type: string }
+      required:
+        - id
+        - type
+        - senderName
+        - performerName
+        - performerId
+        - giftName
+        - sparkAmount
+        - expiresAt
+        - createdAt
+
+    GiftSent:
+      type: object
+      properties:
+        id: { type: string }
+        roomId: { type: string }
+        senderId: { type: string }
+        senderName: { type: string }
+        performerId: { type: string }
+        performerName: { type: string }
+        gift:
+          $ref: "#/components/schemas/GiftType"
+        sparkCost: { type: integer }
+        performerEarnings: { type: integer }
+        platformFee: { type: integer }
+        createdAt: { type: string }
+      required:
+        - id
+        - roomId
+        - senderId
+        - senderName
+        - performerId
+        - performerName
+        - gift
+        - sparkCost
+        - performerEarnings
+        - platformFee
+        - createdAt
+
+    GiftSendResponse:
+      type: object
+      properties:
+        giftSent:
+          $ref: "#/components/schemas/GiftSent"
+        balance: { type: integer }
+        animation:
+          $ref: "#/components/schemas/GiftAnimation"
+        banner:
+          anyOf:
+            - $ref: "#/components/schemas/PlatformBanner"
+            - type: "null"
+      required: [giftSent, balance, animation, banner]
+
+    ActiveBannersResponse:
+      type: object
+      properties:
+        banners:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlatformBanner"
+      required: [banners]
+
+    PerformerCaps:
+      type: object
+      properties:
+        duo: { type: boolean }
+        toys: { type: boolean }
+        replay: { type: boolean }
+        wardrobe: { type: boolean }
+        maxMins: { type: integer }
+        games:
+          type: array
+          items: { type: string }
+      required: [duo, toys, replay, wardrobe, maxMins, games]
+
+    PerformerSubscription:
+      type: object
+      properties:
+        price: { type: ["number", "null"] }
+        trial: { type: integer }
+      required: [price, trial]
+
+    PerformerScheduleItem:
+      type: object
+      properties:
+        day: { type: string }
+        time: { type: string }
+      required: [day, time]
+
+    PerformerStats:
+      type: object
+      properties:
+        hoursLive: { type: integer }
+        followers: { type: integer }
+      required: [hoursLive, followers]
+
+    Performer:
+      type: object
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        roomId: { type: string }
+        name: { type: string }
+        stageName: { type: ["string", "null"] }
+        vibe: { type: string }
+        viewers: { type: integer }
+        game: { type: ["string", "null"] }
+        level: { type: ["string", "null"] }
+        tags:
+          type: array
+          items: { type: string }
+        accent: { type: string }
+        rating: { type: number }
+        sessions: { type: integer }
+        categories:
+          type: array
+          items: { type: string }
+        caps:
+          $ref: "#/components/schemas/PerformerCaps"
+        bio: { type: string }
+        subscription:
+          $ref: "#/components/schemas/PerformerSubscription"
+        schedule:
+          type: array
+          items:
+            $ref: "#/components/schemas/PerformerScheduleItem"
+        stats:
+          $ref: "#/components/schemas/PerformerStats"
+        requests:
+          type: array
+          items: { type: object, additionalProperties: true }
+        posts:
+          type: array
+          items: { type: object, additionalProperties: true }
+        isLive: { type: boolean }
+      required:
+        - id
+        - slug
+        - roomId
+        - name
+        - stageName
+        - vibe
+        - viewers
+        - game
+        - level
+        - tags
+        - accent
+        - rating
+        - sessions
+        - categories
+        - caps
+        - bio
+        - subscription
+        - schedule
+        - stats
+        - requests
+        - posts
+        - isLive
+
+    PerformerListResponse:
+      type: object
+      properties:
+        performers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Performer"
+      required: [performers]
+
+    PerformerResponse:
+      type: object
+      properties:
+        performer:
+          $ref: "#/components/schemas/Performer"
+      required: [performer]
+
+    ViewerHistoryPerformer:
+      type: object
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        roomId: { type: string }
+        accent: { type: string }
+      required: [id, slug, name, roomId, accent]
+
+    ViewerHistorySummary:
+      type: object
+      properties:
+        sessionsCount: { type: integer }
+        sparksSpent: { type: integer }
+        isSubscribed: { type: boolean }
+        firstInteraction: { type: ["string", "null"] }
+        lastInteraction: { type: ["string", "null"] }
+      required: [sessionsCount, sparksSpent, isSubscribed, firstInteraction, lastInteraction]
+
+    GiftHistoryEntry:
+      type: object
+      properties:
+        id: { type: string }
+        roomId: { type: string }
+        giftTypeId: { type: string }
+        giftName: { type: string }
+        sparkCost: { type: integer }
+        animationType: { type: ["string", "null"] }
+        durationMs: { type: integer }
+        icon: { type: ["string", "null"] }
+        color: { type: ["string", "null"] }
+        createdAt: { type: string }
+      required:
+        - id
+        - roomId
+        - giftTypeId
+        - giftName
+        - sparkCost
+        - animationType
+        - durationMs
+        - icon
+        - color
+        - createdAt
+
+    ViewerHistoryResponse:
+      type: object
+      properties:
+        performer:
+          $ref: "#/components/schemas/ViewerHistoryPerformer"
+        summary:
+          $ref: "#/components/schemas/ViewerHistorySummary"
+        gifts:
+          type: array
+          items:
+            $ref: "#/components/schemas/GiftHistoryEntry"
+      required: [performer, summary, gifts]
+
+    GameQuestion:
+      type: object
+      properties:
+        q: { type: string }
+        opts:
+          type: array
+          items: { type: string }
+        ans: { type: integer }
+      required: [q, opts, ans]
+
+    GameQuestionsResponse:
+      type: object
+      properties:
+        provider: { type: string }
+        paidProviderUsed: { type: boolean }
+        rawProviderApisEnabled: { type: boolean }
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/GameQuestion"
+      required: [provider, paidProviderUsed, rawProviderApisEnabled, questions]

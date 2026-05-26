@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vybe://contracts/socketio/v1/server-to-client/spark_storm_start.schema.json",
+  "title": "Socket.io spark_storm_start event payload (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "stormId": { "type": "string", "minLength": 1 },
+    "roomId": { "type": "string", "minLength": 1 },
+    "performerId": { "type": "string", "minLength": 1 },
+    "target": { "type": "integer", "minimum": 0 },
+    "current": { "type": "integer", "minimum": 0 },
+    "timerMs": { "type": "integer", "minimum": 0 },
+    "level": { "type": "integer", "minimum": 1, "maximum": 5 }
+  },
+  "required": [
+    "stormId",
+    "roomId",
+    "performerId",
+    "target",
+    "current",
+    "timerMs",
+    "level"
+  ]
+}

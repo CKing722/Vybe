@@ -711,9 +711,6 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
         <div><div style={{fontWeight:700,fontSize:".8rem"}}>{r.name}</div><div style={{fontSize:".66rem",color:"var(--mt)"}}>{r.desc}</div></div>
         <span style={{fontWeight:800,fontSize:".76rem",color:"var(--am)",display:"flex",alignItems:"center",gap:2,flexShrink:0}}><I n="spark" s={10} c="var(--am)"/>{r.sparks.toLocaleString()}</span></button>)}</div></Pn>}
     {gm&&<GE game={gm} sparks={user.sparks} onSpend={onSC} onClose={()=>setGm(null)} onSB={sb}/>}
-    {/* Viewer avatars with badges */}
-    <div style={{position:"absolute",bottom:60,left:"50%",transform:"translateX(-50%)",display:"flex",zIndex:5}}>
-      {VWR.slice(0,4).map((v,i)=><div key={v.name} style={{width:18,height:18,borderRadius:"50%",background:`hsl(${i*55+200},55%,48%)`,border:"2px solid #050810",display:"flex",alignItems:"center",justifyContent:"center",fontSize:".44rem",fontWeight:800,marginLeft:i>0?-3:0,color:"#fff"}}>{v.name[0]}</div>)}</div>
     {/* Action Bar */}
     <div style={{position:"absolute",bottom:0,left:0,right:0,zIndex:15}}>
       <div style={{display:"grid",gridTemplateColumns:"minmax(210px,1fr) auto minmax(210px,1fr)",alignItems:"center",gap:12,padding:"8px 12px",background:"linear-gradient(to top,rgba(5,8,16,.96) 68%,transparent)"}}>

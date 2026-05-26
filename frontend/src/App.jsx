@@ -129,6 +129,30 @@ const LOYALTY=[{name:"Bronze",min:0,back:0,color:"#cd7f32"},{name:"Silver",min:2
 const FBQ=[{q:"What makes anticipation more exciting than the reward itself?",opts:["Dopamine loop","Serotonin burst","Oxytocin rush","Cortisol spike"],ans:0},{q:"Which sense is most powerful for physical arousal?",opts:["Touch","Smell","Sight","Hearing"],ans:0},{q:"What type of touch creates the most anticipation?",opts:["Firm pressure","Light slow tracing","Quick tapping","Static holding"],ans:1},{q:"Which color lingerie is statistically rated most attractive?",opts:["Black","Red","White","Purple"],ans:1},{q:"What does 'aftercare' mean in intimacy?",opts:["Skincare","Emotional comfort after a scene","Follow-up texts","Review"],ans:1},{q:"Which scent is most associated with arousal?",opts:["Vanilla","Lavender","Jasmine","Peppermint"],ans:0},{q:"What voice pitch is rated most attractive?",opts:["High breathy","Deep and slow","Fast energetic","Monotone"],ans:1},{q:"Eye contact held 4+ seconds signals what?",opts:["Aggression","Deep attraction","Confusion","Boredom"],ans:1},{q:"What makes 'playing hard to get' work?",opts:["Scarcity value","Disinterest","Reduces dopamine","Triggers fear"],ans:0},{q:"What is 'sensate focus' in therapy?",opts:["Visual meditation","Mindful non-goal touch","Aromatherapy","Sound healing"],ans:1},{q:"What hormone drives bonding and trust?",opts:["Testosterone","Dopamine","Oxytocin","Adrenaline"],ans:2},{q:"Which compliment style creates the most attraction?",opts:["Physical appearance","Specific observational","Generic flattery","Celebrity comparison"],ans:1},{q:"What is 'mirroring' in attraction?",opts:["Using a webcam","Copying body language","Matching outfits","Repeating words"],ans:1},{q:"Which environment most increases intimacy?",opts:["Bright lights","Dim warm lighting","Cold temperature","Loud music"],ans:1},{q:"Which trigger most effectively builds desire?",opts:["Direct statements","Mystery and suggestion","Repetition","Logic"],ans:1},{q:"What does 'the chase' activate?",opts:["Fear","Dopamine anticipation loop","Logical reasoning","Memory"],ans:1},{q:"What is social proof in attraction?",opts:["Finding someone attractive because others want them","Photos together","Many friends","Being famous"],ans:0},{q:"Most reported erogenous zone after primary zones?",opts:["Inner thigh","Neck","Lower back","Earlobes"],ans:1},{q:"What % of adults fantasize about someone they know?",opts:["45%","62%","78%","91%"],ans:2},{q:"Which texting behavior builds romantic tension?",opts:["Instant replies","Delayed but thoughtful","One-word answers","Voice notes only"],ans:1}];
 const WSEGS=["Reveal +1","Dare Card","Bonus Sparks","Wildcard","Tease Moment","Mystery Gift","Double Down","Reset"];
 const TDC=[{t:"Truth",x:"Most daring thing you've done on camera?"},{t:"Dare",x:"Slow dance for 30 seconds."},{t:"Truth",x:"Biggest turn-on that surprises people?"},{t:"Dare",x:"Whisper something seductive to camera."},{t:"Truth",x:"When did you feel most desired?"},{t:"Dare",x:"Show your most confident pose."},{t:"Truth",x:"Ideal intimate evening in 3 words?"},{t:"Dare",x:"Most seductive look for 10 seconds."},{t:"Truth",x:"One thing you've never told a viewer?"},{t:"Dare",x:"Move like nobody's watching, 15 seconds."}];
+const GAME_ECON={
+  trivia:{stake:5,reward:15,label:"answer"},
+  wheel:{stake:25,reward:75,label:"spin"},
+  binary:{truth:10,dare:20,reward:0,label:"prompt"},
+  timed:{stake:10,reward:30,label:"answer"},
+  cards:{stake:20,reward:60,label:"flip"},
+  auction:{minBid:50,label:"escrow bid"},
+  score:{stake:15,reward:45,label:"answer"},
+  box:{stake:10,reward:50,label:"open"},
+  ladder:{stepStake:15,rewardStep:25,label:"climb"},
+  reaction:{stake:20,reward:80,label:"reaction tap"},
+  touch:{trace:5,submit:25,reward:0,label:"trace"},
+  jackpot:{stake:50,jackpot:500,label:"answer"}
+};
+const fsn=n=>(Number(n)||0).toLocaleString();
+const gameEconomyLine=type=>{
+  const e=GAME_ECON[type]||GAME_ECON.trivia;
+  if(type==="auction")return "Bid escrow from spark balance";
+  if(type==="ladder")return `${fsn(e.stepStake)}+ climb stake / ${fsn(e.rewardStep)} per rung`;
+  if(type==="touch")return `${fsn(e.trace)} trace / ${fsn(e.submit)} submit`;
+  if(type==="binary")return `${fsn(e.truth)} truth / ${fsn(e.dare)} dare`;
+  if(type==="jackpot")return `${fsn(e.stake)} stake / ${fsn(e.jackpot)} jackpot`;
+  return `${fsn(e.stake)} stake / ${fsn(e.reward)} reward`;
+};
 const VWR=[{name:"VelvetKing",score:2450,lv:34,badge:"crown"},{name:"DiamondJay",score:1820,lv:28,badge:"diamond"},{name:"AceHigh",score:1340,lv:22,badge:"streak"},{name:"NightOwl",score:890,lv:15,badge:""},{name:"xShadowx",score:620,lv:11,badge:""}];
 const HEAT={warm:"#ffab00",rising:"#f97316",hot:"#ff2d78",finale:"#c6ff00"};
 
@@ -351,21 +375,47 @@ function PF({perf,user,onBack,onLive,onBook,onVip,onWallet}){
   </div>;}
 
 /* ═══ GAME ENGINE — 11 Unique Modes ═══ */
-function GE({game,onClose,onSB}){
+function GE({game,onClose,onSB,sparks=0,onSpend=()=>{}}){
   const [qs,setQs]=useState(FBQ.sort(()=>Math.random()-.5).slice(0,5));
-  const [s,setS]=useState({qi:0,fb:"",m:0,wr:null,sp:false,td:null,tm:15,cP:0,cO:0,bid:50,hb:120,at:20,hs:0,hr:1,
+  const [s,setS]=useState({qi:0,fb:"",m:0,wr:null,sp:false,td:null,tm:15,cP:0,cO:0,bid:170,hb:120,at:20,hs:0,hr:1,
     bx:[...Array(6)].map((_,i)=>({id:i,op:false,pr:["10 sparks","25 sparks","50 sparks","Reveal +1","Badge","Empty"][i]})),
     lr:0,lb:false,br:false,bt:null,bres:null,bms:0,jl:3,js:0,jw:false,tc:[]});
   const u=(k,v)=>setS(p=>({...p,...(typeof k==="string"?{[k]:v}:k)}));
+  const econ=GAME_ECON[game.type]||GAME_ECON.trivia;
+  const balance=Math.max(0,Number(sparks)||0);
+  const flash=msg=>{u("fb",msg);setTimeout(()=>u("fb",""),1800)};
+  const spend=(amount,label=econ.label||"play")=>{
+    const cost=Math.max(0,Math.floor(Number(amount)||0));
+    if(cost<=0)return true;
+    if(balance<cost){flash(`Need ${fsn(cost)} sparks to ${label}.`);return false}
+    onSpend(-cost);
+    return true;
+  };
+  const award=amount=>{const prize=Math.max(0,Math.floor(Number(amount)||0));if(prize>0)onSB(prize)};
+  const stakeLine=game.type==="auction"
+    ?`Bids come from balance and are held in escrow. Minimum raise ${fsn(econ.minBid)} sparks.`
+    :game.type==="ladder"
+      ?`Next climb costs ${fsn((s.lr+1)*(econ.stepStake||15))}. Banked reward now ${fsn(s.lr*(econ.rewardStep||25))}.`
+      :game.type==="touch"
+        ?`Trace points cost ${fsn(econ.trace)}. Sending the trace costs ${fsn(econ.submit)}.`
+        :game.type==="binary"
+          ?`Truth costs ${fsn(econ.truth)}. Dare costs ${fsn(econ.dare)}. Performer approval still applies.`
+          :game.type==="jackpot"
+            ?`${fsn(econ.stake)} per answer. Jackpot reward ${fsn(econ.jackpot)}.`
+            :`${fsn(econ.stake)} stake per ${econ.label}. Reward up to ${fsn(econ.reward)} sparks.`;
   useEffect(()=>{genQs().then(nq=>{if(nq.length>0)setQs(nq)}).catch(()=>{})},[]);
   useEffect(()=>{if(s.qi>0&&s.qi%4===0)genQs().then(nq=>{if(nq.length>0)setQs(p=>[...p,...nq])}).catch(()=>{})},[s.qi]);
   useEffect(()=>{if(game.type==="timed"&&s.tm>0){const t=setInterval(()=>u("tm",s.tm-1),1000);return()=>clearInterval(t)}
     if(game.type==="reaction"&&!s.br&&!s.bres){const t=setTimeout(()=>u({br:true,bt:Date.now()}),2000+Math.random()*4000);return()=>clearTimeout(t)}},[s.tm,s.br,s.bres,game.type]);
   const q=qs[s.qi%qs.length]||FBQ[0];
-  const ans=(i)=>{if(i===q.ans){u({m:Math.min(100,s.m+12),fb:"Correct!",qi:s.qi+1});onSB(5)}else u({fb:"Wrong!",qi:s.qi+1});setTimeout(()=>u("fb",""),1800)};
+  const ans=(i,cost=econ.stake,prize=econ.reward)=>{if(!spend(cost,"answer"))return false;if(i===q.ans){u({m:Math.min(100,s.m+12),fb:`Correct! +${fsn(prize)}`,qi:s.qi+1});award(prize)}else u({fb:"No payout",qi:s.qi+1});setTimeout(()=>u("fb",""),1800);return true};
 
   return<Pn onClose={onClose} title={game.name} icon={game.icon} ic={game.color} style={{position:"absolute",right:12,top:84,bottom:76,zIndex:24,width:"min(390px,34vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(9,10,18,.9))",boxShadow:"0 30px 90px rgba(0,0,0,.45)"}}>
     <div style={{height:4,borderRadius:999,background:"rgba(255,255,255,.05)",marginBottom:8}}><div style={{height:"100%",borderRadius:"inherit",width:`${s.m}%`,transition:"width .4s",background:"linear-gradient(90deg,var(--cy),var(--lm),var(--pk))"}}/></div>
+    <div style={{display:"grid",gridTemplateColumns:"auto 1fr",gap:8,alignItems:"center",padding:"8px 9px",borderRadius:9,border:"1px solid rgba(255,171,0,.18)",background:"rgba(255,171,0,.055)",marginBottom:9}}>
+      <div style={{fontWeight:1000,color:"var(--am)",fontSize:".82rem",display:"flex",alignItems:"center",gap:3}}><I n="spark" s={11} c="var(--am)"/>{fsn(balance)}</div>
+      <div style={{fontSize:".62rem",lineHeight:1.35,color:"var(--mt)",fontWeight:700}}>{stakeLine}</div>
+    </div>
 
     {game.type==="trivia"&&<div><h4 style={{fontSize:".92rem",fontWeight:700,lineHeight:1.2,marginBottom:7}}>{q.q}</h4>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>ans(i)} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:600,fontSize:".76rem",cursor:"pointer"}}>{o}</button>)}</div></div>}
@@ -380,18 +430,18 @@ function GE({game,onClose,onSB}){
       </div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5,marginBottom:10}}>{["Glow","Whisper","Choice","Spotlight"].map(x=><span key={x} style={{padding:"6px 8px",borderRadius:999,border:"1px solid var(--bd)",background:"rgba(255,255,255,.04)",fontSize:".62rem",fontWeight:800,color:"rgba(255,255,255,.72)"}}>{x}</span>)}</div>
       {s.wr&&<div style={{fontWeight:900,fontSize:".86rem",color:"var(--lm)",marginBottom:8}}>{s.wr}</div>}
-      <Btn primary small disabled={s.sp} onClick={()=>{u("sp",true);setTimeout(()=>{const r=WSEGS[Math.floor(Math.random()*8)];u({sp:false,wr:r,m:Math.min(100,s.m+8)});if(r.includes("Sparks"))onSB(15)},2400)}}>{s.sp?"Dialing...":"Spin Velvet Dial"}</Btn></div>}
+      <Btn primary small disabled={s.sp} onClick={()=>{if(!spend(econ.stake,"spin"))return;u("sp",true);setTimeout(()=>{const r=WSEGS[Math.floor(Math.random()*8)],win=r.includes("Sparks");u({sp:false,wr:r,m:Math.min(100,s.m+8),fb:win?`Bonus +${fsn(econ.reward)}`:r});if(win)award(econ.reward);setTimeout(()=>u("fb",""),1500)},2400)}}>{s.sp?"Dialing...":"Spin Velvet Dial"}</Btn></div>}
 
     {game.type==="binary"&&<div style={{textAlign:"center"}}>
       {s.td?<div style={{padding:12,borderRadius:8,border:"1px solid var(--bd)",background:"var(--cd)",marginBottom:6}}><Tag color={s.td.t==="Truth"?"var(--cy)":"var(--pk)"}>{s.td.t}</Tag><p style={{marginTop:5,fontWeight:600,fontSize:".85rem",lineHeight:1.4}}>{s.td.x}</p></div>
       :<p style={{color:"var(--mt)",marginBottom:6,fontSize:".8rem"}}>Pick truth or dare.</p>}
       <div style={{display:"flex",gap:5,justifyContent:"center"}}>
-        <Btn small onClick={()=>{u({td:TDC.filter(c=>c.t==="Truth")[Math.floor(Math.random()*5)],m:Math.min(100,s.m+10)});onSB(5)}} style={{border:"1px solid var(--cy)",color:"var(--cy)"}}>Truth</Btn>
-        <Btn small onClick={()=>{u({td:TDC.filter(c=>c.t==="Dare")[Math.floor(Math.random()*5)]||TDC[1],m:Math.min(100,s.m+15)});onSB(10)}} style={{border:"1px solid var(--pk)",color:"var(--pk)"}}>Dare</Btn></div></div>}
+        <Btn small onClick={()=>{if(!spend(econ.truth,"open truth"))return;const deck=TDC.filter(c=>c.t==="Truth");u({td:deck[Math.floor(Math.random()*deck.length)],m:Math.min(100,s.m+10),fb:"Truth opened"});setTimeout(()=>u("fb",""),1300)}} style={{border:"1px solid var(--cy)",color:"var(--cy)"}}>Truth</Btn>
+        <Btn small onClick={()=>{if(!spend(econ.dare,"open dare"))return;const deck=TDC.filter(c=>c.t==="Dare");u({td:deck[Math.floor(Math.random()*deck.length)]||TDC[1],m:Math.min(100,s.m+15),fb:"Dare opened"});setTimeout(()=>u("fb",""),1300)}} style={{border:"1px solid var(--pk)",color:"var(--pk)"}}>Dare</Btn></div></div>}
 
     {game.type==="timed"&&<div><div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}><span style={{fontSize:".68rem",color:"var(--mt)"}}>Beat the clock</span><span style={{fontWeight:900,fontSize:"1rem",color:s.tm<5?"var(--pk)":"var(--am)"}}>{s.tm}s</span></div>
       <h4 style={{fontSize:".9rem",fontWeight:700,lineHeight:1.2,marginBottom:6}}>{q.q}</h4>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>{ans(i);u("tm",15)}} disabled={s.tm===0} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:600,fontSize:".76rem",cursor:s.tm===0?"not-allowed":"pointer",opacity:s.tm===0?.4:1}}>{o}</button>)}</div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>{if(ans(i,econ.stake,econ.reward))u("tm",15)}} disabled={s.tm===0} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:600,fontSize:".76rem",cursor:s.tm===0?"not-allowed":"pointer",opacity:s.tm===0?.4:1}}>{o}</button>)}</div>
       {s.tm===0&&<Btn small primary onClick={()=>u({tm:15,qi:s.qi+1})} style={{marginTop:5}}>Next</Btn>}</div>}
 
     {game.type==="cards"&&<div style={{textAlign:"center"}}>
@@ -399,42 +449,43 @@ function GE({game,onClose,onSB}){
         {[[s.cP,"var(--cy)"],[s.cO,"var(--pk)"]].map(([v,c],i)=><div key={i} style={{width:50,height:70,borderRadius:6,border:"1px solid "+c,background:"var(--cd)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:"1.2rem",color:c}}>{v||"?"}</div>)}
         <div style={{position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)",fontWeight:800,color:"var(--mt)",fontSize:".7rem"}}>VS</div>
       </div>
-      <Btn primary small onClick={()=>{const p=Math.floor(Math.random()*13)+2,o=Math.floor(Math.random()*13)+2;u({cP:p,cO:o,fb:p>o?"You win! +15":p<o?"Opponent wins":"Draw!",m:Math.min(100,s.m+(p>o?10:0))});if(p>o)onSB(15)}}>Flip</Btn></div>}
+      <Btn primary small onClick={()=>{if(!spend(econ.stake,"flip"))return;const p=Math.floor(Math.random()*13)+2,o=Math.floor(Math.random()*13)+2;u({cP:p,cO:o,fb:p>o?`You win! +${fsn(econ.reward)}`:p<o?"Opponent wins":"Draw!",m:Math.min(100,s.m+(p>o?10:0))});if(p>o)award(econ.reward)}}>Flip</Btn></div>}
 
     {game.type==="auction"&&<div><div style={{padding:8,borderRadius:7,border:"1px solid var(--bd)",background:"var(--cd)",marginBottom:7,textAlign:"center"}}>
-      <div style={{fontSize:".58rem",color:"var(--mt)",textTransform:"uppercase"}}>High Bid</div><div style={{fontWeight:900,fontSize:"1.2rem",color:"var(--am)"}}>{s.hb}</div></div>
-      <div style={{display:"flex",gap:4}}><input type="text" value={s.bid} onChange={e=>u("bid",parseInt(e.target.value)||0)} style={{flex:1,textAlign:"center",fontWeight:700}}/>
-        <Btn primary small onClick={()=>{if(s.bid>s.hb)u({hb:s.bid,fb:"Top bidder!",m:Math.min(100,s.m+5)});else u("fb","Must exceed")}}>Bid</Btn></div></div>}
+      <div style={{fontSize:".58rem",color:"var(--mt)",textTransform:"uppercase"}}>High Bid</div><div style={{fontWeight:900,fontSize:"1.2rem",color:"var(--am)"}}>{fsn(s.hb)}</div></div>
+      <div style={{display:"flex",gap:4}}><input type="number" min={s.hb+econ.minBid} max={balance} value={s.bid} onChange={e=>u("bid",parseInt(e.target.value)||0)} style={{flex:1,textAlign:"center",fontWeight:700}}/>
+        <Btn primary small onClick={()=>{const bid=Math.floor(Number(s.bid)||0);if(bid<s.hb+econ.minBid){flash(`Raise by at least ${fsn(econ.minBid)} sparks.`);return}if(!spend(bid,"place bid"))return;u({hb:bid,fb:"Top bidder! Bid held in escrow",m:Math.min(100,s.m+5)});setTimeout(()=>u("fb",""),1800)}}>Bid</Btn></div>
+      <p style={{fontSize:".62rem",color:"var(--mt)",lineHeight:1.4,marginTop:7}}>Winning bids are deducted immediately and stay pending until the performer accepts the moment or refunds it.</p></div>}
 
     {game.type==="score"&&<div><div style={{textAlign:"center",marginBottom:6}}><div style={{fontWeight:900,fontSize:"1.5rem",color:"var(--lm)"}}>{s.hs}</div><div style={{fontSize:".6rem",color:"var(--mt)"}}>Round {s.hr}</div></div>
       <h4 style={{fontSize:".88rem",fontWeight:700,marginBottom:5}}>{q.q}</h4>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>{if(i===q.ans){u({hs:s.hs+100,hr:s.hr+1,qi:s.qi+1,fb:"+100"});onSB(5)}else u({hr:s.hr+1,qi:s.qi+1,fb:"0pts"});setTimeout(()=>u("fb",""),1500)}} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:600,fontSize:".76rem",cursor:"pointer"}}>{o}</button>)}</div></div>}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>{if(!spend(econ.stake,"answer"))return;if(i===q.ans){u({hs:s.hs+100,hr:s.hr+1,qi:s.qi+1,fb:`+100 score, +${fsn(econ.reward)}`});award(econ.reward)}else u({hr:s.hr+1,qi:s.qi+1,fb:"0pts"});setTimeout(()=>u("fb",""),1500)}} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:600,fontSize:".76rem",cursor:"pointer"}}>{o}</button>)}</div></div>}
 
     {game.type==="box"&&<div><p style={{fontSize:".76rem",color:"var(--mt)",marginBottom:6}}>Tap to reveal. 10 sparks each.</p>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:5}}>{s.bx.map((b,i)=><button key={i} onClick={()=>{if(!b.op){const nb=[...s.bx];nb[i]={...nb[i],op:true};u({bx:nb,m:Math.min(100,s.m+6)});if(b.pr.includes("sparks"))onSB(parseInt(b.pr))}}} disabled={b.op} style={{height:55,borderRadius:7,border:"1px solid var(--bd)",background:b.op?"rgba(255,255,255,.02)":"var(--cd)",cursor:b.op?"default":"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",fontSize:".66rem",fontWeight:700,color:b.op?"var(--lm)":"var(--mt)"}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:5}}>{s.bx.map((b,i)=><button key={i} onClick={()=>{if(!b.op){if(!spend(econ.stake,"open drop"))return;const nb=[...s.bx];nb[i]={...nb[i],op:true};const prize=b.pr.includes("sparks")?parseInt(b.pr):0;u({bx:nb,m:Math.min(100,s.m+6),fb:prize?`Drop +${fsn(prize)}`:`Revealed ${b.pr}`});if(prize)award(prize);setTimeout(()=>u("fb",""),1400)}}} disabled={b.op} style={{height:55,borderRadius:7,border:"1px solid var(--bd)",background:b.op?"rgba(255,255,255,.02)":"var(--cd)",cursor:b.op?"default":"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",fontSize:".66rem",fontWeight:700,color:b.op?"var(--lm)":"var(--mt)"}}>
           {b.op?b.pr:<I n="mystery" s={18} c="var(--am)"/>}</button>)}</div></div>}
 
     {game.type==="ladder"&&<div style={{textAlign:"center"}}>
       <div style={{display:"flex",flexDirection:"column-reverse",gap:2,marginBottom:8}}>{[1,2,3,4,5].map(r=><div key={r} style={{padding:5,borderRadius:5,border:"1px solid var(--bd)",background:s.lr>=r?"rgba(255,45,120,.08)":"var(--cd)",display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:".72rem"}}>
         <span style={{fontWeight:700,color:s.lr>=r?"var(--pk)":"var(--mt)"}}>Rung {r}</span><span style={{color:"var(--am)"}}>{r*25}</span>{s.lr>=r&&<I n="check" s={11} c="var(--gn)"/>}</div>)}</div>
-      {!s.lb?<div style={{display:"flex",gap:5,justifyContent:"center"}}><Btn primary small disabled={s.lr>=5} onClick={()=>{u({lr:s.lr+1,m:Math.min(100,s.m+12)});onSB(10*(s.lr+1))}}>Climb</Btn>
-        <Btn small disabled={s.lr===0} onClick={()=>{onSB(s.lr*25);u({lb:true,fb:`Banked ${s.lr*25}!`})}}>Bank</Btn></div>:<p style={{fontWeight:700,color:"var(--gn)"}}>Banked!</p>}</div>}
+      {!s.lb?<div style={{display:"flex",gap:5,justifyContent:"center"}}><Btn primary small disabled={s.lr>=5} onClick={()=>{const next=s.lr+1,cost=next*econ.stepStake;if(!spend(cost,"climb"))return;u({lr:next,m:Math.min(100,s.m+12),fb:`Rung ${next} locked`});setTimeout(()=>u("fb",""),1200)}}>Climb</Btn>
+        <Btn small disabled={s.lr===0} onClick={()=>{const prize=s.lr*econ.rewardStep;award(prize);u({lb:true,fb:`Banked ${fsn(prize)}!`})}}>Bank</Btn></div>:<p style={{fontWeight:700,color:"var(--gn)"}}>Banked!</p>}</div>}
 
     {game.type==="reaction"&&<div style={{textAlign:"center"}}>
       {!s.bres?<><p style={{fontSize:".78rem",color:"var(--mt)",marginBottom:12}}>Tap when it lights up!</p>
-        <button onClick={()=>{if(s.br){const ms=Date.now()-s.bt;u({bres:ms<500?"F":"S",bms:ms,br:false});if(ms<500)onSB(20)}}} style={{width:80,height:80,borderRadius:"50%",border:"3px solid "+(s.br?"var(--pk)":"var(--bd)"),background:s.br?"rgba(255,45,120,.15)":"var(--cd)",cursor:"pointer",animation:s.br?"bf .3s infinite":"none"}}>
+        <button onClick={()=>{if(s.br){if(!spend(econ.stake,"reaction tap"))return;const ms=Date.now()-s.bt;u({bres:ms<500?"F":"S",bms:ms,br:false});if(ms<500)award(econ.reward)}}} style={{width:80,height:80,borderRadius:"50%",border:"3px solid "+(s.br?"var(--pk)":"var(--bd)"),background:s.br?"rgba(255,45,120,.15)":"var(--cd)",cursor:"pointer",animation:s.br?"bf .3s infinite":"none"}}>
           <span style={{fontWeight:900,fontSize:s.br?".9rem":".72rem",color:s.br?"var(--pk)":"var(--mt)"}}>{s.br?"TAP!":"Wait..."}</span></button></>
       :<div><div style={{fontWeight:900,fontSize:"1.3rem",color:s.bms<500?"var(--gn)":"var(--pk)"}}>{s.bms}ms</div>
         <Btn primary small onClick={()=>u({br:false,bres:null,bms:0})} style={{marginTop:6}}>Again</Btn></div>}</div>}
 
     {game.type==="touch"&&<div>
       <p style={{fontSize:".74rem",color:"var(--mt)",lineHeight:1.45,marginBottom:8}}>Draw a glow trace over the live frame. The performer sees it as a pending interaction and accepts the one they want to acknowledge.</p>
-      <div onPointerDown={e=>{const r=e.currentTarget.getBoundingClientRect(),x=((e.clientX-r.left)/r.width)*100,y=((e.clientY-r.top)/r.height)*100;u({tc:[...s.tc.slice(-7),{x,y,id:Date.now()}],m:Math.min(100,s.m+9)});onSB(5)}} style={{position:"relative",height:190,borderRadius:12,border:"1px solid rgba(0,212,255,.24)",overflow:"hidden",cursor:"crosshair",background:"radial-gradient(circle at 50% 34%,rgba(255,196,160,.22),transparent 14%),linear-gradient(180deg,rgba(10,14,24,.9),rgba(14,6,22,.96))"}}>
+      <div onPointerDown={e=>{if(!spend(econ.trace,"place trace"))return;const r=e.currentTarget.getBoundingClientRect(),x=((e.clientX-r.left)/r.width)*100,y=((e.clientY-r.top)/r.height)*100;u({tc:[...s.tc.slice(-7),{x,y,id:Date.now()}],m:Math.min(100,s.m+9),fb:"Trace point held"});setTimeout(()=>u("fb",""),1000)}} style={{position:"relative",height:190,borderRadius:12,border:"1px solid rgba(0,212,255,.24)",overflow:"hidden",cursor:"crosshair",background:"radial-gradient(circle at 50% 34%,rgba(255,196,160,.22),transparent 14%),linear-gradient(180deg,rgba(10,14,24,.9),rgba(14,6,22,.96))"}}>
         <div style={{position:"absolute",left:"50%",bottom:0,transform:"translateX(-50%)",width:82,height:142,borderRadius:"44% 44% 14px 14px",background:"linear-gradient(170deg,rgba(255,45,120,.76),rgba(139,92,246,.62),rgba(5,8,16,.9))",filter:"blur(.1px)"}}/>
         {s.tc.map((m,i)=><div key={m.id} style={{position:"absolute",left:`${m.x}%`,top:`${m.y}%`,width:42,height:42,borderRadius:"50%",transform:"translate(-50%,-50%)",border:"1px solid rgba(0,212,255,.7)",background:"radial-gradient(circle,rgba(0,212,255,.28),transparent 68%)",boxShadow:"0 0 30px rgba(0,212,255,.35)",opacity:.45+i*.07}}/>)}
         <div style={{position:"absolute",left:10,bottom:10,right:10,display:"flex",justifyContent:"space-between",fontSize:".58rem",color:"rgba(255,255,255,.62)",fontWeight:800}}><span>touch map</span><span>{s.tc.length} traces</span></div>
       </div>
-      <div style={{display:"flex",gap:6,marginTop:8}}><Btn small primary onClick={()=>{u({fb:"Trace sent for performer approval",m:Math.min(100,s.m+12)});onSB(10)}}>Send Trace</Btn><Btn small onClick={()=>u("tc",[])}>Clear</Btn></div>
+      <div style={{display:"flex",gap:6,marginTop:8}}><Btn small primary onClick={()=>{if(!s.tc.length){flash("Place a trace first.");return}if(!spend(econ.submit,"send trace"))return;u({fb:"Trace sent for performer approval",m:Math.min(100,s.m+12)})}}>Send Trace</Btn><Btn small onClick={()=>u("tc",[])}>Clear</Btn></div>
     </div>}
 
     {game.type==="jackpot"&&<div>
@@ -445,9 +496,9 @@ function GE({game,onClose,onSB}){
       {s.jw?<div style={{textAlign:"center",padding:14}}><I n="crown" s={32} c="var(--am)"/><div style={{fontWeight:900,fontSize:"1.1rem",color:"var(--am)",marginTop:5}}>JACKPOT!</div></div>
       :s.jl<=0?<div style={{textAlign:"center",padding:14}}><div style={{fontWeight:900,color:"var(--pk)"}}>Game Over</div></div>
       :<div><h4 style={{fontSize:".88rem",fontWeight:700,marginBottom:5}}>{q.q}</h4>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>{if(i===q.ans){const ns=s.js+1;if(ns>=10){u({js:ns,jw:true,m:100});onSB(500)}else{u({js:ns,m:ns*10,fb:ns+"/10",qi:s.qi+1});onSB(10)}}else{u({jl:s.jl-1,js:0,m:0,fb:"Life lost",qi:s.qi+1})}setTimeout(()=>u("fb",""),1500)}} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:600,fontSize:".76rem",cursor:"pointer"}}>{o}</button>)}</div></div>}</div>}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4}}>{q.opts.map((o,i)=><button key={i} onClick={()=>{if(!spend(econ.stake,"play streak"))return;if(i===q.ans){const ns=s.js+1;if(ns>=10){u({js:ns,jw:true,m:100,fb:`Jackpot +${fsn(econ.jackpot)}`});award(econ.jackpot)}else{u({js:ns,m:ns*10,fb:ns+"/10",qi:s.qi+1})}}else{u({jl:s.jl-1,js:0,m:0,fb:"Life lost",qi:s.qi+1})}setTimeout(()=>u("fb",""),1500)}} style={{padding:8,borderRadius:6,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",textAlign:"left",fontWeight:600,fontSize:".76rem",cursor:"pointer"}}>{o}</button>)}</div></div>}</div>}
 
-    {s.fb&&<p style={{marginTop:5,fontWeight:700,fontSize:".76rem",color:s.fb.includes("Correct")||s.fb.includes("win")||s.fb.includes("Bank")||s.fb.includes("/10")||s.fb==="Top bidder!"?"var(--gn)":"var(--pk)"}}>{s.fb}</p>}
+    {s.fb&&<p style={{marginTop:5,fontWeight:700,fontSize:".76rem",color:s.fb.includes("Correct")||s.fb.includes("win")||s.fb.includes("Bank")||s.fb.includes("/10")||s.fb.includes("Top bidder")||s.fb.includes("+")||s.fb.includes("opened")||s.fb.includes("sent")||s.fb.includes("locked")?"var(--gn)":"var(--pk)"}}>{s.fb}</p>}
   </Pn>;}
 
 /* ═══ LOBBY ═══ */
@@ -493,11 +544,12 @@ function LB({user,onPerf,onWallet,cat,setCat,onMenu}){
       </div></div>
     {/* Games */}
     <div style={{padding:16,border:"1px solid var(--bd)",borderRadius:12,background:"var(--cd)",marginBottom:14}}>
-      <Kk>11 Game Modes — Always Free</Kk>
+      <Kk>11 Game Modes — Spark-Backed Play</Kk>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:5,marginTop:8}}>
         {GAMES.map(g=><div key={g.id} style={{padding:"7px 8px",borderRadius:7,border:"1px solid var(--bd)"}}>
           <div style={{display:"flex",alignItems:"center",gap:3}}><I n={g.icon} s={12} c={g.color}/><span style={{fontWeight:700,fontSize:".72rem"}}>{g.name}</span></div>
-          <p style={{fontSize:".62rem",color:"var(--mt)",lineHeight:1.3,marginTop:1}}>{g.desc}</p></div>)}</div>
+          <p style={{fontSize:".62rem",color:"var(--mt)",lineHeight:1.3,marginTop:1}}>{g.desc}</p>
+          <div style={{marginTop:4,fontSize:".56rem",fontWeight:900,color:"var(--am)",display:"flex",alignItems:"center",gap:2}}><I n="spark" s={8} c="var(--am)"/>{gameEconomyLine(g.type)}</div></div>)}</div>
     </div>
     <div style={{padding:10,borderTop:"1px solid var(--bd)",fontSize:".56rem",color:"var(--mt)",textAlign:"center"}}>VYBE Inc. · 18 USC §2257 · 80/20 · CCBill/Segpay · <a href="#" style={{color:"var(--cy)"}}>Terms</a> · <a href="#" style={{color:"var(--cy)"}}>Privacy</a> · <a href="#" style={{color:"var(--cy)"}}>2257</a> · <a href="#" style={{color:"var(--cy)"}}>DMCA</a></div>
   </div>;}
@@ -592,17 +644,18 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
     {pn==="games"&&<Pn onClose={()=>setPn(null)} title="Games" icon="gamepad" ic="var(--cy)" style={{position:"absolute",right:12,top:88,bottom:76,zIndex:22,width:"min(390px,34vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
       <div style={{padding:9,borderRadius:10,border:"1px solid rgba(0,212,255,.18)",background:"rgba(0,212,255,.055)",marginBottom:9}}>
         <div style={{fontWeight:900,fontSize:".78rem"}}>VYBE game direction</div>
-        <p style={{fontSize:".66rem",lineHeight:1.45,color:"var(--mt)",marginTop:3}}>Games create anticipation, performer choice, and audience competition. No automatic performer control without acceptance.</p>
+        <p style={{fontSize:".66rem",lineHeight:1.45,color:"var(--mt)",marginTop:3}}>Games are spark-backed. Higher-value rewards require higher stakes, and performer-control outcomes still need acceptance.</p>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"1fr",gap:5,overflowY:"auto",maxHeight:"calc(100% - 88px)",paddingRight:3}}>{avG.map(g=><button key={g.id} onClick={()=>{setGm(g);setPn(null)}} style={{padding:"9px 8px",borderRadius:8,border:"1px solid var(--bd)",background:"var(--cd)",textAlign:"left",cursor:"pointer"}}>
         <div style={{display:"flex",alignItems:"center",gap:3}}><I n={g.icon} s={11} c={g.color}/><span style={{fontWeight:700,fontSize:".7rem"}}>{g.name}</span></div>
-        <p style={{fontSize:".6rem",color:"var(--mt)",lineHeight:1.3,marginTop:1}}>{g.desc}</p></button>)}</div></Pn>}
+        <p style={{fontSize:".6rem",color:"var(--mt)",lineHeight:1.3,marginTop:1}}>{g.desc}</p>
+        <div style={{marginTop:5,fontSize:".56rem",fontWeight:900,color:"var(--am)",display:"flex",alignItems:"center",gap:2}}><I n="spark" s={8} c="var(--am)"/>{gameEconomyLine(g.type)}</div></button>)}</div></Pn>}
     {pn==="requests"&&<Pn onClose={()=>setPn(null)} title="Requests" icon="request" ic="var(--am)" style={{position:"absolute",right:12,top:88,bottom:76,zIndex:22,width:"min(390px,34vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
       <div style={{padding:9,borderRadius:10,border:"1px solid rgba(255,171,0,.22)",background:"rgba(255,171,0,.06)",fontSize:".66rem",lineHeight:1.45,color:"var(--mt)",marginBottom:8}}>Requests are held in spark escrow. Performer accepts to fulfill or declines to refund.</div>
       <div style={{overflowY:"auto",maxHeight:"calc(100% - 76px)",paddingRight:3}}>{(perf.requests||[]).map((r,i)=><button key={i} onClick={()=>addReq(r)} disabled={user.sparks<r.sparks} style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%",padding:"8px 0",background:"none",border:"none",borderBottom:i<perf.requests.length-1?"1px solid var(--bd)":"none",cursor:user.sparks>=r.sparks?"pointer":"not-allowed",opacity:user.sparks>=r.sparks?1:.35,color:"var(--tx)",textAlign:"left"}}>
         <div><div style={{fontWeight:700,fontSize:".8rem"}}>{r.name}</div><div style={{fontSize:".66rem",color:"var(--mt)"}}>{r.desc}</div></div>
         <span style={{fontWeight:800,fontSize:".76rem",color:"var(--am)",display:"flex",alignItems:"center",gap:2,flexShrink:0}}><I n="spark" s={10} c="var(--am)"/>{r.sparks.toLocaleString()}</span></button>)}</div></Pn>}
-    {gm&&<GE game={gm} onClose={()=>setGm(null)} onSB={sb}/>}
+    {gm&&<GE game={gm} sparks={user.sparks} onSpend={onSC} onClose={()=>setGm(null)} onSB={sb}/>}
     {/* Viewer avatars with badges */}
     <div style={{position:"absolute",bottom:60,left:"50%",transform:"translateX(-50%)",display:"flex",zIndex:5}}>
       {VWR.slice(0,4).map((v,i)=><div key={v.name} style={{width:18,height:18,borderRadius:"50%",background:`hsl(${i*55+200},55%,48%)`,border:"2px solid #050810",display:"flex",alignItems:"center",justifyContent:"center",fontSize:".44rem",fontWeight:800,marginLeft:i>0?-3:0,color:"#fff"}}>{v.name[0]}</div>)}</div>

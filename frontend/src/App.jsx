@@ -608,18 +608,23 @@ function LB({user,onPerf,onWallet,cat,setCat,onMenu}){
 function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const [pn,setPn]=useState(null);const [gm,setGm]=useState(null);
   const settingsPreview=typeof window!=="undefined"&&new URLSearchParams(window.location.search).get("settingsPreview")==="1";
-  const [media,setMedia]=useState({paused:false,muted:false,volume:72,volumeOpen:false,fullscreen:false,settings:settingsPreview,captions:false,pip:false,quality:"1080p",layout:"Theater"});
+  const [media,setMedia]=useState({paused:false,replay:false,replayLeft:0,muted:false,volume:72,volumeOpen:false,fullscreen:false,settings:settingsPreview,captions:false,pip:false,quality:"1080p",layout:"Theater"});
   const [ch,setCh]=useState([{user:"VYBE",msg:`Welcome — ${perf.name} is live. You are known here.`,vip:false,id:0}]);
   const [ci,setCi]=useState("");const [chH,setChH]=useState(false);
   const [anims,setAnims]=useState([]);const [reqFx,setReqFx]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
   const [pendingReq,setPendingReq]=useState([{id:1,user:"test",name:"Ultimate Fantasy",desc:"You design it, she delivers",sparks:5000,status:"pending"}]);
   const roomRef=useRef(null);const aid=useRef(0);const CP=[{user:"NightOwl",msg:"Let's go"},{user:"VelvetKing",msg:"Crown incoming",vip:true},{user:"AceHigh",msg:"All in",vip:true},{user:"DiamondJay",msg:"Here we go",vip:true}];
-  useEffect(()=>{const t=setInterval(()=>{if(!media.paused)setTm(p=>Math.max(0,p-1))},1000);return()=>clearInterval(t)},[media.paused]);
+  useEffect(()=>{const t=setInterval(()=>setTm(p=>Math.max(0,p-1)),1000);return()=>clearInterval(t)},[]);
   useEffect(()=>{const t=setInterval(()=>{setCh(p=>[...p.slice(-39),{...CP[Math.floor(Math.random()*4)],id:Date.now()}])},5000);return()=>clearInterval(t)},[]);
   useEffect(()=>{const level=media.muted?0:Math.max(0,Math.min(100,media.volume))/100;document.querySelectorAll("video,audio").forEach(el=>{el.volume=level;el.muted=media.muted||media.volume===0})},[media.volume,media.muted]);
+  useEffect(()=>{document.querySelectorAll("video,audio").forEach(el=>{if(media.paused)el.pause&&el.pause();else{const p=el.play&&el.play();if(p&&p.catch)p.catch(()=>{})}})},[media.paused]);
+  useEffect(()=>{if(!media.replay||media.paused)return;const t=setInterval(()=>setMedia(p=>{if(!p.replay||p.paused)return p;if(p.replayLeft<=1)return {...p,replay:false,replayLeft:0};return {...p,replayLeft:p.replayLeft-1}}),1000);return()=>clearInterval(t)},[media.replay,media.paused]);
   useEffect(()=>{const onFs=()=>{if(!document.fullscreenElement)setMedia(p=>({...p,fullscreen:false,volumeOpen:false}))};document.addEventListener("fullscreenchange",onFs);return()=>document.removeEventListener("fullscreenchange",onFs)},[]);
   const fmt=s=>`${Math.floor(s/60)}:${(s%60).toString().padStart(2,"0")}`;
   const setVolume=v=>{const volume=Math.max(0,Math.min(100,Number(v)||0));setMedia(p=>({...p,volume,muted:volume===0}))};
+  const setViewingPaused=paused=>setMedia(p=>({...p,paused,settings:false,volumeOpen:false}));
+  const goLive=()=>{setMedia(p=>({...p,paused:false,replay:false,replayLeft:0,settings:false,volumeOpen:false}));setNotif("Returned to live");setTimeout(()=>setNotif(null),1400)};
+  const startReplay=()=>{if(!perf.caps.replay){setNotif("Replay is not enabled for this room");setTimeout(()=>setNotif(null),1600);return}setPn(null);setGm(null);setMedia(p=>({...p,paused:false,replay:true,replayLeft:15,settings:false,volumeOpen:false}));setNotif("Instant replay - 15 seconds behind live");setTimeout(()=>setNotif(null),1600)};
   const toggleFullscreen=async()=>{const entering=!media.fullscreen;if(entering){setPn(null);setGm(null);setChH(true);setMedia(p=>({...p,fullscreen:true,settings:false,volumeOpen:false}));try{const el=roomRef.current||document.documentElement,req=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;if(req)await req.call(el)}catch(e){}}else{setMedia(p=>({...p,fullscreen:false,volumeOpen:false}));try{const exit=document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen;if((document.fullscreenElement||document.webkitFullscreenElement||document.msFullscreenElement)&&exit)await exit.call(document)}catch(e){}}};
   const tog=n=>{setPn(p=>p===n?null:n);if(n)setGm(null)};
   const sg=g=>{if(user.sparks<g.cost)return;onSC(-g.cost);const id=++aid.current,x=68+Math.random()*20,y=18+Math.random()*24;
@@ -638,6 +643,12 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
       <div style={{position:"absolute",bottom:0,left:"50%",transform:"translateX(-50%)",width:media.fullscreen?"min(520px,44vw)":"min(300px,36%)",height:media.fullscreen?"86%":"72%",transition:"width .45s ease,height .45s ease"}}>
         <div style={{position:"absolute",top:"4%",left:"50%",transform:"translateX(-50%)",width:media.fullscreen?88:64,height:media.fullscreen?88:64,borderRadius:"50%",background:"radial-gradient(circle,#e8c4a8 55%,#c49070)",transition:"width .45s ease,height .45s ease"}}/>
         <div style={{position:"absolute",bottom:"-3%",left:"50%",transform:"translateX(-50%)",width:media.fullscreen?250:160,height:"70%",borderRadius:"42% 42% 20px 20px",background:`linear-gradient(170deg,${perf.accent} 15%,var(--vi) 50%,#0a0e1a 90%)`,transition:"width .45s ease"}}/></div>
+      {(media.paused||media.replay)&&<div className="ai" style={{position:"absolute",top:media.fullscreen?18:58,left:"50%",transform:"translateX(-50%)",zIndex:18,display:"flex",alignItems:"center",gap:12,padding:"8px 10px",borderRadius:999,border:"1px solid rgba(255,255,255,.14)",background:"linear-gradient(135deg,rgba(10,14,24,.68),rgba(7,9,16,.9))",boxShadow:"0 22px 70px rgba(0,0,0,.36)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",pointerEvents:"auto"}}>
+        <span style={{width:8,height:8,borderRadius:8,background:media.paused?"var(--am)":"var(--cy)",boxShadow:`0 0 18px ${media.paused?"var(--am)":"var(--cy)"}`}}/>
+        <div style={{minWidth:0}}><div style={{fontSize:".68rem",fontWeight:1000,letterSpacing:".08em",textTransform:"uppercase",color:media.paused?"var(--am)":"var(--cy)"}}>{media.paused?"Viewing paused":"Instant replay"}</div>
+          <div style={{fontSize:".58rem",fontWeight:800,color:"rgba(255,255,255,.62)",whiteSpace:"nowrap"}}>{media.paused?"Live keeps moving for the room":`${media.replayLeft || 15}s behind live`}</div></div>
+        <button type="button" onClick={media.paused?()=>setViewingPaused(false):goLive} style={{height:28,padding:"0 10px",borderRadius:14,border:"1px solid rgba(255,255,255,.14)",background:"rgba(255,255,255,.08)",color:"#fff",font:"inherit",fontSize:".58rem",fontWeight:1000,cursor:"pointer",whiteSpace:"nowrap"}}>{media.paused?"Resume":"Go Live"}</button>
+      </div>}
       {anims.map(g=><div key={g.id} className="gpa" style={{left:`${g.x}%`,top:`${g.y}%`}}><I n={g.icon} s={g.cost>=500?40:g.cost>=150?32:24} c={g.color}/></div>)}
       {reqFx.map(r=><RequestMoment key={r.id} item={r} perf={perf}/>)}
     </div>
@@ -722,9 +733,9 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
     {!media.fullscreen&&<div style={{position:"absolute",bottom:0,left:0,right:0,zIndex:15}}>
       <div style={{display:"grid",gridTemplateColumns:"minmax(210px,1fr) auto minmax(210px,1fr)",alignItems:"center",gap:12,padding:"8px 12px",background:"linear-gradient(to top,rgba(5,8,16,.96) 68%,transparent)"}}>
         <div style={{display:"flex",alignItems:"center",gap:6}}>
-          <button type="button" title={media.paused?"Resume feed":"Pause feed"} onClick={()=>setMedia(p=>({...p,paused:!p.paused}))} style={{height:36,padding:"0 10px",borderRadius:18,border:"1px solid var(--bd)",background:media.paused?"rgba(255,171,0,.16)":"rgba(255,255,255,.07)",color:"#fff",display:"inline-flex",alignItems:"center",gap:6,cursor:"pointer",fontWeight:900,fontSize:".66rem"}}><I n={media.paused?"play":"pause"} s={13}/>{media.paused?"Resume":"Pause"}</button>
-          <button type="button" title="Restart preview timer" onClick={()=>{setTm(1800);setNotif("Replay marker reset");setTimeout(()=>setNotif(null),1500)}} style={{height:36,padding:"0 10px",borderRadius:18,border:"1px solid var(--bd)",background:"rgba(255,255,255,.07)",color:"#fff",display:"inline-flex",alignItems:"center",gap:6,cursor:"pointer",fontWeight:900,fontSize:".66rem"}}><I n="refresh" s={14}/>Replay</button>
-          <span style={{color:"rgba(255,255,255,.74)",fontSize:".82rem",fontWeight:900,fontVariantNumeric:"tabular-nums"}}>{fmt(1800-tm)}</span>
+          <button type="button" title={media.paused?"Resume local feed":"Pause local feed"} onClick={()=>setViewingPaused(!media.paused)} style={{height:36,padding:"0 10px",borderRadius:18,border:"1px solid var(--bd)",background:media.paused?"rgba(255,171,0,.16)":"rgba(255,255,255,.07)",color:"#fff",display:"inline-flex",alignItems:"center",gap:6,cursor:"pointer",fontWeight:900,fontSize:".66rem"}}><I n={media.paused?"play":"pause"} s={13}/>{media.paused?"Resume":"Pause"}</button>
+          <button type="button" title={media.replay?"Return to live":"Replay last 15 seconds"} disabled={!perf.caps.replay} onClick={media.replay?goLive:startReplay} style={{height:36,padding:"0 10px",borderRadius:18,border:"1px solid "+(media.replay?"rgba(0,212,255,.4)":"var(--bd)"),background:media.replay?"rgba(0,212,255,.14)":perf.caps.replay?"rgba(255,255,255,.07)":"rgba(255,255,255,.035)",color:perf.caps.replay?"#fff":"rgba(255,255,255,.34)",display:"inline-flex",alignItems:"center",gap:6,cursor:perf.caps.replay?"pointer":"not-allowed",fontWeight:900,fontSize:".66rem"}}><I n={media.replay?"live":"refresh"} s={14}/>{media.replay?"Live":"Replay"}</button>
+          <span style={{color:media.replay?"var(--cy)":"rgba(255,255,255,.74)",fontSize:".82rem",fontWeight:900,fontVariantNumeric:"tabular-nums"}}>{media.replay?`-${media.replayLeft || 15}s`:fmt(1800-tm)}</span>
         </div>
         <div style={{display:"flex",justifyContent:"center",gap:3,overflowX:"auto",maxWidth:"min(620px,48vw)",paddingBottom:1}}>
           {[{i:"gift",l:"Gift",k:"gifts"},{i:"gamepad",l:"Games",k:"games"},{i:"request",l:"Request",k:"requests"},{i:"trophy",l:"Board",k:"board"},

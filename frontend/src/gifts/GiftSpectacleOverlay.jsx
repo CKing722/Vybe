@@ -224,7 +224,7 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, isBanner, phase
       `}</style>
       <div style={auraStyle} />
       {!reducedMotion && <CanvasParticleRenderer pal={pal} budget={effect.particleBudget} phase={phase} />}
-      <Gift3DObject effect={effect} pal={pal} />
+      <Gift3DObject effect={effect} pal={pal} reducedMotion={reducedMotion} />
       <div style={labelStyle}>
         <div>{headline}</div>
         <div style={metaStyle}>
@@ -236,13 +236,13 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, isBanner, phase
   );
 }
 
-function Gift3DObject({ effect, pal }) {
+function Gift3DObject({ effect, pal, reducedMotion }) {
   const objectStyle = {
     position: "relative",
     width: effect.id === "private_key" ? "180px" : "154px",
     height: effect.id === "private_key" ? "180px" : "154px",
     transformStyle: "preserve-3d",
-    animation: effect.id === "crown_drop" ? "vybe-gift-crown-drop 900ms cubic-bezier(0.16,1,0.3,1) both, vybe-gift-orbit 2.6s ease-in-out 900ms infinite" : "vybe-gift-orbit 2.8s ease-in-out infinite",
+    animation: reducedMotion ? "none" : (effect.id === "crown_drop" ? "vybe-gift-crown-drop 900ms cubic-bezier(0.16,1,0.3,1) both, vybe-gift-orbit 2.6s ease-in-out 900ms infinite" : "vybe-gift-orbit 2.8s ease-in-out infinite"),
     filter: "drop-shadow(0 22px 32px rgba(0,0,0,0.52)) drop-shadow(0 0 24px " + (pal.glow || pal.primary + "55") + ")",
   };
 
@@ -255,7 +255,7 @@ function Gift3DObject({ effect, pal }) {
     borderRadius: "50%",
     border: "1px solid " + pal.primary + "66",
     boxShadow: "0 0 28px " + (pal.glow || pal.primary + "44"),
-    animation: "vybe-gift-ring 1.8s ease-out infinite",
+    animation: reducedMotion ? "none" : "vybe-gift-ring 1.8s ease-out infinite",
   };
 
   return (

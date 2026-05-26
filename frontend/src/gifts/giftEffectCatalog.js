@@ -71,6 +71,65 @@ export const GIFT_EFFECT_CATALOG = [
   },
 
   {
+    id: "velvet_spark",
+    displayName: "Velvet Spark",
+    sparkCost: 100,
+    tier: "mid",
+    durationMs: 3200,
+    audienceScope: "room",
+    platformWideBanner: false,
+
+    palette: {
+      primary: "#9B5CFF",   // royal violet
+      secondary: "#C49EFF", // lilac shimmer
+      glow: "#9B5CFF44",    // violet bloom
+      text: "#FFFFFF",
+    },
+
+    particleBudget: {
+      count: 40,
+      maxRadius: 9,
+      spread: "radial-tight",
+      trailFade: true,
+      glitterEnabled: true,
+    },
+
+    typography: {
+      displayFont: "inherit",
+      weight: 600,
+      size: "md",
+      letterSpacing: "0.08em",
+      casing: "none",
+      showSenderLabel: true,
+      showSparkCount: true,
+    },
+
+    effectPhases: [
+      {
+        phase: "entry",
+        durationMs: 300,
+        animation: "pop-scale",
+        scale: 0.78,
+        opacity: [0, 1],
+      },
+      {
+        phase: "hold",
+        durationMs: 2200,
+        animation: "pulse-glow",
+        glowIntensity: 0.65,
+        particleEmit: true,
+      },
+      {
+        phase: "exit",
+        durationMs: 700,
+        animation: "fade-sink",
+        scale: 0.9,
+        opacity: [1, 0],
+      },
+    ],
+  },
+
+  {
     id: "crown_drop",
     displayName: "Crown Drop",
     sparkCost: 500,

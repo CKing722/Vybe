@@ -60,6 +60,7 @@ export default function GiftSpectacleOverlay({ giftId, sender = "Someone", recip
   if (!effect || !visible || phase === "idle" || phase === "done") return null;
 
   const isHigh = effect.tier === "high";
+  const isMid = effect.tier === "mid";
   const isBanner = effect.platformWideBanner && effect.sparkCost >= PLATFORM_BANNER_THRESHOLD_SPARKS;
   const pal = effect.palette;
   const typo = effect.typography;
@@ -70,6 +71,9 @@ export default function GiftSpectacleOverlay({ giftId, sender = "Someone", recip
 
   if (isHigh) {
     return <HighTierOverlay effect={effect} pal={pal} typo={typo} sender={sender} recipient={recipient} headline={headline} isBanner={isBanner} phase={phase} reducedMotion={reducedMotion} />;
+  }
+  if (isMid) {
+    return <MidTierBurst effect={effect} pal={pal} typo={typo} sender={sender} phase={phase} reducedMotion={reducedMotion} />;
   }
   return <LowTierToast effect={effect} pal={pal} typo={typo} sender={sender} phase={phase} reducedMotion={reducedMotion} />;
 }
@@ -309,6 +313,136 @@ function KeyMesh({ pal }) {
         <rect x="187" y="89" width="15" height="22" rx="5" fill="url(#vybeKeyFace)" />
         <path d="M34 101 C74 126 139 121 197 91" fill="none" stroke="#dfffee" strokeWidth="5" opacity="0.3" />
       </g>
+    </svg>
+  );
+}
+
+/* -----------------------------------------------------------------------
+   Mid-tier: prominent center-room moment - more than a toast, less than cinematic
+   ----------------------------------------------------------------------- */
+function MidTierBurst({ effect, pal, typo, sender, phase, reducedMotion }) {
+  const entering = !reducedMotion && phase === "entry";
+  const exiting = !reducedMotion && phase === "exit";
+  const holding = !reducedMotion && phase === "hold";
+
+  const wrapStyle = {
+    position: "fixed",
+    bottom: "22%",
+    left: "50%",
+    zIndex: 1600,
+    transform: entering
+      ? "translateX(-50%) scale(0.78)"
+      : exiting
+        ? "translateX(-50%) scale(0.92) translateY(6px)"
+        : "translateX(-50%) scale(1)",
+    transition: reducedMotion
+      ? "opacity 0.15s ease"
+      : "opacity 0.3s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1)",
+    opacity: entering ? 0 : exiting ? 0 : 1,
+    pointerEvents: "none",
+    userSelect: "none",
+  };
+
+  const cardStyle = {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    padding: "11px 20px 11px 14px",
+    borderRadius: "36px",
+    background: "rgba(10,8,18,0.93)",
+    border: "1px solid " + pal.primary + "88",
+    boxShadow: "0 0 32px " + (pal.glow || pal.primary + "44") + ", 0 18px 52px rgba(0,0,0,0.42)",
+    color: "#fff",
+    fontFamily: "inherit",
+    fontSize: "14px",
+    letterSpacing: typo.letterSpacing || "0.06em",
+    backdropFilter: "blur(14px)",
+    WebkitBackdropFilter: "blur(14px)",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+  };
+
+  const gemStyle = {
+    flexShrink: 0,
+    animation: holding
+      ? "vybe-mid-gem-pulse 1.6s ease-in-out infinite"
+      : "none",
+  };
+
+  const textWrap = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
+  };
+
+  const senderStyle = {
+    color: pal.primary,
+    fontWeight: 700,
+    fontSize: "13px",
+  };
+
+  const nameStyle = {
+    color: "#fff",
+    fontWeight: typo.weight || 600,
+    fontSize: "16px",
+    letterSpacing: "0.04em",
+  };
+
+  const sparkStyle = {
+    color: "rgba(255,255,255,0.52)",
+    fontSize: "11px",
+    fontWeight: 500,
+  };
+
+  return (
+    <div style={wrapStyle} role="status" aria-live="polite" aria-label={sender + " sent " + effect.displayName}>
+      {holding && !reducedMotion && (
+        <style>{`@keyframes vybe-mid-gem-pulse{0%,100%{filter:drop-shadow(0 0 6px ${pal.primary})}50%{filter:drop-shadow(0 0 18px ${pal.primary}) drop-shadow(0 0 36px ${pal.primary}55)}}`}</style>
+      )}
+      <div style={cardStyle}>
+        {!reducedMotion && (
+          <div style={{ position: "absolute", inset: 0, overflow: "hidden", borderRadius: "36px", pointerEvents: "none" }}>
+            <ParticleBurst pal={pal} budget={effect.particleBudget} phase={phase} />
+          </div>
+        )}
+        <DiamondGlyph pal={pal} style={gemStyle} />
+        <div style={textWrap}>
+          <span style={senderStyle}>{sender}</span>
+          <span style={nameStyle}>{effect.displayName}</span>
+          {typo.showSparkCount && (
+            <span style={sparkStyle}>{effect.sparkCost.toLocaleString()} sparks</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DiamondGlyph({ pal, style }) {
+  return (
+    <svg viewBox="0 0 40 44" width="34" height="38" style={style} aria-hidden="true">
+      <defs>
+        <linearGradient id="vybeDiamondFace" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stopColor="#fff" stopOpacity="0.92" />
+          <stop offset="0.36" stopColor={pal.secondary || pal.primary} />
+          <stop offset="1" stopColor={pal.primary} />
+        </linearGradient>
+        <linearGradient id="vybeDiamondSide" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor={pal.primary} stopOpacity="0.5" />
+          <stop offset="1" stopColor={pal.primary} stopOpacity="0.15" />
+        </linearGradient>
+      </defs>
+      {/* shadow facet */}
+      <polygon points="22,3 39,16 21,42 5,16" fill="url(#vybeDiamondSide)" transform="translate(2,3)" />
+      {/* main face */}
+      <polygon points="20,2 37,15 20,41 3,15" fill="url(#vybeDiamondFace)" stroke="#fff" strokeWidth="1.2" strokeLinejoin="round" opacity="0.97" />
+      {/* horizontal divider */}
+      <polyline points="3,15 20,24 37,15" fill="none" stroke="#fff" strokeWidth="0.9" opacity="0.48" />
+      {/* top center shine */}
+      <line x1="20" y1="2" x2="20" y2="24" stroke="#fff" strokeWidth="0.7" opacity="0.28" />
+      {/* highlight facet */}
+      <polygon points="20,2 10,15 20,24 12,15" fill="#fff" opacity="0.14" />
     </svg>
   );
 }

@@ -683,6 +683,9 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
       </G>
     </div>}
     {chH&&<button type="button" title="Show chat" aria-label="Show chat" onClick={()=>setChH(false)} style={{position:"absolute",left:12,top:96,zIndex:14,height:36,padding:"0 12px",borderRadius:18,border:"1px solid rgba(255,255,255,.12)",background:"linear-gradient(135deg,rgba(10,14,24,.78),rgba(8,10,16,.92))",color:"var(--tx)",display:"inline-flex",alignItems:"center",gap:7,cursor:"pointer",boxShadow:"0 18px 55px rgba(0,0,0,.34)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",fontWeight:900,fontSize:".66rem",letterSpacing:".04em"}}><I n="chat" s={13} c="var(--cy)"/>Chat</button>}
+    {media.captions&&<div className="ai" style={{position:"absolute",left:"50%",bottom:76,transform:"translateX(-50%)",zIndex:13,maxWidth:"min(520px,62vw)",padding:"8px 13px",borderRadius:12,border:"1px solid rgba(255,45,120,.34)",background:"linear-gradient(135deg,rgba(10,14,24,.78),rgba(7,9,16,.92))",boxShadow:"0 20px 70px rgba(0,0,0,.42),0 0 30px rgba(255,45,120,.12)",backdropFilter:"blur(14px)",WebkitBackdropFilter:"blur(14px)",color:"#fff",fontWeight:800,fontSize:".78rem",lineHeight:1.35,textAlign:"center",pointerEvents:"none"}}>
+      <span style={{color:"var(--pk)",fontWeight:1000,marginRight:6}}>CC</span>{perf.name.split(" ")[0]}: Welcome in. Keep your eyes here.
+    </div>}
     {/* Panels */}
     {pn==="board"&&<Pn onClose={()=>setPn(null)} title="Leaderboard" icon="trophy" ic="var(--am)" style={{position:"absolute",right:12,top:88,zIndex:22,width:230,maxHeight:"calc(100vh - 180px)",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(8,10,16,.9))",boxShadow:"0 24px 80px rgba(0,0,0,.42)"}}>
       {VWR.map((v,i)=><div key={v.name} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",fontSize:".7rem",borderBottom:i<4?"1px solid var(--bd)":"none"}}>
@@ -742,11 +745,14 @@ function MediaButton({children,label,onClick,active=false}) {
 }
 
 function MediaSettings({media,setMedia}) {
+  const toggle=on=><span aria-hidden="true" style={{width:44,height:24,borderRadius:999,padding:3,display:"inline-flex",alignItems:"center",justifyContent:on?"flex-end":"flex-start",background:on?"linear-gradient(135deg,var(--pk),var(--am))":"rgba(255,255,255,.14)",border:"1px solid "+(on?"rgba(255,45,120,.62)":"rgba(255,255,255,.14)"),boxShadow:on?"0 0 18px rgba(255,45,120,.28)":"inset 0 0 0 1px rgba(0,0,0,.18)",transition:"background .2s ease, box-shadow .2s ease"}}>
+    <span style={{width:18,height:18,borderRadius:"50%",background:"#fff",boxShadow:"0 3px 10px rgba(0,0,0,.34)",display:"block"}}/>
+  </span>;
   const row=(icon,label,value,onClick)=><button type="button" onClick={onClick} style={{display:"grid",gridTemplateColumns:"22px minmax(0,1fr) auto",alignItems:"center",gap:10,width:"100%",padding:"10px 12px",border:"none",borderRadius:9,background:"transparent",color:"#f7f7f7",textAlign:"left",cursor:"pointer",font:"inherit",fontSize:".78rem",fontWeight:800}}>
     <I n={icon} s={16} c="rgba(255,255,255,.82)"/><span>{label}</span><span style={{color:"rgba(255,255,255,.58)",fontSize:".72rem",fontWeight:900}}>{value}</span>
   </button>;
   return <G className="ai" style={{position:"fixed",right:110,bottom:58,width:274,padding:7,borderRadius:12,background:"rgba(42,42,46,.97)",border:"1px solid rgba(255,255,255,.14)",boxShadow:"0 24px 80px rgba(0,0,0,.5)",zIndex:80}}>
-    {row("cc","Show captions / CC",media.captions?"On":"C",()=>setMedia(p=>({...p,captions:!p.captions})))}
+    {row("cc","Show captions / CC",toggle(media.captions),()=>setMedia(p=>({...p,captions:!p.captions})))}
     {row("orientation","Orientation",media.layout,()=>setMedia(p=>({...p,layout:p.layout==="Theater"?"Vertical":"Theater"})))}
     {row("gear","Quality",media.quality,()=>setMedia(p=>({...p,quality:p.quality==="1080p"?"720p":p.quality==="720p"?"540p":"1080p"})))}
     {row("pip","Picture-in-picture",media.pip?"On":"P",()=>setMedia(p=>({...p,pip:!p.pip})))}

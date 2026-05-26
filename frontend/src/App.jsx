@@ -137,6 +137,7 @@ const PAYMENT_RAILS=[
 const CRYPTO_RAILS=["Universal router","Bitcoin","Ethereum / EVM","Solana","Tron","Cosmos","Sui","Aptos","Other chain"];
 const WATCH_GRAD="linear-gradient(135deg,var(--pk),var(--am))";
 const CAPTION_LANGUAGES=["English (US) original","Auto-translate","Afrikaans","Albanian","Amharic","Arabic","Armenian","Azerbaijani","Basque","Belarusian","Bengali","Bulgarian","Burmese","Cantonese/Hong Kong","Central Khmer","Chinese","Czech","Danish","Dutch","Estonian","Farsi","Filipino","Finnish","French","Galician","Georgian","German","Greek","Gujarati","Hebrew","Hindi","Hungarian","Icelandic","Indonesian","Italian","Japanese","Javanese","Kannada","Korean","Lao","Latvian","Lithuanian","Macedonian","Malay","Malayalam","Marathi","Mongolian","Nepali","Norwegian","Polish","Portuguese","Punjabi","Romanian","Russian","Sinhalese","Slovak","Spanish","Sundanese","Swahili","Swedish","Tamil","Telugu","Thai","Turkish","Ukrainian","Urdu","Uzbek","Vietnamese","Zulu"];
+const DEFAULT_CAPTION_LANG="English (US) original";
 const BOOK=[{id:"q",name:"Quick Play",mins:15,sparks:250},{id:"m",name:"Main Event",mins:30,sparks:450,pop:true},{id:"s",name:"Neon Suite",mins:45,sparks:650},{id:"e",name:"VIP Extended",mins:60,sparks:800}];
 const VIPPK=[
   {id:"vp",name:"VIP Private",mins:60,sparks:1500,desc:"Private room, custom pace."},
@@ -820,11 +821,13 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const [pn,setPn]=useState(initialGame?null:(roomParams.get("panel")==="games"?"games":null));const [gm,setGm]=useState(initialGame);
   const settingsPreview=roomParams.get("settingsPreview")==="1";
   const theaterPreview=roomParams.get("theaterPreview")==="1";
-  const [media,setMedia]=useState({paused:false,replay:false,replayLeft:0,muted:false,volume:72,volumeOpen:false,fullscreen:false,settings:settingsPreview,captions:roomParams.get("captionsPreview")==="1",captionLang:roomParams.get("captionLang")||"English (US) original",quality:"1080p",layout:roomParams.get("layout")==="vertical"?"Vertical":"Wide",theater:theaterPreview});
+  const requestedCaptionLang=roomParams.get("captionLang");
+  const initialCaptionLang=CAPTION_LANGUAGES.includes(requestedCaptionLang)?requestedCaptionLang:DEFAULT_CAPTION_LANG;
+  const [media,setMedia]=useState({paused:false,replay:false,replayLeft:0,muted:false,volume:72,volumeOpen:false,fullscreen:false,settings:settingsPreview,captions:roomParams.get("captionsPreview")==="1",captionLang:initialCaptionLang,captionMenu:roomParams.get("captionMenuPreview")==="1",quality:"1080p",layout:roomParams.get("layout")==="vertical"?"Vertical":"Wide",theater:theaterPreview});
   const [ch,setCh]=useState([{user:"VYBE",msg:`Welcome — ${perf.name} is live. You are known here.`,vip:false,id:0}]);
   const [ci,setCi]=useState("");const [chH,setChH]=useState(theaterPreview||roomParams.get("chatHidden")==="1");
   const [reqFx,setReqFx]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
-  const [pendingReq,setPendingReq]=useState([{id:1,user:"test",name:"Ultimate Fantasy",desc:"You design it, she delivers",sparks:5000,status:"pending"}]);
+  const [pendingReq,setPendingReq]=useState([]);
   const [requestPins,setRequestPins]=useState([]);
   const roomRef=useRef(null);const CP=[{user:"NightOwl",msg:"Let's go"},{user:"VelvetKing",msg:"Crown incoming",vip:true},{user:"AceHigh",msg:"All in",vip:true},{user:"DiamondJay",msg:"Here we go",vip:true}];
   useEffect(()=>{const t=setInterval(()=>setTm(p=>Math.max(0,p-1)),1000);return()=>clearInterval(t)},[]);
@@ -849,10 +852,19 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const sb=a=>{onSC(a);setNotif(`+${a} sparks earned`);setTimeout(()=>setNotif(null),1800)};
   const acceptReq=id=>{const rq=pendingReq.find(r=>r.id===id&&r.status==="pending");if(!rq)return;const now=Date.now(),item={...rq,status:"accepted",pinId:now};setPendingReq(p=>p.filter(r=>r.id!==id));setNotif(null);setRequestPins(p=>[item,...p.filter(x=>x.id!==rq.id)].slice(0,10));const fx={...rq,id:now};setReqFx(p=>[...p,fx]);setTimeout(()=>setReqFx(p=>p.filter(r=>r.id!==fx.id)),5400);setCh(p=>[...p.slice(-39),{type:"request",status:"accepted",user:rq.user,name:rq.name,sparks:rq.sparks,msg:`accepted ${rq.name}`,vip:false,id:now}])};
   const declineReq=id=>{const rq=pendingReq.find(r=>r.id===id&&r.status==="pending");if(!rq)return;const now=Date.now(),item={...rq,status:"declined",pinId:now};setPendingReq(p=>p.filter(r=>r.id!==id));setRequestPins(p=>[item,...p.filter(x=>x.id!==rq.id)].slice(0,10));if(rq.user===user.name)onSC(rq.sparks);setCh(p=>[...p.slice(-39),{type:"request",status:"declined",user:rq.user,name:rq.name,sparks:rq.sparks,msg:`${rq.name} declined`,vip:false,id:now}])};
-  const addReq=r=>{if(user.sparks<r.sparks)return;onSC(-r.sparks);const item={id:Date.now(),user:user.name,name:r.name,desc:r.desc,sparks:r.sparks,status:"pending"};setPendingReq(p=>[item,...p].slice(0,5));setCh(p=>[...p.slice(-39),{user:user.name,msg:`requested ${r.name} - pending performer approval`,vip:true,id:Date.now()}]);setPn(null)};
+  const addReq=r=>{if(user.sparks<r.sparks)return;onSC(-r.sparks);const item={id:Date.now(),user:user.name,name:r.name,desc:r.desc,sparks:r.sparks,status:"pending"};setPendingReq(p=>[item,...p].slice(0,5));setPn(null)};
   const avG=GAMES.filter(g=>perf.caps.games.includes(g.id));
   const topAcceptedReq=requestPins.filter(r=>r.status==="accepted").reduce((best,r)=>!best||r.sparks>best.sparks||(r.sparks===best.sparks&&r.pinId>best.pinId)?r:best,null);
   const latestDeclinedReq=requestPins.filter(r=>r.status==="declined").reduce((best,r)=>!best||r.pinId>best.pinId?r:best,null);
+  const pendingSparkPressure=pendingReq.filter(r=>r.status==="pending").reduce((sum,r)=>sum+Math.min(18,r.sparks/350),0);
+  const acceptedSparkPressure=requestPins.filter(r=>r.status==="accepted").reduce((sum,r)=>sum+Math.min(18,r.sparks/450),0);
+  const vipChatPressure=ch.filter(m=>m.vip).length*2.1;
+  const chatPressure=Math.min(24,ch.length*.75);
+  const gamePressure=gm?8:0;
+  const heatPulse=(((1800-tm)%24)/24)*7;
+  const roomHeat=Math.max(12,Math.min(99,Math.round(24+chatPressure+vipChatPressure+pendingSparkPressure+acceptedSparkPressure+gamePressure+heatPulse)));
+  const heatBars=[.36,.52,.66,.78,.9].map((m,i)=>Math.max(18,Math.min(72,roomHeat*m+i*3)));
+  const heatColors=["#00d4ff","#c6ff00","#ffab00","#ff2d78","#8b5cf6"];
   const theaterView=media.fullscreen||media.theater;
   const verticalLayout=media.layout==="Vertical";
   const stageWidth=media.fullscreen?verticalLayout?"min(430px,36vw)":"min(760px,58vw)":theaterView?verticalLayout?"min(360px,34vw)":"min(680px,58vw)":verticalLayout?"min(250px,30%)":"min(300px,36%)";
@@ -890,10 +902,10 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
       <G style={{padding:12,borderRadius:12,background:"linear-gradient(180deg,rgba(8,10,16,.54),rgba(8,10,16,.86))",boxShadow:"0 22px 70px rgba(0,0,0,.28)"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
           <div style={{fontSize:".66rem",fontWeight:900,letterSpacing:".12em",textTransform:"uppercase",color:"var(--mt)"}}>Room heat</div>
-          <div style={{fontSize:".68rem",fontWeight:900,color:"var(--lm)"}}>74%</div>
+          <div style={{fontSize:".68rem",fontWeight:900,color:"var(--lm)"}}>{roomHeat}%</div>
         </div>
-        <div style={{height:84,borderRadius:10,position:"relative",overflow:"hidden",border:"1px solid rgba(255,255,255,.07)",background:"radial-gradient(circle at 72% 46%,rgba(255,45,120,.24),transparent 20%),radial-gradient(circle at 38% 70%,rgba(0,212,255,.18),transparent 24%),linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))"}}>
-          {[18,34,50,66,82].map((x,i)=><div key={x} style={{position:"absolute",left:`${x}%`,bottom:10,width:18+i*4,height:28+i*7,borderRadius:999,background:`linear-gradient(180deg,${["#00d4ff","#c6ff00","#ffab00","#ff2d78","#8b5cf6"][i]},rgba(255,255,255,.05))`,filter:"blur(.2px)",opacity:.82}}/>)}
+        <div style={{height:84,borderRadius:10,position:"relative",overflow:"hidden",border:"1px solid rgba(255,255,255,.07)",background:`radial-gradient(circle at 72% 46%,rgba(255,45,120,${Math.min(.34,.08+roomHeat/360)}),transparent 22%),radial-gradient(circle at 38% 70%,rgba(0,212,255,${Math.min(.26,.07+roomHeat/470)}),transparent 24%),linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))`}}>
+          {heatBars.map((height,i)=><div key={heatColors[i]} style={{position:"absolute",left:`${18+i*16}%`,bottom:10,width:18+i*4,height,borderRadius:999,background:`linear-gradient(180deg,${heatColors[i]},rgba(255,255,255,.05))`,filter:"blur(.2px)",opacity:.56+roomHeat/220,boxShadow:`0 0 ${12+roomHeat/5}px ${heatColors[i]}55`,transition:"height .45s ease, opacity .45s ease, box-shadow .45s ease"}}/>)}
           <svg viewBox="0 0 320 72" preserveAspectRatio="none" style={{position:"absolute",inset:0,width:"100%",height:"100%"}}>
             <path d="M0 54 C42 44 62 58 100 38 S164 28 210 40 S274 28 320 18" fill="none" stroke="rgba(255,255,255,.42)" strokeWidth="2"/>
             <path d="M0 58 C42 48 62 62 100 42 S164 32 210 44 S274 32 320 22" fill="none" stroke="rgba(255,45,120,.55)" strokeWidth="5" opacity=".28"/>
@@ -906,10 +918,6 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
           <div style={{fontSize:".68rem",fontWeight:900,letterSpacing:".1em",textTransform:"uppercase",color:"var(--mt)"}}>Room</div>
           <button type="button" title="Hide chat" aria-label="Hide chat" onClick={()=>setChH(true)} style={{width:28,height:28,borderRadius:14,border:"1px solid var(--bd)",background:"rgba(255,255,255,.055)",color:"var(--mt)",cursor:"pointer",display:"grid",placeItems:"center",flexShrink:0}}><I n="eyeoff" s={13}/></button>
         </div>
-        {pendingReq.filter(r=>r.status==="pending").map(r=><div key={r.id} style={{padding:10,borderRadius:10,border:"1px solid rgba(255,171,0,.28)",background:"linear-gradient(135deg,rgba(255,171,0,.09),rgba(255,45,120,.05))",marginBottom:8}}>
-          <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"start"}}><div><div style={{fontSize:".58rem",letterSpacing:".12em",textTransform:"uppercase",color:"var(--am)",fontWeight:900}}>Pending request</div><div style={{fontWeight:900,fontSize:".82rem",marginTop:3}}>{r.name}</div><div style={{fontSize:".66rem",color:"var(--mt)",marginTop:2}}>{r.user} escrowed {r.sparks.toLocaleString()} sparks</div></div><I n="request" s={18} c="var(--am)"/></div>
-          <div style={{display:"flex",gap:6,marginTop:9}}><button onClick={()=>acceptReq(r.id)} style={{flex:1,height:30,border:0,borderRadius:8,background:"var(--gn)",color:"#04110a",fontWeight:900,cursor:"pointer"}}>Accept</button><button onClick={()=>declineReq(r.id)} style={{flex:1,height:30,border:"1px solid rgba(255,255,255,.12)",borderRadius:8,background:"rgba(255,255,255,.06)",color:"var(--tx)",fontWeight:900,cursor:"pointer"}}>Decline + refund</button></div>
-        </div>)}
         {topAcceptedReq&&<RequestPinCard item={topAcceptedReq} status="accepted"/>}
         {latestDeclinedReq&&<RequestPinCard item={latestDeclinedReq} status="declined"/>}
         <div style={{overflowY:"auto",minHeight:0,flex:1,paddingRight:4}}>
@@ -968,7 +976,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
               <I n={b.i} s={13}/><span style={{fontSize:".46rem",fontWeight:700,color:pn===b.k?"var(--pk)":"var(--mt)"}}>{b.l}</span></button>)}
         </div>
         <div style={{display:"flex",justifyContent:"flex-end",alignItems:"center",gap:8,position:"relative"}}>
-          <MediaButton label="Captions / CC" active={media.captions} onClick={()=>setMedia(p=>({...p,captions:!p.captions,settings:false,volumeOpen:false}))}><I n="cc" s={16}/></MediaButton>
+          <MediaButton label="Captions / CC" active={media.captions} onClick={()=>setMedia(p=>({...p,captions:!p.captions,captionMenu:false,settings:false,volumeOpen:false}))}><I n="cc" s={16}/></MediaButton>
           <MediaButton label="Settings" active={media.settings} onClick={()=>setMedia(p=>({...p,settings:!p.settings,volumeOpen:false}))}><I n="gear" s={16}/></MediaButton>
           <MediaButton label="Fullscreen" onClick={toggleFullscreen}><I n="fullscreen" s={16}/></MediaButton>
           <MediaButton label={`Volume ${media.muted?0:media.volume}%`} active={media.volumeOpen} onClick={()=>setMedia(p=>({...p,volumeOpen:!p.volumeOpen,settings:false}))}><I n={media.muted||media.volume===0?"volumeoff":"volume"} s={17}/></MediaButton>
@@ -979,7 +987,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
     </div>}
     {media.fullscreen&&<div style={{position:"absolute",right:18,bottom:18,zIndex:30,display:"flex",alignItems:"center",gap:8,padding:6,borderRadius:22,border:"1px solid rgba(255,255,255,.12)",background:"linear-gradient(135deg,rgba(10,14,24,.54),rgba(7,9,16,.82))",boxShadow:"0 22px 70px rgba(0,0,0,.38)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)"}}>
       <button type="button" onClick={toggleFullscreen} style={{height:34,padding:"0 12px",borderRadius:17,border:"1px solid rgba(255,255,255,.2)",background:WATCH_GRAD,color:"#fff",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:7,fontWeight:900,fontSize:".66rem",boxShadow:"0 12px 34px rgba(255,45,120,.22)"}}><I n="fullscreen" s={14} c="#fff"/>Exit</button>
-      <MediaButton label="Captions / CC" active={media.captions} onClick={()=>setMedia(p=>({...p,captions:!p.captions,volumeOpen:false}))}><I n="cc" s={16}/></MediaButton>
+      <MediaButton label="Captions / CC" active={media.captions} onClick={()=>setMedia(p=>({...p,captions:!p.captions,captionMenu:false,volumeOpen:false}))}><I n="cc" s={16}/></MediaButton>
       <div style={{position:"relative"}}>
         <MediaButton label={`Volume ${media.muted?0:media.volume}%`} active={media.volumeOpen} onClick={()=>setMedia(p=>({...p,volumeOpen:!p.volumeOpen}))}><I n={media.muted||media.volume===0?"volumeoff":"volume"} s={17}/></MediaButton>
         {media.volumeOpen&&<VolumePopover media={media} setMedia={setMedia} setVolume={setVolume}/>}
@@ -1006,6 +1014,21 @@ function VolumePopover({media,setMedia,setVolume}) {
   </G>;
 }
 
+function CaptionLanguagePicker({media,setMedia}) {
+  const pick=lang=>setMedia(p=>({...p,captionLang:lang,captions:true,captionMenu:false}));
+  return <div style={{position:"relative",padding:"0 12px 10px 44px"}}>
+    <button type="button" aria-haspopup="listbox" aria-expanded={media.captionMenu} onClick={()=>setMedia(p=>({...p,captions:true,captionMenu:!p.captionMenu}))} style={{width:"100%",height:36,borderRadius:9,border:"1px solid rgba(255,171,0,.38)",background:"linear-gradient(135deg,rgba(255,45,120,.14),rgba(255,171,0,.14))",color:"#fff",display:"grid",gridTemplateColumns:"minmax(0,1fr) auto",alignItems:"center",gap:10,padding:"0 10px",cursor:"pointer",font:"inherit",boxShadow:"inset 0 0 0 1px rgba(255,255,255,.04)"}}>
+      <span style={{fontSize:".68rem",fontWeight:1000,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",textAlign:"left"}}>{media.captionLang}</span>
+      <span aria-hidden="true" style={{width:0,height:0,borderLeft:"4px solid transparent",borderRight:"4px solid transparent",borderTop:"5px solid var(--am)",transform:media.captionMenu?"rotate(180deg)":"none",transition:"transform .18s ease"}}/>
+    </button>
+    {media.captionMenu&&<div role="listbox" aria-label="Caption language" style={{position:"absolute",left:44,right:12,top:40,maxHeight:214,overflowY:"auto",borderRadius:10,border:"1px solid rgba(255,171,0,.34)",background:"linear-gradient(180deg,rgba(22,24,32,.98),rgba(10,13,22,.98))",boxShadow:"0 22px 70px rgba(0,0,0,.54),0 0 34px rgba(255,45,120,.12)",padding:5,zIndex:95}}>
+      {CAPTION_LANGUAGES.map(lang=>{const active=lang===media.captionLang;return <button key={lang} type="button" role="option" aria-selected={active} onClick={()=>pick(lang)} style={{width:"100%",height:30,border:0,borderRadius:7,background:active?WATCH_GRAD:"transparent",color:active?"#fff":"rgba(255,255,255,.84)",display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,padding:"0 9px",font:"inherit",fontSize:".66rem",fontWeight:active?1000:800,cursor:"pointer",textAlign:"left"}}>
+        <span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{lang}</span>{active&&<span style={{fontSize:".54rem",letterSpacing:".08em",textTransform:"uppercase"}}>On</span>}
+      </button>})}
+    </div>}
+  </div>;
+}
+
 function MediaSettings({media,setMedia,setTheaterMode,switchLayout}) {
   const toggle=on=><span aria-hidden="true" style={{width:44,height:24,borderRadius:999,padding:3,display:"inline-flex",alignItems:"center",justifyContent:on?"flex-end":"flex-start",background:on?"linear-gradient(135deg,var(--pk),var(--am))":"rgba(255,255,255,.14)",border:"1px solid "+(on?"rgba(255,45,120,.62)":"rgba(255,255,255,.14)"),boxShadow:on?"0 0 18px rgba(255,45,120,.28)":"inset 0 0 0 1px rgba(0,0,0,.18)",transition:"background .2s ease, box-shadow .2s ease"}}>
     <span style={{width:18,height:18,borderRadius:"50%",background:"#fff",boxShadow:"0 3px 10px rgba(0,0,0,.34)",display:"block"}}/>
@@ -1014,12 +1037,8 @@ function MediaSettings({media,setMedia,setTheaterMode,switchLayout}) {
     <I n={icon} s={16} c="var(--am)"/><span>{label}</span><span style={{color:"rgba(255,255,255,.66)",fontSize:".72rem",fontWeight:900}}>{value}</span>
   </button>;
   return <G className="ai" style={{position:"fixed",right:110,bottom:58,width:314,padding:7,borderRadius:12,background:"rgba(42,42,46,.97)",border:"1px solid rgba(255,255,255,.14)",boxShadow:"0 24px 80px rgba(0,0,0,.5)",zIndex:80}}>
-    {row("cc","Show captions / CC",toggle(media.captions),()=>setMedia(p=>({...p,captions:!p.captions})))}
-    {media.captions&&<div style={{padding:"0 12px 10px 44px"}}>
-      <select aria-label="Caption language" value={media.captionLang} onChange={e=>setMedia(p=>({...p,captionLang:e.target.value,captions:true}))} style={{height:34,fontSize:".68rem",fontWeight:900,borderRadius:8,border:"1px solid rgba(255,171,0,.3)",background:"rgba(255,171,0,.08)",color:"#fff",padding:"0 8px"}}>
-        {CAPTION_LANGUAGES.map(l=><option key={l} value={l}>{l}</option>)}
-      </select>
-    </div>}
+    {row("cc","Show captions / CC",toggle(media.captions),()=>setMedia(p=>({...p,captions:!p.captions,captionMenu:false})))}
+    {media.captions&&<CaptionLanguagePicker media={media} setMedia={setMedia}/>}
     {row("fullscreen","Theater Mode",toggle(media.theater),()=>setTheaterMode(!media.theater))}
     {row("gear","Quality",media.quality,()=>setMedia(p=>({...p,quality:p.quality==="1080p"?"720p":p.quality==="720p"?"540p":"1080p"})))}
     {row("orientation","Switch layout",media.layout,()=>switchLayout())}

@@ -180,6 +180,10 @@ function drawAura(ctx, w, h, tone, t) {
 function drawObject(ctx, w, h, gift, t) {
   if (gift.id === "private_key") return drawKey(ctx, w, h, gift.tone, t);
   if (gift.id === "neon_rose") return drawRose(ctx, w, h, gift.tone, t);
+  if (gift.id === "fire_shot") return drawFlame(ctx, w, h, gift.tone, t);
+  if (gift.id === "velvet_kiss") return drawSilk(ctx, w, h, gift.tone, t);
+  if (gift.id === "diamond_rain") return drawDiamond(ctx, w, h, gift.tone, t);
+  if (gift.id === "champagne_pour") return drawChampagne(ctx, w, h, gift.tone, t);
   return drawCrown(ctx, w, h, gift.tone, t);
 }
 
@@ -308,6 +312,217 @@ function drawRose(ctx, w, h, tone, t) {
     ctx.fill();
     ctx.stroke();
   }
+  ctx.restore();
+}
+
+function drawFlame(ctx, w, h, tone, t) {
+  const cx = w / 2;
+  const cy = h / 2 + Math.sin(t * 2.4) * 3;
+  const scale = Math.min(w, h) / 148;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
+  ctx.shadowColor = tone;
+  ctx.shadowBlur = 26;
+
+  const outer = ctx.createRadialGradient(0, -14, 4, 0, 10, 58);
+  outer.addColorStop(0, "#fff9d0");
+  outer.addColorStop(0.36, tone);
+  outer.addColorStop(1, "#8b1d00");
+  ctx.fillStyle = outer;
+  ctx.beginPath();
+  ctx.moveTo(0, -58);
+  ctx.bezierCurveTo(24, -18, 44, 2, 38, 38);
+  ctx.bezierCurveTo(30, 62, -30, 62, -38, 38);
+  ctx.bezierCurveTo(-44, 2, -24, -18, 0, -58);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.globalAlpha = 0.78;
+  ctx.fillStyle = "#fff8c2";
+  ctx.beginPath();
+  ctx.moveTo(0, -28);
+  ctx.bezierCurveTo(12, 2, 16, 22, 8, 42);
+  ctx.bezierCurveTo(2, 56, -2, 56, -8, 42);
+  ctx.bezierCurveTo(-16, 22, -12, 2, 0, -28);
+  ctx.closePath();
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // ground glow
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = tone + "28";
+  ctx.beginPath();
+  ctx.ellipse(0, 64, 34, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawSilk(ctx, w, h, tone, t) {
+  const cx = w / 2;
+  const cy = h / 2 + Math.sin(t * 1.8) * 4;
+  const scale = Math.min(w, h) / 140;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
+  ctx.shadowColor = tone;
+  ctx.shadowBlur = 20;
+
+  const fill = ctx.createLinearGradient(-62, -28, 62, 28);
+  fill.addColorStop(0, "#fff0f8");
+  fill.addColorStop(0.42, tone);
+  fill.addColorStop(1, "#5a1235");
+
+  // ribbon body
+  ctx.beginPath();
+  ctx.moveTo(-64, -10);
+  ctx.bezierCurveTo(-44, -42, -6, -36, 0, -4);
+  ctx.bezierCurveTo(6, 24, 46, 32, 64, -2);
+  ctx.bezierCurveTo(44, 48, 6, 40, 0, 12);
+  ctx.bezierCurveTo(-6, -16, -46, -26, -64, 12);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.strokeStyle = "#ffd1e6";
+  ctx.lineWidth = 1.8;
+  ctx.stroke();
+
+  // highlight sheen
+  ctx.globalAlpha = 0.32;
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(-50, -8);
+  ctx.bezierCurveTo(-24, -28, 18, -22, 42, -4);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  ctx.restore();
+}
+
+function drawDiamond(ctx, w, h, tone, t) {
+  const cx = w / 2;
+  const cy = h / 2 + Math.sin(t * 2) * 3;
+  const scale = Math.min(w, h) / 138;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
+  ctx.rotate(Math.sin(t * 1.3) * 0.03);
+  ctx.shadowColor = tone;
+  ctx.shadowBlur = 28;
+
+  const gem = ctx.createLinearGradient(-44, -52, 44, 52);
+  gem.addColorStop(0, "#ffffff");
+  gem.addColorStop(0.26, tone);
+  gem.addColorStop(0.72, "#dff8ff");
+  gem.addColorStop(1, "#246b83");
+
+  // girdle (top cap)
+  ctx.beginPath();
+  ctx.moveTo(-44, 0);
+  ctx.lineTo(-22, -52);
+  ctx.lineTo(22, -52);
+  ctx.lineTo(44, 0);
+  ctx.closePath();
+  ctx.fillStyle = gem;
+  ctx.fill();
+
+  // pavilion (bottom)
+  ctx.beginPath();
+  ctx.moveTo(-44, 0);
+  ctx.lineTo(0, 60);
+  ctx.lineTo(44, 0);
+  ctx.closePath();
+  ctx.fillStyle = gem;
+  ctx.globalAlpha = 0.9;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // facet lines
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.45;
+  ctx.beginPath();
+  ctx.moveTo(-44, 0); ctx.lineTo(44, 0);
+  ctx.moveTo(0, -52); ctx.lineTo(0, 60);
+  ctx.moveTo(-22, -52); ctx.lineTo(0, 0);
+  ctx.moveTo(22, -52); ctx.lineTo(0, 0);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  // ground shadow
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = tone + "22";
+  ctx.beginPath();
+  ctx.ellipse(0, 66, 30, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawChampagne(ctx, w, h, tone, t) {
+  const cx = w / 2 - 8;
+  const cy = h / 2 + Math.sin(t * 1.6) * 3;
+  const scale = Math.min(w, h) / 155;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
+  ctx.rotate(-0.14 + Math.sin(t * 1.2) * 0.025);
+  ctx.shadowColor = tone;
+  ctx.shadowBlur = 22;
+
+  // bottle body
+  const bottle = ctx.createLinearGradient(-22, -70, 22, 56);
+  bottle.addColorStop(0, "rgba(255,255,255,.72)");
+  bottle.addColorStop(0.18, "#244e35");
+  bottle.addColorStop(0.72, "#0b1c15");
+  bottle.addColorStop(1, "#050907");
+  ctx.beginPath();
+  ctx.moveTo(-14, -70);
+  ctx.lineTo(-14, -22);
+  ctx.bezierCurveTo(-26, -10, -26, 36, -20, 56);
+  ctx.lineTo(20, 56);
+  ctx.bezierCurveTo(26, 36, 26, -10, 14, -22);
+  ctx.lineTo(14, -70);
+  ctx.closePath();
+  ctx.fillStyle = bottle;
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,.28)";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // foil cap
+  ctx.fillStyle = tone;
+  ctx.globalAlpha = 0.88;
+  ctx.fillRect(-14, -70, 28, 22);
+  ctx.globalAlpha = 1;
+
+  // label band
+  ctx.fillStyle = "rgba(255,255,255,.12)";
+  ctx.fillRect(-20, 2, 40, 20);
+
+  // bubbles rising
+  const bubbleCount = 5;
+  for (let i = 0; i < bubbleCount; i++) {
+    const bx = -8 + i * 4;
+    const phase = (t * 1.4 + i * 0.4) % 1;
+    const by = 40 - phase * 90;
+    ctx.globalAlpha = 0.55 * (1 - phase);
+    ctx.fillStyle = tone;
+    ctx.beginPath();
+    ctx.arc(bx, by, 2.5 - phase * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // ground shadow
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = tone + "20";
+  ctx.beginPath();
+  ctx.ellipse(0, 62, 22, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
   ctx.restore();
 }
 

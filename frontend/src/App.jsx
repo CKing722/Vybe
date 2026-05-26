@@ -590,6 +590,28 @@ function RequestMoment({item,perf}){
   </div>;
 }
 
+function RequestPinCard({item,status}){
+  const accepted=status==="accepted",tone=accepted?"var(--am)":"var(--gn)",bg=accepted?"rgba(255,171,0,.085)":"rgba(34,197,94,.08)";
+  return <div style={{position:"relative",overflow:"hidden",padding:10,borderRadius:10,border:`1px solid ${accepted?"rgba(255,171,0,.42)":"rgba(34,197,94,.36)"}`,background:`linear-gradient(135deg,${bg},rgba(255,255,255,.025))`,marginBottom:8,boxShadow:accepted?"0 14px 36px rgba(255,171,0,.08)":"0 14px 36px rgba(34,197,94,.06)"}}>
+    <div style={{position:"absolute",left:0,top:0,bottom:0,width:3,background:tone}}/>
+    <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"start",paddingLeft:4}}>
+      <div style={{minWidth:0}}><div style={{fontSize:".56rem",letterSpacing:".12em",textTransform:"uppercase",fontWeight:1000,color:tone}}>{accepted?"Pinned top accepted request":"Pinned refund in chat"}</div>
+        <div style={{fontWeight:1000,fontSize:".8rem",marginTop:3,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</div>
+        <div style={{fontSize:".63rem",color:"rgba(255,255,255,.66)",lineHeight:1.35,marginTop:2}}>{accepted?`${item.user} holds the top request with ${fsn(item.sparks)} sparks.`:`${fsn(item.sparks)} sparks returned to ${item.user}.`}</div></div>
+      <div style={{fontSize:".66rem",fontWeight:1000,color:tone,display:"flex",alignItems:"center",gap:2,whiteSpace:"nowrap"}}><I n={accepted?"spark":"check"} s={10} c={tone}/>{fsn(item.sparks)}</div>
+    </div>
+  </div>;
+}
+
+function RequestChatMessage({item}){
+  const accepted=item.status==="accepted",tone=accepted?"var(--am)":"var(--gn)";
+  return <div style={{margin:"6px 0",padding:"8px 9px",borderRadius:9,border:`1px solid ${accepted?"rgba(255,171,0,.34)":"rgba(34,197,94,.34)"}`,background:accepted?"linear-gradient(135deg,rgba(255,171,0,.1),rgba(255,45,120,.035))":"linear-gradient(135deg,rgba(34,197,94,.1),rgba(0,212,255,.035))",boxShadow:"0 12px 30px rgba(0,0,0,.18)"}}>
+    <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center"}}><span style={{fontSize:".56rem",letterSpacing:".12em",textTransform:"uppercase",fontWeight:1000,color:tone}}>{accepted?"Request accepted":"Request declined + refunded"}</span><span style={{fontSize:".58rem",fontWeight:1000,color:tone}}>{fsn(item.sparks)}</span></div>
+    <div style={{fontSize:".74rem",fontWeight:900,marginTop:3,lineHeight:1.25}}>{item.name}</div>
+    <div style={{fontSize:".62rem",color:"rgba(255,255,255,.68)",lineHeight:1.35,marginTop:2}}>{accepted?`${item.user} is now pinned by request value.`:`${item.user} received their sparks back.`}</div>
+  </div>;
+}
+
 function LB({user,onPerf,onWallet,cat,setCat,onMenu}){
   const f=cat==="All"?PERFS:PERFS.filter(p=>p.cats.includes(cat));const tier=gl(user.spent);
   return<div style={{minHeight:"100vh",background:"var(--bg)",padding:"12px clamp(10px,3vw,30px)"}}>
@@ -651,6 +673,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const [ci,setCi]=useState("");const [chH,setChH]=useState(false);
   const [reqFx,setReqFx]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
   const [pendingReq,setPendingReq]=useState([{id:1,user:"test",name:"Ultimate Fantasy",desc:"You design it, she delivers",sparks:5000,status:"pending"}]);
+  const [requestPins,setRequestPins]=useState([]);
   const roomRef=useRef(null);const CP=[{user:"NightOwl",msg:"Let's go"},{user:"VelvetKing",msg:"Crown incoming",vip:true},{user:"AceHigh",msg:"All in",vip:true},{user:"DiamondJay",msg:"Here we go",vip:true}];
   useEffect(()=>{const t=setInterval(()=>setTm(p=>Math.max(0,p-1)),1000);return()=>clearInterval(t)},[]);
   useEffect(()=>{const t=setInterval(()=>{setCh(p=>[...p.slice(-39),{...CP[Math.floor(Math.random()*4)],id:Date.now()}])},5000);return()=>clearInterval(t)},[]);
@@ -670,10 +693,12 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
     setCh(p=>[...p.slice(-39),{user:user.name,msg:`sent ${g.name}`,vip:true,id:Date.now()}]);onGiftSent&&onGiftSent(effectId);setPn(null)};
   const sc=()=>{if(!ci.trim())return;setCh(p=>[...p.slice(-39),{user:user.name,msg:ci,vip:true,id:Date.now()}]);setCi("")};
   const sb=a=>{onSC(a);setNotif(`+${a} sparks earned`);setTimeout(()=>setNotif(null),1800)};
-  const acceptReq=id=>{const rq=pendingReq.find(r=>r.id===id&&r.status==="pending");if(!rq)return;setPendingReq(p=>p.filter(r=>r.id!==id));setNotif(null);const fx={...rq,id:Date.now()};setReqFx(p=>[...p,fx]);setTimeout(()=>setReqFx(p=>p.filter(r=>r.id!==fx.id)),5400);setCh(p=>[...p.slice(-39),{user:"Performer",msg:`accepted ${rq.name}`,vip:false,id:Date.now()}])};
-  const declineReq=id=>{const rq=pendingReq.find(r=>r.id===id&&r.status==="pending");if(!rq)return;setPendingReq(p=>p.filter(r=>r.id!==id));if(rq.user===user.name)onSC(rq.sparks);setCh(p=>[...p.slice(-39),{user:"VYBE",msg:`${rq.name} declined - ${rq.sparks.toLocaleString()} sparks refunded to ${rq.user}`,vip:false,id:Date.now()}]);setNotif(`${rq.sparks.toLocaleString()} sparks refunded to ${rq.user}`);setTimeout(()=>setNotif(null),2200)};
+  const acceptReq=id=>{const rq=pendingReq.find(r=>r.id===id&&r.status==="pending");if(!rq)return;const now=Date.now(),item={...rq,status:"accepted",pinId:now};setPendingReq(p=>p.filter(r=>r.id!==id));setNotif(null);setRequestPins(p=>[item,...p.filter(x=>x.id!==rq.id)].slice(0,10));const fx={...rq,id:now};setReqFx(p=>[...p,fx]);setTimeout(()=>setReqFx(p=>p.filter(r=>r.id!==fx.id)),5400);setCh(p=>[...p.slice(-39),{type:"request",status:"accepted",user:rq.user,name:rq.name,sparks:rq.sparks,msg:`accepted ${rq.name}`,vip:false,id:now}])};
+  const declineReq=id=>{const rq=pendingReq.find(r=>r.id===id&&r.status==="pending");if(!rq)return;const now=Date.now(),item={...rq,status:"declined",pinId:now};setPendingReq(p=>p.filter(r=>r.id!==id));setRequestPins(p=>[item,...p.filter(x=>x.id!==rq.id)].slice(0,10));if(rq.user===user.name)onSC(rq.sparks);setCh(p=>[...p.slice(-39),{type:"request",status:"declined",user:rq.user,name:rq.name,sparks:rq.sparks,msg:`${rq.name} declined`,vip:false,id:now}])};
   const addReq=r=>{if(user.sparks<r.sparks)return;onSC(-r.sparks);const item={id:Date.now(),user:user.name,name:r.name,desc:r.desc,sparks:r.sparks,status:"pending"};setPendingReq(p=>[item,...p].slice(0,5));setCh(p=>[...p.slice(-39),{user:user.name,msg:`requested ${r.name} - pending performer approval`,vip:true,id:Date.now()}]);setPn(null)};
   const avG=GAMES.filter(g=>perf.caps.games.includes(g.id));
+  const topAcceptedReq=requestPins.filter(r=>r.status==="accepted").reduce((best,r)=>!best||r.sparks>best.sparks||(r.sparks===best.sparks&&r.pinId>best.pinId)?r:best,null);
+  const latestDeclinedReq=requestPins.filter(r=>r.status==="declined").reduce((best,r)=>!best||r.pinId>best.pinId?r:best,null);
 
   return<div ref={roomRef} style={{position:"relative",width:"100%",height:"100vh",overflow:"hidden",background:"#050810"}}>
     <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse at 45% 65%,${perf.accent}15,transparent 50%),radial-gradient(ellipse at 55% 35%,rgba(0,212,255,.06),transparent 50%),linear-gradient(180deg,#080e1c,#0a0814 50%,#0d061a)`}}>
@@ -724,8 +749,10 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
           <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"start"}}><div><div style={{fontSize:".58rem",letterSpacing:".12em",textTransform:"uppercase",color:"var(--am)",fontWeight:900}}>Pending request</div><div style={{fontWeight:900,fontSize:".82rem",marginTop:3}}>{r.name}</div><div style={{fontSize:".66rem",color:"var(--mt)",marginTop:2}}>{r.user} escrowed {r.sparks.toLocaleString()} sparks</div></div><I n="request" s={18} c="var(--am)"/></div>
           <div style={{display:"flex",gap:6,marginTop:9}}><button onClick={()=>acceptReq(r.id)} style={{flex:1,height:30,border:0,borderRadius:8,background:"var(--gn)",color:"#04110a",fontWeight:900,cursor:"pointer"}}>Accept</button><button onClick={()=>declineReq(r.id)} style={{flex:1,height:30,border:"1px solid rgba(255,255,255,.12)",borderRadius:8,background:"rgba(255,255,255,.06)",color:"var(--tx)",fontWeight:900,cursor:"pointer"}}>Decline + refund</button></div>
         </div>)}
+        {topAcceptedReq&&<RequestPinCard item={topAcceptedReq} status="accepted"/>}
+        {latestDeclinedReq&&<RequestPinCard item={latestDeclinedReq} status="declined"/>}
         <div style={{overflowY:"auto",minHeight:0,flex:1,paddingRight:4}}>
-          {ch.map((m,i)=><div key={m.id} style={{padding:"4px 0",fontSize:".76rem",opacity:.62+Math.min(i,ch.length-1)/(Math.max(ch.length-1,1))*.36,lineHeight:1.35}}>
+          {ch.map((m,i)=>m.type==="request"?<RequestChatMessage key={m.id} item={m}/>:<div key={m.id} style={{padding:"4px 0",fontSize:".76rem",opacity:.62+Math.min(i,ch.length-1)/(Math.max(ch.length-1,1))*.36,lineHeight:1.35}}>
             <span style={{fontWeight:800,color:m.vip?"var(--am)":"var(--cy)",marginRight:5}}>{m.user}</span>
             <span style={{color:"rgba(255,255,255,.76)"}}>{m.msg}</span></div>)}
         </div>

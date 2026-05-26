@@ -145,6 +145,24 @@ Requires auth.
 
 Returns the current viewer, spark balance, loyalty tier, and performer history.
 
+### `PUT /api/me/profile`
+
+Requires auth.
+
+Updates the current viewer profile fields (demo backend supports `display_name`, `avatar_url`, `bio`).
+
+Request:
+
+```json
+{
+  "display_name": "VelvetQueen",
+  "avatar_url": "https://example.com/avatar.png",
+  "bio": "Profile update smoke test"
+}
+```
+
+Returns the same shape as `GET /api/me`.
+
 ### `GET /api/me/history/:performerId`
 
 Requires auth.

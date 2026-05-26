@@ -98,12 +98,42 @@ test('HTTP endpoints return OpenAPI-compliant JSON payloads (vertical slice)', a
         expectedStatus: 200,
       },
       {
+        name: 'GET /api/me',
+        openapiPath: '/api/me',
+        method: 'get',
+        url: `${baseUrl}/api/me`,
+        headers: authHeaders,
+        expectedStatus: 200,
+      },
+      {
+        name: 'PUT /api/me/profile',
+        openapiPath: '/api/me/profile',
+        method: 'put',
+        url: `${baseUrl}/api/me/profile`,
+        headers: { ...authHeaders, 'content-type': 'application/json' },
+        body: {
+          display_name: 'NeonVelvet',
+          avatar: 'https://cdn.vybe.local/avatars/neon.png',
+          bio: 'I only gift in cinematic.',
+        },
+        expectedStatus: 200,
+      },
+      {
         name: 'GET /api/gifts/types',
         openapiPath: '/api/gifts/types',
         method: 'get',
         url: `${baseUrl}/api/gifts/types`,
         headers: {},
         expectedStatus: 200,
+      },
+      {
+        name: 'POST /api/gifts/send',
+        openapiPath: '/api/gifts/send',
+        method: 'post',
+        url: `${baseUrl}/api/gifts/send`,
+        headers: { ...authHeaders, 'content-type': 'application/json' },
+        body: { performer_id: MEMORY_IDS.performer, gift_type_id: 'crown', room_id: MEMORY_IDS.room },
+        expectedStatus: 201,
       },
       {
         name: 'GET /api/banners/active',
@@ -120,14 +150,6 @@ test('HTTP endpoints return OpenAPI-compliant JSON payloads (vertical slice)', a
         url: `${baseUrl}/api/games/questions`,
         headers: { 'content-type': 'application/json' },
         body: { theme: 'spark storm', count: 3 },
-        expectedStatus: 200,
-      },
-      {
-        name: 'GET /api/me',
-        openapiPath: '/api/me',
-        method: 'get',
-        url: `${baseUrl}/api/me`,
-        headers: authHeaders,
         expectedStatus: 200,
       },
       {
@@ -172,4 +194,3 @@ test('HTTP endpoints return OpenAPI-compliant JSON payloads (vertical slice)', a
     await close();
   }
 });
-

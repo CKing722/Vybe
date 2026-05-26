@@ -225,6 +225,11 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedM
     textTransform: "uppercase",
   };
 
+  const showGrid = !reducedMotion && (() => {
+    const cur = effect.effectPhases.find((p) => p.phase === phase);
+    return cur?.gridOverlay === true;
+  })();
+
   return (
     <>
       <div style={dimStyle} />
@@ -253,7 +258,29 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedM
             60% { transform: scale(1) rotateX(0deg) translateX(-5px); }
             80% { transform: scale(1) rotateX(0deg) translateX(5px); }
           }
+          @keyframes vybe-grid-flicker {
+            0%,100% { opacity: 0.55; }
+            45% { opacity: 0.82; }
+            52% { opacity: 0.28; }
+            60% { opacity: 0.76; }
+          }
         `}</style>
+        {showGrid && (
+          <div
+            aria-hidden="true"
+            style={{
+              position: "fixed",
+              inset: 0,
+              backgroundImage:
+                "linear-gradient(" + (pal.accentGrid || pal.primary + "18") + " 1px, transparent 1px)," +
+                "linear-gradient(90deg, " + (pal.accentGrid || pal.primary + "18") + " 1px, transparent 1px)",
+              backgroundSize: "52px 52px",
+              pointerEvents: "none",
+              zIndex: 2150,
+              animation: "vybe-grid-flicker 1.8s ease-in-out infinite",
+            }}
+          />
+        )}
         <div style={auraStyle} />
         {!reducedMotion && <CanvasParticleRenderer pal={pal} budget={effect.particleBudget} phase={phase} />}
         <Gift3DObject effect={effect} pal={pal} reducedMotion={reducedMotion} />

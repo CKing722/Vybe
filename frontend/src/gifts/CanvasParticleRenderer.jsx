@@ -128,7 +128,9 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
       ? { ...budget, count: Math.min(budget.count, 32) }
       : budget;
 
-    const particles = spawnParticles(effectiveBudget, w, h);
+    // live_flag is set to false in cleanup so re-spawn loop stops when phase ends.
+    let live_flag = true;
+    let particles = spawnParticles(effectiveBudget, w, h);
 
     // trailFade=false: hard-edge particles stay opaque until nearly dead
     const hardEdge = budget.trailFade === false;
@@ -193,12 +195,17 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
 
       if (alive > 0) {
         animIdRef.current = requestAnimationFrame(tick);
+      } else if (live_flag) {
+        // Re-spawn so hold phases stay populated for their full duration.
+        particles = spawnParticles(effectiveBudget, w, h);
+        animIdRef.current = requestAnimationFrame(tick);
       }
     }
 
     tick();
 
     return () => {
+      live_flag = false;
       cancelAnimationFrame(animIdRef.current);
     };
   }, [active]); // eslint-disable-line react-hooks/exhaustive-deps

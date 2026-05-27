@@ -268,10 +268,28 @@ CREATE TABLE request_purchases (
   viewer_id UUID REFERENCES users(id),
   performer_id UUID REFERENCES users(id),
   request_id UUID REFERENCES performer_requests(id),
+  requester_display_name VARCHAR(50),
+  request_name VARCHAR(100),
+  request_description TEXT,
+  prompt TEXT,
   spark_cost INTEGER NOT NULL,
+  escrow_sparks INTEGER NOT NULL DEFAULT 0,
+  purchased_sparks_spent INTEGER DEFAULT 0,
+  bonus_sparks_spent INTEGER DEFAULT 0,
   performer_earnings INTEGER NOT NULL,
-  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'completed', 'declined')),
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  platform_fee INTEGER DEFAULT 0,
+  status VARCHAR(20) DEFAULT 'pending' CHECK (
+    status IN ('pending', 'accepted', 'completed', 'declined', 'expired', 'cancelled')
+  ),
+  public_visible BOOLEAN DEFAULT FALSE,
+  accepted_at TIMESTAMPTZ,
+  declined_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  refunded_at TIMESTAMPTZ,
+  refund_transaction_id UUID,
+  metadata JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- ═══ SUBSCRIPTIONS ═══
@@ -495,6 +513,9 @@ CREATE INDEX idx_spark_txn_bonus_expiry ON spark_transactions(user_id, expires_a
 CREATE INDEX idx_gifts_performer ON gifts_sent(performer_id, created_at DESC);
 CREATE INDEX idx_sessions_viewer ON sessions(viewer_id, created_at DESC);
 CREATE INDEX idx_sessions_performer ON sessions(performer_id, created_at DESC);
+CREATE INDEX idx_request_purchases_viewer ON request_purchases(viewer_id, created_at DESC);
+CREATE INDEX idx_request_purchases_performer_status ON request_purchases(performer_id, status, created_at DESC);
+CREATE INDEX idx_request_purchases_public ON request_purchases(performer_id, public_visible, accepted_at DESC) WHERE public_visible = TRUE;
 CREATE INDEX idx_content_performer ON content_posts(performer_id, created_at DESC);
 CREATE INDEX idx_chat_room ON chat_messages(room_id, created_at DESC);
 CREATE INDEX idx_dm_recipient ON direct_messages(recipient_id, is_read, created_at DESC);

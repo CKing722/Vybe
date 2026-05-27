@@ -11,6 +11,7 @@ const giftRoutes = require('./routes/gifts').router;
 const healthRoutes = require('./routes/health');
 const paymentRoutes = require('./routes/payments');
 const performerRoutes = require('./routes/performers');
+const requestRoutes = require('./routes/requests');
 const sparkRoutes = require('./routes/sparks');
 const userRoutes = require('./routes/users');
 
@@ -31,6 +32,7 @@ function createApp() {
   app.use('/api/gifts', giftRoutes);
   app.use('/api/payments', paymentRoutes);
   app.use('/api/performers', performerRoutes);
+  app.use('/api/requests', requestRoutes);
   app.use('/api/sparks', sparkRoutes);
 
   app.use(notFoundHandler);

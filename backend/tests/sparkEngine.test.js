@@ -141,6 +141,78 @@ test('demo API exposes viewer, performer, and spark contracts for frontend integ
     assert.equal(paymentMethodResponse.status, 201);
     const paymentMethod = await paymentMethodResponse.json();
     assert.equal(paymentMethod.method.type, 'crypto_wallet');
+
+    const menuResponse = await fetch(`${baseUrl}/api/requests/performers/${MEMORY_IDS.performer}/menu`);
+    assert.equal(menuResponse.status, 200);
+    const requestMenu = await menuResponse.json();
+    assert.ok(requestMenu.requests.length > 0);
+
+    const requestPurchaseResponse = await fetch(`${baseUrl}/api/requests/purchase`, {
+      method: 'POST',
+      headers: { ...headers, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        performer_id: MEMORY_IDS.performer,
+        request_id: requestMenu.requests[0].id,
+        prompt: 'A polished, consent-safe custom moment',
+      }),
+    });
+    assert.equal(requestPurchaseResponse.status, 201);
+    const requestPurchase = await requestPurchaseResponse.json();
+    assert.equal(requestPurchase.request.status, 'pending');
+    assert.equal(requestPurchase.request.publicVisible, false);
+    assert.equal(requestPurchase.balance, 10125);
+
+    const performerLoginResponse = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: 'luna@vybe.local', password: 'vybe-demo' }),
+    });
+    assert.equal(performerLoginResponse.status, 200);
+    const performerLogin = await performerLoginResponse.json();
+    const performerHeaders = { authorization: `Bearer ${performerLogin.accessToken}` };
+
+    const pendingResponse = await fetch(`${baseUrl}/api/requests/performer`, {
+      headers: performerHeaders,
+    });
+    assert.equal(pendingResponse.status, 200);
+    const pending = await pendingResponse.json();
+    assert.equal(pending.requests.length, 1);
+
+    const acceptResponse = await fetch(
+      `${baseUrl}/api/requests/${requestPurchase.request.id}/accept`,
+      { method: 'POST', headers: performerHeaders }
+    );
+    assert.equal(acceptResponse.status, 200);
+    const accepted = await acceptResponse.json();
+    assert.equal(accepted.request.status, 'accepted');
+    assert.equal(accepted.request.publicVisible, true);
+    assert.equal(accepted.publicEvent.type, 'request_accepted');
+
+    const refundPurchaseResponse = await fetch(`${baseUrl}/api/requests/purchase`, {
+      method: 'POST',
+      headers: { ...headers, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        performer_id: MEMORY_IDS.performer,
+        request_id: requestMenu.requests[1].id,
+      }),
+    });
+    assert.equal(refundPurchaseResponse.status, 201);
+    const refundPurchase = await refundPurchaseResponse.json();
+    assert.equal(refundPurchase.balance, 9875);
+
+    const declineResponse = await fetch(
+      `${baseUrl}/api/requests/${refundPurchase.request.id}/decline`,
+      {
+        method: 'POST',
+        headers: { ...performerHeaders, 'content-type': 'application/json' },
+        body: JSON.stringify({ reason: 'Performer declined this moment' }),
+      }
+    );
+    assert.equal(declineResponse.status, 200);
+    const declined = await declineResponse.json();
+    assert.equal(declined.request.status, 'declined');
+    assert.equal(declined.publicEvent.type, 'request_declined_refunded');
+    assert.equal(declined.refund.balanceAfter, 10125);
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }

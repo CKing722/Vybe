@@ -155,6 +155,34 @@ function spendSparksFromProfile(profile, amount) {
   };
 }
 
+function refundSparksToProfile(profile, { purchasedSparks = 0, bonusSparks = 0, amount = null } = {}) {
+  reconcileSparkProfile(profile);
+  const purchasedRefund = Math.max(0, Number(purchasedSparks || 0));
+  let bonusRefund = Math.max(0, Number(bonusSparks || 0));
+  const expectedAmount = amount == null ? purchasedRefund + bonusRefund : Number(amount);
+
+  if (!Number.isInteger(expectedAmount) || expectedAmount <= 0) {
+    throw badRequest('Refund amount must be a positive integer');
+  }
+  if (purchasedRefund + bonusRefund === 0) {
+    bonusRefund = expectedAmount;
+  }
+  if (purchasedRefund + bonusRefund !== expectedAmount) {
+    throw badRequest('Refund split must equal refund amount');
+  }
+
+  profile.purchased_sparks += purchasedRefund;
+  profile.bonus_sparks += bonusRefund;
+  profile.sparks = profile.purchased_sparks + profile.bonus_sparks;
+  return {
+    balanceAfter: profile.sparks,
+    purchasedRefund,
+    bonusRefund,
+    purchasedSparks: profile.purchased_sparks,
+    bonusSparks: profile.bonus_sparks,
+  };
+}
+
 async function spendSparksWithDatabase(client, userId, amount) {
   const cost = Number(amount || 0);
   if (!Number.isInteger(cost) || cost <= 0) {
@@ -190,6 +218,33 @@ async function spendSparksWithDatabase(client, userId, amount) {
   );
 
   return spend;
+}
+
+async function refundSparksWithDatabase(
+  client,
+  userId,
+  { purchasedSparks = 0, bonusSparks = 0, amount = null } = {}
+) {
+  const { rows } = await client.query(
+    `SELECT sparks, purchased_sparks, bonus_sparks, bonus_sparks_expires_at
+     FROM viewer_profiles
+     WHERE user_id = $1
+     FOR UPDATE`,
+    [userId]
+  );
+  const profile = rows[0];
+  if (!profile) {
+    throw notFound('Spark balance not found');
+  }
+
+  const refund = refundSparksToProfile(profile, { purchasedSparks, bonusSparks, amount });
+  await client.query(
+    `UPDATE viewer_profiles
+     SET sparks = $1, purchased_sparks = $2, bonus_sparks = $3
+     WHERE user_id = $4`,
+    [refund.balanceAfter, refund.purchasedSparks, refund.bonusSparks, userId]
+  );
+  return refund;
 }
 
 async function getSparkBalance(userId) {
@@ -408,6 +463,8 @@ module.exports = {
   normalizeSparkTransaction,
   purchaseSparkPackage,
   reconcileSparkProfile,
+  refundSparksToProfile,
+  refundSparksWithDatabase,
   spendSparksFromProfile,
   spendSparksWithDatabase,
 };

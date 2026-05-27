@@ -6,7 +6,8 @@
     "start": "node server.js",
     "test": "node --test",
     "check": "node --check server.js && node --test",
-    "db:migrate": "psql $DATABASE_URL -f schema.sql"
+    "db:schema": "psql $DATABASE_URL -f schema.sql",
+    "db:migrate": "node scripts/run-migrations.js"
   },
   "dependencies": {
     "express": "^4.21.0",

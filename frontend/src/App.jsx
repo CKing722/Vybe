@@ -79,6 +79,9 @@ menu:<svg viewBox="0 0 24 24" style={p}><line x1="3" y1="6" x2="21" y2="6" strok
 lock:<svg viewBox="0 0 24 24" style={p}><rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke={c} strokeWidth="1.5"/><path d="M8 11V7a4 4 0 018 0v4" fill="none" stroke={c} strokeWidth="1.5"/><circle cx="12" cy="16" r="1.5" fill={c}/></svg>,
 id:<svg viewBox="0 0 24 24" style={p}><rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke={c} strokeWidth="1.5"/><circle cx="8" cy="11" r="2.5" fill="none" stroke={c} strokeWidth="1.2"/><line x1="15" y1="9" x2="20" y2="9" stroke={c} strokeWidth="1.2" strokeLinecap="round"/><line x1="15" y1="12" x2="20" y2="12" stroke={c} strokeWidth="1.2" strokeLinecap="round"/></svg>,
 request:<svg viewBox="0 0 24 24" style={p}><path d="M12 2a7 7 0 017 7c0 3-2 5-3.5 6.5L12 19l-3.5-3.5C7 14 5 12 5 9a7 7 0 017-7z" fill="none" stroke={c} strokeWidth="1.5"/><circle cx="12" cy="9" r="2" fill={c} opacity=".6"/></svg>,
+heart:<svg viewBox="0 0 24 24" style={p}><path d="M12 21s-7-4.4-9.2-8.6C1.1 9 2.7 5.5 6.3 5.1c2-.2 3.5.8 4.4 2.1.9-1.3 2.4-2.3 4.4-2.1 3.6.4 5.2 3.9 3.5 7.3C16.8 16.6 12 21 12 21z" fill="none" stroke={c} strokeWidth="1.55" strokeLinejoin="round"/></svg>,
+thumbdown:<svg viewBox="0 0 24 24" style={p}><path d="M8 4h9a2 2 0 012 2v7a2 2 0 01-2 2h-3l-1.2 4.8a2 2 0 01-3.8-.4V15H6a2 2 0 01-2-2V7a3 3 0 013-3h1z" fill="none" stroke={c} strokeWidth="1.55" strokeLinejoin="round"/><path d="M8 4v11" stroke={c} strokeWidth="1.55" strokeLinecap="round"/></svg>,
+share:<svg viewBox="0 0 24 24" style={p}><circle cx="18" cy="5" r="3" fill="none" stroke={c} strokeWidth="1.5"/><circle cx="6" cy="12" r="3" fill="none" stroke={c} strokeWidth="1.5"/><circle cx="18" cy="19" r="3" fill="none" stroke={c} strokeWidth="1.5"/><path d="M8.7 10.7l6.6-4.4M8.7 13.3l6.6 4.4" fill="none" stroke={c} strokeWidth="1.5" strokeLinecap="round"/></svg>,
 bookmark:<svg viewBox="0 0 24 24" style={p}><path d="M5 3h14a1 1 0 011 1v17l-8-4-8 4V4a1 1 0 011-1z" fill="none" stroke={c} strokeWidth="1.5"/></svg>,
 eye:<svg viewBox="0 0 24 24" style={p}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" fill="none" stroke={c} strokeWidth="1.5"/><circle cx="12" cy="12" r="3" fill="none" stroke={c} strokeWidth="1.5"/></svg>,
 eyeoff:<svg viewBox="0 0 24 24" style={p}><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" fill="none" stroke={c} strokeWidth="1.5"/><line x1="1" y1="1" x2="23" y2="23" stroke={c} strokeWidth="1.5"/></svg>,
@@ -88,34 +91,35 @@ badge:<svg viewBox="0 0 24 24" style={p}><circle cx="12" cy="9" r="6" fill="none
 /* ═══ DATA — 80/20 Split, Earned Loyalty, "You Are Known" ═══ */
 const CATS=["All","Women","Men","Couples","Trans","Interactive","Solo","Fetish","VIP","New","Trending","Roleplay","Toys","HD"];
 const PERFS=[
-  {id:"luna",name:"Luna Voss",vibe:"Sultry game show host energy",viewers:342,game:"Tease Trivia",level:"hot",tags:["Interactive","Toys","HD"],accent:"#ff2d78",rating:4.9,sessions:1247,cats:["Women","Interactive","HD","Trending"],
-    caps:{duo:true,toys:true,replay:true,wardrobe:true,maxMins:60,games:["trivia","spin","truth","hotseat","clash","auction","king","mystery","ladder","buzz","jackpot"]},
+  {id:"luna",name:"Luna Voss",vibe:"Sultry game show host energy",viewers:342,game:"Vybe Mansion",level:"hot",tags:["Interactive","Toys","HD"],accent:"#ff2d78",rating:4.9,sessions:1247,cats:["Women","Interactive","HD","Trending"],
+    caps:{duo:true,toys:true,replay:true,wardrobe:true,maxMins:60,games:["mansion","trivia","spin","truth","hotseat","clash","auction","king","mystery","ladder","buzz","jackpot"],battles:["neon-royale","gacha-vault","rhythm-pulse","boss-raid"]},
     bio:"Your favorite late-night game host. I compete — come ready to play or ready to lose.",sub:{price:29.99,trial:7},
     schedule:[{day:"Mon",time:"9PM"},{day:"Wed",time:"10PM"},{day:"Fri",time:"9PM"},{day:"Sat",time:"11PM"}],stats:{hoursLive:2840,followers:12400},
     requests:[{name:"Song & Vibe",sparks:150,desc:"She plays your song"},{name:"Outfit Choice",sparks:250,desc:"Pick her wardrobe"},{name:"Personal Shoutout",sparks:400,desc:"Your name on camera"},{name:"Custom Dare",sparks:500,desc:"You write the dare"},{name:"Game Master",sparks:750,desc:"You control 5 min"},{name:"Fantasy Intro",sparks:1000,desc:"Custom roleplay opening"},{name:"Exclusive Content",sparks:2000,desc:"Custom set for you"},{name:"Ultimate Fantasy",sparks:5000,desc:"You design it, she delivers"}],
     posts:[{text:"Tonight's trivia: spicy confessions. Bring it.",time:"2h"},{text:"New wardrobe drop — subs get first look.",time:"1d"},{text:"5-game win streak. Who's dethroning me?",time:"3d"}]},
   {id:"ari",name:"Ari Vale",vibe:"High-energy pop culture queen",viewers:218,game:"Spin & Sin",level:"rising",tags:["Solo","HD"],accent:"#ffab00",rating:4.8,sessions:894,cats:["Women","Solo","New","HD"],
-    caps:{duo:false,toys:true,replay:false,wardrobe:true,maxMins:45,games:["trivia","spin","hotseat","clash","buzz"]},sub:{price:19.99,trial:0},
+    caps:{duo:false,toys:true,replay:false,wardrobe:true,maxMins:45,games:["trivia","spin","hotseat","clash","buzz"],battles:["rhythm-pulse","kart-heat","puzzle-fever"]},sub:{price:19.99,trial:0},
     requests:[{name:"Song & Vibe",sparks:100,desc:"Your song, her mood"},{name:"Custom Dare",sparks:400,desc:"You write it"},{name:"Shoutout",sparks:300,desc:"On camera callout"}],
     schedule:[{day:"Tue",time:"8PM"},{day:"Thu",time:"9PM"},{day:"Sat",time:"10PM"}],stats:{hoursLive:1200,followers:6800},posts:[{text:"Going live tonight — bring your A-game.",time:"4h"}]},
   {id:"nia",name:"Nia Stone",vibe:"Luxury VIP slow-burn specialist",viewers:156,game:"Fantasy Auction",level:"warm",tags:["VIP","Roleplay"],accent:"#00d4ff",rating:4.9,sessions:1560,cats:["Women","VIP","Roleplay"],
-    caps:{duo:true,toys:true,replay:true,wardrobe:true,maxMins:60,games:["trivia","truth","auction","mystery","ladder"]},sub:{price:34.99,trial:7},
+    caps:{duo:true,toys:true,replay:true,wardrobe:true,maxMins:60,games:["mansion","trivia","truth","auction","mystery","ladder"],battles:["suite-heist","gacha-vault","season-pass"]},sub:{price:34.99,trial:7},
     requests:[{name:"Outfit Choice",sparks:300,desc:"Pick from collection"},{name:"Fantasy Intro",sparks:1500,desc:"Full scenario"},{name:"Ultimate Fantasy",sparks:5000,desc:"The works"}],
     schedule:[{day:"Wed",time:"9PM"},{day:"Fri",time:"10PM"},{day:"Sun",time:"8PM"}],stats:{hoursLive:3200,followers:15600},posts:[{text:"VIP night tomorrow. Limited spots.",time:"6h"}]},
   {id:"jade",name:"Jade Kincaid",vibe:"Competitive trash-talk champion",viewers:489,game:"King of the Hill",level:"finale",tags:["Interactive","Trending"],accent:"#c6ff00",rating:4.7,sessions:2103,cats:["Women","Interactive","Trending","Fetish"],
-    caps:{duo:false,toys:false,replay:true,wardrobe:false,maxMins:45,games:["trivia","hotseat","clash","king","buzz","jackpot"]},sub:{price:14.99,trial:0},
+    caps:{duo:false,toys:false,replay:true,wardrobe:false,maxMins:45,games:["trivia","hotseat","clash","king","buzz","jackpot"],battles:["arena-draft","neon-royale","kart-heat"]},sub:{price:14.99,trial:0},
     requests:[{name:"Game Master",sparks:500,desc:"You pick the games"},{name:"Custom Dare",sparks:600,desc:"Push her limits"}],
     schedule:[{day:"Mon",time:"10PM"},{day:"Thu",time:"9PM"},{day:"Sat",time:"11PM"}],stats:{hoursLive:4100,followers:22000},posts:[{text:"King of the Hill tournament tonight.",time:"1h"}]},
   {id:"raven",name:"Raven Blackwell",vibe:"Dark mystery & dare master",viewers:267,game:"Dare Ladder",level:"hot",tags:["Fetish","Roleplay"],accent:"#8b5cf6",rating:4.8,sessions:987,cats:["Women","Fetish","Roleplay","Toys"],
-    caps:{duo:true,toys:true,replay:false,wardrobe:true,maxMins:60,games:["truth","mystery","ladder","spin","auction"]},sub:{price:24.99,trial:7},
+    caps:{duo:true,toys:true,replay:false,wardrobe:true,maxMins:60,games:["mansion","truth","mystery","ladder","spin","auction"],battles:["guild-rush","boss-raid","suite-heist"]},sub:{price:24.99,trial:7},
     requests:[{name:"Fantasy Intro",sparks:1200,desc:"Dark roleplay"},{name:"Exclusive Content",sparks:2500,desc:"Custom, your theme"},{name:"Ultimate Fantasy",sparks:5000,desc:"Full immersion"}],
     schedule:[{day:"Tue",time:"11PM"},{day:"Fri",time:"10PM"}],stats:{hoursLive:1800,followers:9500},posts:[{text:"New dare deck unlocked. Subs only.",time:"5h"}]},
   {id:"kai",name:"Kai Mercer",vibe:"Smooth-talking couples host",viewers:178,game:"Card Clash",level:"rising",tags:["Couples","Interactive"],accent:"#f97316",rating:4.6,sessions:654,cats:["Men","Couples","Interactive"],
-    caps:{duo:true,toys:false,replay:true,wardrobe:false,maxMins:30,games:["trivia","clash","king","buzz"]},sub:{price:14.99,trial:0},
+    caps:{duo:true,toys:false,replay:true,wardrobe:false,maxMins:30,games:["trivia","clash","king","buzz"],battles:["craft-fantasy","guild-rush","puzzle-fever"]},sub:{price:14.99,trial:0},
     requests:[{name:"Shoutout",sparks:200,desc:"On camera callout"},{name:"Game Master",sparks:400,desc:"You run the games"}],
     schedule:[{day:"Wed",time:"9PM"},{day:"Sat",time:"10PM"}],stats:{hoursLive:900,followers:4200},posts:[{text:"Couples night Wednesday.",time:"1d"}]},
 ];
 const GAMES=[
+  {id:"mansion",name:"Vybe Mansion",icon:"mystery",desc:"AI-hosted mystery battle for 200 viewers: factions, toy artifacts, room control, sabotage, clues, and a cinematic reveal.",color:"#ff8aa8",type:"mansion"},
   {id:"trivia",name:"Desire Read",icon:"brain",desc:"Patrons predict her preference; correct answers raise room heat.",color:"#c6ff00",type:"trivia"},
   {id:"spin",name:"Velvet Dial",icon:"wheel",desc:"A cinematic mood selector with performer-approved outcomes.",color:"#ff2d78",type:"wheel"},
   {id:"truth",name:"Confession Gate",icon:"target",desc:"The room votes on polished, consent-safe prompts.",color:"#00d4ff",type:"binary"},
@@ -172,6 +176,7 @@ const FBQ=[{q:"What makes anticipation more exciting than the reward itself?",op
 const WSEGS=["Reveal +1","Dare Card","Bonus Sparks","Wildcard","Tease Moment","Mystery Gift","Double Down","Reset"];
 const TDC=[{t:"Truth",x:"Most daring thing you've done on camera?"},{t:"Dare",x:"Slow dance for 30 seconds."},{t:"Truth",x:"Biggest turn-on that surprises people?"},{t:"Dare",x:"Whisper something seductive to camera."},{t:"Truth",x:"When did you feel most desired?"},{t:"Dare",x:"Show your most confident pose."},{t:"Truth",x:"Ideal intimate evening in 3 words?"},{t:"Dare",x:"Most seductive look for 10 seconds."},{t:"Truth",x:"One thing you've never told a viewer?"},{t:"Dare",x:"Move like nobody's watching, 15 seconds."}];
 const GAME_ECON={
+  mansion:{power:35,accuse:75,reward:250,label:"battle move"},
   trivia:{miss:5,reward:15,label:"answer"},
   wheel:{stake:25,reward:75,label:"spin"},
   binary:{prompt:0,reward:0,label:"prompt"},
@@ -188,6 +193,7 @@ const GAME_ECON={
 const fsn=n=>(Number(n)||0).toLocaleString();
 const gameEconomyLine=type=>{
   const e=GAME_ECON[type]||GAME_ECON.trivia;
+  if(type==="mansion")return `Free faction play / ${fsn(e.power)} power move / ${fsn(e.accuse)} accusation`;
   if(type==="auction")return "Escrow bid / +1 raise";
   if(type==="ladder")return "Escalating risk / bank anytime";
   if(type==="touch")return `Free draw / ${fsn(e.submit)} submit`;
@@ -224,6 +230,200 @@ const AUCTION_TIERS=[
   {min:10000,label:"Signature Jackpot",reward:"Exclusive post-show follow-up plus premium room credit if accepted."}
 ];
 const auctionTier=bid=>AUCTION_TIERS.filter(t=>bid>=t.min).slice(-1)[0]||AUCTION_TIERS[0];
+const MANSION_ROOMS=[
+  {id:"mirror",name:"Mirror Suite",tone:"#ff8aa8",glyph:"MS"},
+  {id:"vault",name:"Toy Vault",tone:"#fbbf24",glyph:"TV"},
+  {id:"shower",name:"Neon Shower",tone:"#00d4ff",glyph:"NS"},
+  {id:"lounge",name:"Champagne Lounge",tone:"#c6ff00",glyph:"CL"},
+  {id:"dungeon",name:"Dungeon Hall",tone:"#8b5cf6",glyph:"DH"},
+  {id:"dressing",name:"Dressing Room",tone:"#f472b6",glyph:"DR"},
+  {id:"afterparty",name:"Afterparty Suite",tone:"#f97316",glyph:"AS"},
+  {id:"balcony",name:"Velvet Balcony",tone:"#34d399",glyph:"VB"}
+];
+const MANSION_TOYS=[
+  {id:"rose_wand",name:"Rose Wand",power:"reveals hidden emotional clues",tone:"#ff2d78"},
+  {id:"pulse_ring",name:"Pulse Ring",power:"doubles speed votes",tone:"#00d4ff"},
+  {id:"velvet_rabbit",name:"Velvet Rabbit",power:"opens secret room animations",tone:"#f472b6"},
+  {id:"crystal_plug",name:"Crystal Plug",power:"protects a faction from sabotage",tone:"#8b5cf6"},
+  {id:"remote_bullet",name:"Remote Bullet",power:"triggers a surprise surge",tone:"#f97316"},
+  {id:"golden_toy",name:"Golden Toy",power:"turns the reveal into a premium unlock",tone:"#fbbf24"}
+];
+const MANSION_SCENARIOS=["Midnight Tease","Mirror Command","Velvet Lock-In","Afterparty Secret","Champagne Dare","Neon Confession"];
+const MANSION_MOTIVES=["Jealous Rivalry","Stolen Spotlight","Secret Tribute","Crown Challenge","Locked Desire","Collector's Bet"];
+const MANSION_FACTIONS=[
+  {id:"voyeurs",name:"Voyeurs",boost:"see clues first",color:"#00d4ff"},
+  {id:"teasers",name:"Teasers",boost:"double late votes",color:"#ff2d78"},
+  {id:"collectors",name:"Collectors",boost:"hoard rare toys",color:"#fbbf24"},
+  {id:"saboteurs",name:"Saboteurs",boost:"jam rival scans",color:"#8b5cf6"},
+  {id:"devoted",name:"Devoted",boost:"defend room control",color:"#22c55e"}
+];
+const MANSION_NAMES=["VelvetKing","DiamondJay","AceHigh","NightOwl","xShadowx","SilkSignal","CrownPulse","NeonSaint","SuiteSeven","AfterDark","GlassKey","ChampagneAce","VaultRunner","RoseCipher","HeatIndex","LoyalGhost"];
+const MANSION_EVENTS=[
+  "forced a false clue into the room feed",
+  "stole thirty seconds of room control",
+  "won a speed scan against three rivals",
+  "burned a decoy and exposed a cleaner trail",
+  "blocked a sabotage card with a shield token",
+  "triggered a Vybe Surge in the mansion feed",
+  "moved the crowd toward the final accusation",
+  "split the room vote with a fake artifact"
+];
+const mansionPick=a=>a[Math.floor(Math.random()*a.length)];
+const mansionShuffle=a=>[...a].sort(()=>Math.random()-.5);
+const mansionCaseId=()=>`Case ${String(Math.floor(100+Math.random()*900))}`;
+const mansionDefaultGuess=()=>({
+  roomId:MANSION_ROOMS[0].id,
+  toyId:MANSION_TOYS[0].id,
+  scenario:MANSION_SCENARIOS[0],
+  motive:MANSION_MOTIVES[0]
+});
+const mansionMakeGuess=(solution,bias=.28)=>({
+  roomId:Math.random()<bias?solution.room.id:mansionPick(MANSION_ROOMS).id,
+  toyId:Math.random()<bias?solution.toy.id:mansionPick(MANSION_TOYS).id,
+  scenario:Math.random()<bias?solution.scenario:mansionPick(MANSION_SCENARIOS),
+  motive:Math.random()<bias?solution.motive:mansionPick(MANSION_MOTIVES)
+});
+const mansionScoreGuess=(guess,solution)=>[
+  guess?.roomId===solution.room.id,
+  guess?.toyId===solution.toy.id,
+  guess?.scenario===solution.scenario,
+  guess?.motive===solution.motive
+].filter(Boolean).length;
+const mansionGuessText=guess=>{
+  const room=MANSION_ROOMS.find(r=>r.id===guess?.roomId)?.name||"Unknown Room";
+  const toy=MANSION_TOYS.find(t=>t.id===guess?.toyId)?.name||"Unknown Toy";
+  return `${room} / ${toy} / ${guess?.scenario||"Unknown Scenario"} / ${guess?.motive||"Unknown Motive"}`;
+};
+const makeMansionContestants=(factions=MANSION_FACTIONS)=>mansionShuffle(MANSION_NAMES).slice(0,12).map((name,i)=>{
+  const f=factions[i%factions.length];
+  return {name,faction:f.id,score:Math.floor(680+Math.random()*1640),status:i<3?"hot":"live"};
+}).sort((a,b)=>b.score-a.score);
+const makeMansionCase=()=>{
+  const room=mansionPick(MANSION_ROOMS),toy=mansionPick(MANSION_TOYS),scenario=mansionPick(MANSION_SCENARIOS),motive=mansionPick(MANSION_MOTIVES);
+  const id=mansionCaseId();
+  const memberSplit=mansionShuffle([35,38,40,42,45]);
+  const factions=MANSION_FACTIONS.map((f,i)=>({...f,score:Math.floor(620+Math.random()*760+i*35),members:memberSplit[i],surge:Math.floor(18+Math.random()*44)}));
+  const solution={room,toy,scenario,motive};
+  const decoyRoom=mansionPick(MANSION_ROOMS.filter(r=>r.id!==room.id));
+  const decoyToy=mansionPick(MANSION_TOYS.filter(t=>t.id!==toy.id));
+  const rooms=mansionShuffle(MANSION_ROOMS).map((r,i)=>({...r,heat:Math.floor(28+Math.random()*58),scans:0,control:factions[i%factions.length].id}));
+  const clues=mansionShuffle([
+    {truth:true,text:`A clean trace points toward the ${room.name}.`,tag:"room"},
+    {truth:true,text:`The artifact signature matches the ${toy.name}: it ${toy.power}.`,tag:"toy"},
+    {truth:true,text:`The AI host tags the scenario as ${scenario}.`,tag:"scenario"},
+    {truth:true,text:`The motive profile reads ${motive}.`,tag:"motive"},
+    {truth:false,text:`A rival faction is loudly pushing ${decoyRoom.name}.`,tag:"decoy"},
+    {truth:false,text:`A corrupted scan keeps flashing ${decoyToy.name}.`,tag:"decoy"},
+    {truth:false,text:"Two contestants are boosting fake evidence to split the final vote.",tag:"sabotage"},
+    {truth:false,text:"The Toy Vault camera dropped five seconds during the first surge.",tag:"noise"}
+  ]);
+  return {
+    id,
+    solution,
+    rooms,
+    factions,
+    leaders:makeMansionContestants(factions),
+    clues,
+    revealedClues:clues.slice(0,1),
+    tick:0,
+    log:[`AI Host opened ${id} for 200 simulated viewers.`],
+    revealed:false,
+    result:null
+  };
+};
+const LOBBY_BATTLE_GAMES=[
+  {id:"neon-royale",name:"Neon Royale",archetype:"Battle royale",icon:"target",color:"#ff2d78",entry:25,moveCost:15,rewardCap:180,returnRate:.54,houseHold:24,creatorPool:22,players:200,mode:"Elimination",inspired:"Fortnite / PUBG scale: fast rounds, visible status, last squad energy.",hook:"Factions drop into a neon club district and fight for final spotlight control.",visual:"Storm shutters, shard trails, crowd heat meter",teams:["Rose Squad","Velvet Ops","Afterdark Unit","Crownline"]},
+  {id:"guild-rush",name:"Guild Rush",archetype:"Clan strategy",icon:"shield",color:"#22c55e",entry:20,moveCost:10,rewardCap:140,returnRate:.52,houseHold:26,creatorPool:24,players:180,mode:"Team War",inspired:"Clash-style clans: team identity, recurring wars, donation pressure.",hook:"Viewer guilds raid fantasy lounges and stack tribute towers before the timer ends.",visual:"Territory beams, banner captures, treasury pulse",teams:["Devoted","Collectors","Saboteurs","Teasers"]},
+  {id:"gacha-vault",name:"Gacha Vault",archetype:"Collection RPG",icon:"diamond",color:"#fbbf24",entry:50,moveCost:25,rewardCap:300,returnRate:.48,houseHold:30,creatorPool:22,players:160,mode:"Draft Chase",inspired:"Gacha RPGs: collection desire, rarity reveals, limited-time vaults.",hook:"Teams draft toy artifacts, chase rare vault keys, and cash out only capped bonus rewards.",visual:"Rarity cards, prism cuts, vault unlock cinematic",teams:["Keyholders","Rose Court","Crystal Line","Gold Room"]},
+  {id:"puzzle-fever",name:"Puzzle Fever",archetype:"Puzzle king",icon:"cards",color:"#c6ff00",entry:0,moveCost:5,rewardCap:0,returnRate:0,houseHold:0,creatorPool:0,players:220,mode:"Free Skill",inspired:"Tetris / Candy Crush staying power: simple input, endless mastery, low friction.",hook:"The lobby races to chain symbols and raise performer room heat without paid entry.",visual:"Tile cascades, combo streaks, clean readable bursts",teams:["Combo Pink","Combo Cyan","Combo Gold","Combo Green"]},
+  {id:"suite-heist",name:"Suite Heist",archetype:"Open-world crew",icon:"key",color:"#8b5cf6",entry:35,moveCost:20,rewardCap:220,returnRate:.5,houseHold:28,creatorPool:22,players:190,mode:"Crew Score",inspired:"GTA-style persistence: crews, missions, flexible chaos, social status.",hook:"Crews steal invitation keys from luxury suites and escape with the highest influence score.",visual:"Blueprint overlays, laser grids, getaway streaks",teams:["Glass Keys","Night Drivers","Vault Roses","Silk Masks"]},
+  {id:"kart-heat",name:"Kart Heat",archetype:"Party race",icon:"wheel",color:"#00d4ff",entry:15,moveCost:8,rewardCap:90,returnRate:.57,houseHold:22,creatorPool:21,players:200,mode:"Boost Race",inspired:"Mario Kart durability: readable chaos, comeback items, party rivalry.",hook:"Viewer teams race around performer rooms, throwing boost cards and stealing final lap control.",visual:"Track ribbons, boost sparks, photo-finish flash",teams:["Neon Wheels","Champagne Drift","Velvet Boost","Crown Lap"]},
+  {id:"arena-draft",name:"Arena Draft",archetype:"MOBA draft",icon:"kinghill",color:"#06b6d4",entry:30,moveCost:15,rewardCap:200,returnRate:.51,houseHold:27,creatorPool:22,players:200,mode:"Draft Battle",inspired:"League / Honor of Kings: roles, counter-picks, team fight drama.",hook:"Five factions draft roles around the performer fantasy and clash in timed team fights.",visual:"Role cards, lane surges, ultimate reveal",teams:["Charm Lane","Control Lane","Burst Lane","Guard Lane"]},
+  {id:"craft-fantasy",name:"Craft Fantasy",archetype:"Sandbox build",icon:"gear",color:"#f97316",entry:0,moveCost:5,rewardCap:0,returnRate:0,houseHold:0,creatorPool:0,players:240,mode:"Free Build",inspired:"Minecraft scale: creativity, persistence, social servers.",hook:"The lobby collaboratively builds a fantasy set; winners earn public credit, not spark payouts.",visual:"Modular blocks, room blueprints, creator plaque",teams:["Set Builders","Lighting Crew","Prop Makers","Mood Board"]},
+  {id:"boss-raid",name:"Boss Raid",archetype:"MMO raid",icon:"flame",color:"#f472b6",entry:40,moveCost:20,rewardCap:240,returnRate:.49,houseHold:29,creatorPool:22,players:200,mode:"Co-op Raid",inspired:"World of Warcraft / Monster Hunter: big shared boss, roles, timed burn phase.",hook:"All viewers damage a fantasy boss; top contributors fight for capped bonus rewards and badges.",visual:"Boss health gates, role markers, finale blast",teams:["Pulse Healers","Rose DPS","Vault Tanks","Charm Callers"]},
+  {id:"rhythm-pulse",name:"Rhythm Pulse",archetype:"Rhythm social",icon:"tap",color:"#ffab00",entry:10,moveCost:5,rewardCap:60,returnRate:.6,houseHold:20,creatorPool:20,players:210,mode:"Sync Chain",inspired:"Music/rhythm games: flow state, streaks, spectator readability.",hook:"Viewers tap synchronized pulse windows to build a room-wide heat chain.",visual:"Beat lanes, waveform cuts, perfect-chain shimmer",teams:["On Beat","Afterbeat","Silk Tempo","Gold Sync"]},
+  {id:"season-pass",name:"Season Crown",archetype:"Season ladder",icon:"crown",color:"#fbbf24",entry:75,moveCost:35,rewardCap:420,returnRate:.46,houseHold:32,creatorPool:22,players:150,mode:"Premium Ladder",inspired:"Battle passes: progression, urgency, cosmetics, recurring identity.",hook:"A premium nightly ladder where entry funds creator pool, platform reserve, and capped bonus prizes.",visual:"Crown tiers, prestige runway, season badge reveal",teams:["Obsidian","Platinum","Ruby","Electric"]},
+];
+const LOBBY_BATTLE_EVENTS=[
+  "won a timing window and stole momentum",
+  "triggered a crowd boost across the lobby",
+  "blocked a rival lane with a shield play",
+  "hit a rare combo and lifted the reward meter",
+  "claimed a room-control objective",
+  "baited two factions into spending early",
+  "forced a sudden-death lane",
+  "sniped the final objective with one second left"
+];
+const LOBBY_BATTLE_NAMES=["VelvetKing","DiamondJay","AceHigh","NightOwl","xShadowx","SilkSignal","CrownPulse","NeonSaint","SuiteSeven","AfterDark","GlassKey","ChampagneAce","VaultRunner","RoseCipher","HeatIndex","LoyalGhost","PulseMaven","GoldTrace","VibePilot","FinalTell"];
+const lobbyPick=a=>a[Math.floor(Math.random()*a.length)];
+const makeLobbyBattleRound=(game,hostName="Lobby")=>{
+  const teams=game.teams.map((name,i)=>({name,score:Math.floor(420+Math.random()*760+i*35),heat:Math.floor(24+Math.random()*48),color:i===0?game.color:["#00d4ff","#ffab00","#8b5cf6","#22c55e"][i%4]}));
+  const leaders=LOBBY_BATTLE_NAMES.slice().sort(()=>Math.random()-.5).slice(0,8).map((name,i)=>({name,score:Math.floor(360+Math.random()*940),team:teams[i%teams.length].name,status:i<2?"hot":"live"})).sort((a,b)=>b.score-a.score);
+  return {teams,leaders,tick:0,log:[`${hostName==="Lobby"?"AI Host":hostName} opened ${game.name} for ${game.players} lobby viewers.`],finished:false,winner:null};
+};
+const lobbyRewardForGame=game=>game.entry>0?Math.min(game.rewardCap,Math.floor(game.entry*game.players*game.returnRate/Math.max(8,Math.ceil(game.players/18)))):0;
+const lobbyUsdHint=sparks=>`~$${((Number(sparks)||0)*0.1).toFixed(2)}`;
+const lobbyBattleById=id=>LOBBY_BATTLE_GAMES.find(g=>g.id===id);
+const performerLobbyBattles=perf=>(perf?.caps?.battles||[]).map(lobbyBattleById).filter(Boolean);
+const BATTLE_MOVE_LIBRARY={
+  "neon-royale":[
+    {id:"flank",label:"Flank Spotlight",intent:"+pressure, low risk",gain:150,risk:.08,target:-35,cost:0,copy:"cuts through the neon crowd and steals final-circle position"},
+    {id:"decoy",label:"Drop Decoy Heat",intent:"slow target",gain:80,risk:.18,target:-135,cost:0,copy:"throws a decoy tease into a rival lane"},
+    {id:"surge",label:"Premium Surge",intent:"big push",gain:270,risk:.24,target:-60,paid:true,copy:"buys a premium surge and forces the room camera toward your squad"}
+  ],
+  "guild-rush":[
+    {id:"banner",label:"Raise Guild Banner",intent:"team boost",gain:135,risk:.06,target:0,cost:0,copy:"rallies your guild banner and stacks devotion pressure"},
+    {id:"tribute",label:"Steal Tribute",intent:"drain rival",gain:120,risk:.22,target:-150,cost:0,copy:"siphons tribute from a rival lounge tower"},
+    {id:"fortify",label:"Fortify Lounge",intent:"safe paid hold",gain:220,risk:.12,target:-40,paid:true,copy:"locks the guild lounge and converts defense into score"}
+  ],
+  "gacha-vault":[
+    {id:"rare-key",label:"Draft Rare Key",intent:"high rarity chase",gain:310,risk:.42,target:0,cost:0,fail:35,copy:"chases a rare toy artifact key in the vault"},
+    {id:"set-bonus",label:"Complete Set Bonus",intent:"steady combo",gain:170,risk:.12,target:0,cost:0,copy:"completes a velvet artifact set for a clean bonus"},
+    {id:"vault-lock",label:"Lock Rival Vault",intent:"paid denial",gain:210,risk:.2,target:-180,paid:true,copy:"locks a rival vault door before their reveal lands"}
+  ],
+  "puzzle-fever":[
+    {id:"chain",label:"Chain Symbols",intent:"combo build",gain:120,risk:.05,target:0,cost:0,copy:"chains matching symbols and raises the room heat"},
+    {id:"swap",label:"Swap Desire Tile",intent:"targeted setup",gain:95,risk:.08,target:-55,cost:0,copy:"swaps a desire tile to break a rival combo"},
+    {id:"wild",label:"Wild Tile",intent:"small spark boost",gain:190,risk:.2,target:0,paid:true,copy:"drops a wild tile into the shared board"}
+  ],
+  "suite-heist":[
+    {id:"case",label:"Scout Invitation Case",intent:"intel",gain:115,risk:.07,target:0,cost:0,copy:"scouts the invitation case and marks the cleanest escape"},
+    {id:"laser",label:"Cut Laser Grid",intent:"risky score",gain:260,risk:.34,target:0,cost:0,fail:45,copy:"cuts through the suite laser grid for an invitation key"},
+    {id:"getaway",label:"Fund Getaway",intent:"paid escape",gain:280,risk:.18,target:-90,paid:true,copy:"funds a getaway route before the rival crew can react"}
+  ],
+  "kart-heat":[
+    {id:"drift",label:"Perfect Drift",intent:"steady lap",gain:120,risk:.08,target:0,cost:0,copy:"hits a perfect drift around the velvet track"},
+    {id:"boost",label:"Boost Steal",intent:"comeback",gain:170,risk:.2,target:-80,cost:0,copy:"steals a boost card on the final curve"},
+    {id:"photo",label:"Photo Finish Push",intent:"paid burst",gain:240,risk:.24,target:-40,paid:true,copy:"buys a last-lap burst and forces a photo finish"}
+  ],
+  "arena-draft":[
+    {id:"counter",label:"Counter-Pick Role",intent:"beats target",gain:155,risk:.1,target:-85,cost:0,copy:"counter-picks the rival role before the team fight"},
+    {id:"lane",label:"Win Charm Lane",intent:"lane pressure",gain:145,risk:.16,target:0,cost:0,copy:"wins a lane trade and rotates into the fantasy clash"},
+    {id:"ultimate",label:"Cast Ultimate",intent:"paid team fight",gain:290,risk:.28,target:-110,paid:true,copy:"casts a premium ultimate and swings the team fight"}
+  ],
+  "craft-fantasy":[
+    {id:"block",label:"Place Mood Block",intent:"build score",gain:110,risk:.04,target:0,cost:0,copy:"places a mood block into the shared fantasy set"},
+    {id:"blueprint",label:"Claim Blueprint",intent:"shape the room",gain:140,risk:.12,target:-35,cost:0,copy:"claims the blueprint wall before another crew can"},
+    {id:"spotlight",label:"Light the Set",intent:"spark accent",gain:185,risk:.18,target:0,paid:true,copy:"lights the fantasy set with a premium color pass"}
+  ],
+  "boss-raid":[
+    {id:"mark",label:"Mark Weak Point",intent:"team damage",gain:135,risk:.07,target:0,cost:0,copy:"marks a boss weak point for the raid"},
+    {id:"shield",label:"Shield Burn Phase",intent:"safe role",gain:120,risk:.04,target:-60,cost:0,copy:"shields the burn phase and protects your role stack"},
+    {id:"finisher",label:"Premium Finisher",intent:"paid burst",gain:310,risk:.3,target:0,paid:true,copy:"fires a premium finisher during the boss burn"}
+  ],
+  "rhythm-pulse":[
+    {id:"tap",label:"Perfect Tap",intent:"streak",gain:120,risk:.06,target:0,cost:0,copy:"hits the pulse window and keeps the chain alive"},
+    {id:"sync",label:"Sync With Host",intent:"heat lift",gain:155,risk:.14,target:0,cost:0,copy:"syncs with the host rhythm and lifts room heat"},
+    {id:"remix",label:"Premium Remix",intent:"paid chain",gain:230,risk:.22,target:-55,paid:true,copy:"drops a premium remix into the beat lane"}
+  ],
+  "season-pass":[
+    {id:"quest",label:"Complete Night Quest",intent:"ladder climb",gain:145,risk:.08,target:0,cost:0,copy:"completes a season quest and climbs the crown ladder"},
+    {id:"rival",label:"Challenge Rival Tier",intent:"rank steal",gain:180,risk:.26,target:-120,cost:0,copy:"challenges a rival tier for premium status"},
+    {id:"prestige",label:"Buy Prestige Push",intent:"paid status",gain:330,risk:.28,target:-70,paid:true,copy:"buys a prestige push toward the crown reveal"}
+  ]
+};
+const battleMovesForGame=game=>BATTLE_MOVE_LIBRARY[game.id]||BATTLE_MOVE_LIBRARY["neon-royale"];
+const battleOtherTeam=(teams,name)=>teams.find(t=>t.name!==name)?.name||teams[0]?.name||"Rival";
 const requestPalette=name=>{
   const n=(name||"").toLowerCase();
   if(n.includes("ultimate"))return {a:"#fbbf24",b:"#8b5cf6",c:"#ff2d78",label:"signature"};
@@ -272,10 +472,28 @@ body,#root{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:va
 @keyframes rainDown{0%{opacity:1;transform:translateY(-20px)}100%{opacity:0;transform:translateY(60px)}}
 @keyframes drift{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-12px,0)}}
 @keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+@keyframes battleGrid{0%{background-position:0 0,0 0}100%{background-position:38px 38px,-38px 0}}
+@keyframes battleSweep{0%{transform:translateX(-120%) skewX(-18deg);opacity:0}18%{opacity:.72}72%{opacity:.46}100%{transform:translateX(120%) skewX(-18deg);opacity:0}}
+@keyframes battleShard{0%,100%{transform:translate3d(0,0,0) rotate(0deg);opacity:.34}50%{transform:translate3d(0,-14px,0) rotate(7deg);opacity:.82}}
+@keyframes battleMeter{0%,100%{filter:brightness(1)}50%{filter:brightness(1.32)}}
+@keyframes storySweep{0%{transform:translateX(-55%) skewX(-14deg);opacity:.08}36%{opacity:.58}100%{transform:translateX(55%) skewX(-14deg);opacity:.16}}
+@keyframes orbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes vaultFlip{0%,100%{transform:rotateY(-16deg) translateY(0)}50%{transform:rotateY(18deg) translateY(-10px)}}
+@keyframes laneRun{0%{transform:translateX(-20%)}100%{transform:translateX(115%)}}
+@keyframes tilePop{0%,100%{transform:scale(.94);opacity:.72}50%{transform:scale(1.06);opacity:1}}
+@keyframes crownRise{0%,100%{transform:translateY(8px) scale(.96)}50%{transform:translateY(-8px) scale(1.04)}}
 .ai{animation:fi .3s ease both}
 input[type=text],input[type=email],input[type=tel],input[type=password],select{background:var(--cd);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:8px 12px;font:inherit;outline:none;width:100%}input[type=text]:focus,input[type=email]:focus,input[type=tel]:focus,input[type=password]:focus,select:focus{border-color:var(--cy)}
 html{scroll-behavior:smooth}a{color:inherit;text-decoration:none}
 .pub-menu,.pub-actions{display:flex}.pub-hamb{display:none}
+.battle-card{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,background .22s ease}
+.battle-card:hover{transform:translateY(-3px);box-shadow:0 18px 46px rgba(0,0,0,.28)}
+.battle-stage-grid{background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:38px 38px;animation:battleGrid 9s linear infinite}
+.battle-action{transition:transform .16s ease,border-color .16s ease,background .16s ease}
+.battle-action:hover:not(:disabled){transform:translateY(-2px);border-color:rgba(255,255,255,.28)!important}
+.battle-scene{perspective:900px}
+.battle-scene-card{transform-style:preserve-3d}
+@media(max-width:760px){.battle-modal-panel{border-radius:14px!important}.battle-modal-body{--battle-body-columns:1fr;padding:10px!important;overflow-x:hidden!important}.battle-stage-grid{min-height:315px!important}.battle-core-card{left:14px!important;right:14px!important;width:auto!important;max-width:none!important;transform:translateY(-50%)!important;padding:14px!important}.battle-rule-grid,.battle-control-grid,.battle-team-grid{--battle-compact-columns:1fr}}
 @media(max-width:720px){.pub-menu,.pub-actions{display:none}.pub-hamb{display:grid}.pub-menu.open{display:grid;grid-template-columns:1fr;width:100%;gap:4px;order:3}.pub-actions.open{display:flex;width:100%;order:4}.pub-actions.open button{flex:1}.pub-nav-inner{display:grid!important;grid-template-columns:1fr auto!important}.hero-scene{opacity:.42;transform:translateX(24%) scale(.94);transform-origin:center right}}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}`;
 
@@ -302,7 +520,7 @@ const normalizeFrontendPerformer=p=>({
   rating:Number(p.rating||0),
   sessions:Number(p.sessions||0),
   cats:p.cats||p.categories||[],
-  caps:p.caps||{duo:false,toys:false,replay:false,wardrobe:false,maxMins:60,games:["trivia"]},
+  caps:{duo:false,toys:false,replay:false,wardrobe:false,maxMins:60,games:["trivia"],battles:["neon-royale","puzzle-fever"],...(p.caps||{})},
   bio:p.bio||"",
   sub:p.sub||p.subscription||{price:null,trial:0},
   schedule:p.schedule||[],
@@ -578,9 +796,11 @@ function BK({perf,sparks,pkgs,label,onOk,onClose}){const [pk,setPk]=useState(pkg
     </Pn></div>;}
 
 /* ═══ PERFORMER PROFILE ═══ */
-function PF({perf,user,onBack,onLive,onBook,onVip,onWallet}){
+function PF({perf,user,onBack,onLive,onBook,onVip,onWallet,onSC=()=>{}}){
   const [subbed,setSub]=useState(false);const tier=gl(user.spent);const canVip=user.spent>=1000;
   const avG=GAMES.filter(g=>perf.caps.games.includes(g.id));
+  const hostedBattles=performerLobbyBattles(perf);
+  const [battle,setBattle]=useState(null);
   return<div style={{minHeight:"100vh",background:"var(--bg)",padding:"12px clamp(10px,3vw,30px)"}}>
     <button onClick={onBack} style={{display:"flex",alignItems:"center",gap:5,background:"none",border:"none",color:"var(--mt)",cursor:"pointer",fontWeight:600,fontSize:".8rem",marginBottom:12}}><I n="back" s={14}/>Back</button>
     {/* Banner */}
@@ -618,6 +838,20 @@ function PF({perf,user,onBack,onLive,onBook,onVip,onWallet}){
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(125px,1fr))",gap:5,marginTop:6}}>
             {avG.map(g=><div key={g.id} style={{padding:"7px 9px",borderRadius:7,border:"1px solid var(--bd)"}}><div style={{display:"flex",alignItems:"center",gap:4}}><I n={g.icon} s={12} c={g.color}/><span style={{fontWeight:700,fontSize:".72rem"}}>{g.name}</span></div></div>)}</div>
         </div>
+        {/* Hosted lobby battles */}
+        <div style={{padding:16,border:"1px solid var(--bd)",borderRadius:12,background:"linear-gradient(135deg,rgba(255,45,120,.08),rgba(0,212,255,.04),rgba(255,255,255,.025))",marginBottom:12,overflow:"hidden",position:"relative"}}>
+          <div style={{position:"absolute",left:"-18%",top:14,width:"54%",height:34,background:"linear-gradient(90deg,transparent,rgba(255,45,120,.25),transparent)",animation:"battleSweep 5s ease-in-out infinite",pointerEvents:"none"}}/>
+          <div style={{position:"relative"}}><Kk>Hosted Lobby Battles ({hostedBattles.length})</Kk><Tt s="1rem">{perf.name.split(" ")[0]}'s room-to-lobby events</Tt>
+            <p style={{fontSize:".68rem",lineHeight:1.45,color:"var(--mt)",marginTop:3}}>These are performer-branded versions of the AI battles, so viewers can rally around a specific host while the game still simulates itself.</p>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))",gap:7,marginTop:10}}>
+              {hostedBattles.map(g=><button key={g.id} type="button" className="battle-card" onClick={()=>setBattle(g)} style={{minHeight:112,padding:10,borderRadius:9,border:`1px solid ${g.color}44`,background:`linear-gradient(150deg,${g.color}14,rgba(255,255,255,.035))`,color:"var(--tx)",textAlign:"left",cursor:"pointer"}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}><span style={{fontSize:".58rem",letterSpacing:".09em",textTransform:"uppercase",fontWeight:1000,color:g.color}}>{g.archetype}</span><I n={g.icon} s={15} c={g.color}/></div>
+                <div style={{fontSize:".82rem",fontWeight:1000,marginTop:7}}>{g.name}</div>
+                <div style={{display:"flex",justifyContent:"space-between",gap:8,marginTop:12,fontSize:".6rem",fontWeight:1000}}><span style={{color:g.entry?"var(--am)":"var(--gn)"}}>{g.entry?`${fsn(g.entry)} sparks`:"Free"}</span><span style={{color:"rgba(255,255,255,.5)"}}>{g.players} players</span></div>
+              </button>)}
+            </div>
+          </div>
+        </div>
         {/* Request Menu */}
         <div style={{padding:16,border:"1px solid var(--bd)",borderRadius:12,background:"var(--cd)",marginBottom:12}}>
           <Kk>Request Menu — Performer Priced</Kk><Tt s="1rem">Custom experiences only {perf.name.split(" ")[0]} offers</Tt>
@@ -653,11 +887,191 @@ function PF({perf,user,onBack,onLive,onBook,onVip,onWallet}){
         <Btn full primary onClick={onLive}><I n="eye" s={13} c="#fff" st={{marginRight:3}}/>Watch Live Now</Btn>
       </div>
     </div>
+    {battle&&<LobbyBattleHub game={battle} user={user} onSpend={onSC} performer={perf} onClose={()=>setBattle(null)}/>}
     <div style={{padding:10,borderTop:"1px solid var(--bd)",fontSize:".56rem",color:"var(--mt)",textAlign:"center",marginTop:10}}>VYBE Inc. · 18 USC §2257 workflow · 80/20 Performer Split · <a href="/terms" style={{color:"var(--cy)"}}>Terms</a> · <a href="/privacy" style={{color:"var(--cy)"}}>Privacy</a></div>
   </div>;}
 
-/* ═══ GAME ENGINE — 11 Unique Modes ═══ */
-function GE({game,onClose,onSB,sparks=0,onSpend=()=>{}}){
+function MansionBattle({onClose,sparks=0,onSpend=()=>{},userName="VelvetKing"}){
+  const [round,setRound]=useState(()=>makeMansionCase());
+  const [seconds,setSeconds]=useState(90);
+  const [selectedFaction,setSelectedFaction]=useState(MANSION_FACTIONS[0].id);
+  const [selectedRoom,setSelectedRoom]=useState(round.rooms[0]?.id||MANSION_ROOMS[0].id);
+  const [accusation,setAccusation]=useState(()=>mansionDefaultGuess());
+  const [submitted,setSubmitted]=useState(null);
+  const [notice,setNotice]=useState("");
+  const awardedRef=useRef(false);
+  const econ=GAME_ECON.mansion;
+  const balance=Math.max(0,Number(sparks)||0);
+  const phase=round.revealed?"Reveal":seconds<=16?"Final Accusation":seconds<=48?"Faction War":"Investigation";
+  const phaseTone=round.revealed?"var(--gn)":seconds<=16?"var(--pk)":seconds<=48?"var(--am)":"var(--cy)";
+  const selectedFactionObj=round.factions.find(f=>f.id===selectedFaction)||round.factions[0];
+  const selectedRoomObj=round.rooms.find(r=>r.id===selectedRoom)||round.rooms[0];
+  const roomHeat=Math.round(round.rooms.reduce((sum,r)=>sum+r.heat,0)/Math.max(1,round.rooms.length));
+  const maxFactionScore=Math.max(...round.factions.map(f=>f.score),1);
+  const solvedGuess={roomId:round.solution.room.id,toyId:round.solution.toy.id,scenario:round.solution.scenario,motive:round.solution.motive};
+  const ping=msg=>{setNotice(msg);setTimeout(()=>setNotice(""),1900)};
+  const spend=(amount,label)=>{
+    if(balance<amount){ping(`Need ${fsn(amount)} sparks to ${label}.`);return false}
+    onSpend(-amount);
+    return true;
+  };
+  const mutateLog=(msg,patch={})=>setRound(prev=>({...prev,...patch,log:[msg,...prev.log].slice(0,9)}));
+  function simulateEvent(){
+    setRound(prev=>{
+      if(prev.revealed)return prev;
+      const fIdx=Math.floor(Math.random()*prev.factions.length);
+      const rIdx=Math.floor(Math.random()*prev.rooms.length);
+      const gain=Math.floor(42+Math.random()*130);
+      const faction=prev.factions[fIdx];
+      const event=`${faction.name} ${mansionPick(MANSION_EVENTS)}.`;
+      const factions=prev.factions.map((f,i)=>i===fIdx?{...f,score:f.score+gain,surge:Math.min(100,f.surge+6)}:{...f,score:f.score+Math.floor(Math.random()*24),surge:Math.max(0,f.surge-2)});
+      const rooms=prev.rooms.map((r,i)=>i===rIdx?{...r,heat:Math.min(99,r.heat+Math.floor(8+Math.random()*14)),control:faction.id}:i%3===0?{...r,heat:Math.max(12,r.heat-3)}:r);
+      const leaderIdx=Math.floor(Math.random()*Math.max(1,prev.leaders.length));
+      const leaders=prev.leaders.map((l,i)=>i===leaderIdx?{...l,score:l.score+gain+Math.floor(Math.random()*90),status:"surging"}:{...l,score:l.score+Math.floor(Math.random()*28),status:l.status==="surging"?"hot":l.status}).sort((a,b)=>b.score-a.score);
+      const reveal=prev.tick%3===2&&prev.revealedClues.length<prev.clues.length;
+      const revealedClues=reveal?[...prev.revealedClues,prev.clues[prev.revealedClues.length]]:prev.revealedClues;
+      return {...prev,factions,rooms,leaders,revealedClues,tick:prev.tick+1,log:[reveal?`${event} AI Host released a new clue.`:event,...prev.log].slice(0,9)};
+    });
+  }
+  function investigateRoom(roomId){
+    setSelectedRoom(roomId);
+    setRound(prev=>{
+      if(prev.revealed)return prev;
+      const room=prev.rooms.find(r=>r.id===roomId)||prev.rooms[0];
+      const clue=prev.clues.find(c=>!prev.revealedClues.some(v=>v.text===c.text));
+      const factions=prev.factions.map(f=>f.id===selectedFaction?{...f,score:f.score+58,surge:Math.min(100,f.surge+7)}:f);
+      const rooms=prev.rooms.map(r=>r.id===roomId?{...r,heat:Math.min(99,r.heat+13),scans:r.scans+1,control:selectedFaction}:r);
+      return {...prev,factions,rooms,revealedClues:clue?[...prev.revealedClues,clue]:prev.revealedClues,log:[`${selectedFactionObj.name} scanned ${room.name}${clue?" and surfaced a clue":" for room control"}.`,...prev.log].slice(0,9)};
+    });
+  }
+  function powerMove(kind){
+    if(round.revealed)return;
+    if(!spend(econ.power,kind==="scan"?"scan the mansion":kind==="sabotage"?"sabotage a rival":"trigger a surge"))return;
+    setRound(prev=>{
+      if(prev.revealed)return prev;
+      const faction=prev.factions.find(f=>f.id===selectedFaction)||prev.factions[0];
+      const extraClues=prev.clues.filter(c=>!prev.revealedClues.some(v=>v.text===c.text)).slice(0,kind==="scan"?2:1);
+      const leaders=kind==="sabotage"?prev.leaders.map((l,i)=>i===0&&l.faction!==selectedFaction?{...l,score:Math.max(0,l.score-180),status:"jammed"}:l).sort((a,b)=>b.score-a.score):prev.leaders;
+      const factions=prev.factions.map(f=>f.id===selectedFaction?{...f,score:f.score+(kind==="surge"?260:120),surge:Math.min(100,f.surge+(kind==="surge"?24:10))}:kind==="sabotage"?{...f,score:Math.max(0,f.score-24)}:f);
+      const rooms=prev.rooms.map(r=>r.id===selectedRoom?{...r,heat:Math.min(99,r.heat+(kind==="surge"?22:10)),control:selectedFaction}:r);
+      const label=kind==="scan"?"AI scan cracked two clue fragments":kind==="sabotage"?"Sabotage jammed the current leader":"Vybe Surge lit up the mansion";
+      return {...prev,factions,rooms,leaders,revealedClues:[...prev.revealedClues,...extraClues],log:[`${faction.name}: ${label}.`,...prev.log].slice(0,9)};
+    });
+  }
+  function submitAccusation(){
+    if(submitted){ping("Your accusation is already locked.");return}
+    if(!spend(econ.accuse,"lock an accusation"))return;
+    const locked={...accusation};
+    setSubmitted(locked);
+    mutateLog(`${userName} locked final accusation: ${mansionGuessText(locked)}.`);
+    ping("Final accusation locked. The AI Host will score it at reveal.");
+  }
+  function finishRound(){
+    setRound(prev=>{
+      if(prev.revealed)return prev;
+      const contenders=prev.leaders.slice(0,8).map((leader,i)=>{
+        const guess=mansionMakeGuess(prev.solution,.22+Math.min(.42,leader.score/5200)+(i===0?.08:0));
+        const correct=mansionScoreGuess(guess,prev.solution);
+        return {...leader,guess,correct,total:leader.score+correct*950+Math.random()*360};
+      });
+      if(submitted){
+        const userFaction=prev.factions.find(f=>f.id===selectedFaction)||prev.factions[0];
+        const correct=mansionScoreGuess(submitted,prev.solution);
+        contenders.push({name:userName,faction:selectedFaction,score:userFaction.score,guess:submitted,correct,total:userFaction.score+correct*1125+260+Math.random()*260,status:"locked"});
+      }
+      contenders.sort((a,b)=>b.correct-a.correct||b.total-a.total);
+      const result=contenders[0];
+      return {...prev,revealed:true,result,log:[`AI Host reveal: ${mansionGuessText(solvedGuess)}. ${result.name} scored ${result.correct}/4.`,...prev.log].slice(0,9)};
+    });
+  }
+  function newCase(){
+    const next=makeMansionCase();
+    setRound(next);
+    setSeconds(90);
+    setSelectedRoom(next.rooms[0]?.id||MANSION_ROOMS[0].id);
+    setAccusation(mansionDefaultGuess());
+    setSubmitted(null);
+    awardedRef.current=false;
+    setNotice("");
+  }
+  useEffect(()=>{if(round.revealed)return;const t=setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>clearInterval(t)},[round.revealed]);
+  useEffect(()=>{if(round.revealed)return;const t=setInterval(simulateEvent,1900);return()=>clearInterval(t)},[round.revealed,selectedFaction,selectedRoom]);
+  useEffect(()=>{if(seconds===0&&!round.revealed)finishRound()},[seconds,round.revealed,submitted,selectedFaction]);
+  useEffect(()=>{
+    if(!round.revealed||!round.result||awardedRef.current)return;
+    if(round.result.name===userName){
+      const prize=Math.max(75,round.result.correct*75);
+      awardedRef.current=true;
+      onSpend(prize);
+      ping(`You won the mansion battle. +${fsn(prize)} sparks.`);
+    }
+  },[round.revealed,round.result,userName,onSpend]);
+  return <G className="ai" style={{position:"absolute",left:"clamp(12px,31vw,392px)",right:12,top:84,bottom:76,zIndex:26,padding:0,overflow:"hidden",borderRadius:16,background:"linear-gradient(135deg,rgba(255,45,120,.12),rgba(0,212,255,.055) 34%,rgba(9,10,18,.96))",boxShadow:"0 34px 110px rgba(0,0,0,.52),0 0 80px rgba(255,45,120,.1)"}}>
+    <div style={{position:"absolute",inset:0,pointerEvents:"none",background:"radial-gradient(circle at 18% 14%,rgba(255,138,168,.18),transparent 28%),radial-gradient(circle at 72% 4%,rgba(198,255,0,.12),transparent 24%),radial-gradient(circle at 80% 78%,rgba(139,92,246,.14),transparent 30%)"}}/>
+    <div style={{position:"relative",height:"100%",display:"grid",gridTemplateRows:"auto 1fr",minWidth:0}}>
+      <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,padding:"13px 15px",borderBottom:"1px solid rgba(255,255,255,.1)",background:"rgba(5,8,16,.48)",backdropFilter:"blur(18px)"}}>
+        <div style={{minWidth:0}}><div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}><Tag color="#ff8aa8">{round.id}</Tag><Tag color={phaseTone}>{phase}</Tag><Tag color="var(--cy)">200 simulated viewers</Tag></div>
+          <h3 style={{fontSize:"1.08rem",fontWeight:1000,lineHeight:1.1,marginTop:7}}>Vybe Mansion: Live Mystery Battle</h3></div>
+        <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}><div style={{fontWeight:1000,color:"var(--am)",fontSize:".82rem",display:"flex",alignItems:"center",gap:3}}><I n="spark" s={12} c="var(--am)"/>{fsn(balance)}</div><button onClick={onClose} aria-label="Close mansion" style={{width:34,height:34,borderRadius:17,border:"1px solid rgba(255,255,255,.15)",background:"rgba(255,255,255,.06)",color:"var(--mt)",display:"grid",placeItems:"center",cursor:"pointer"}}><I n="close" s={14}/></button></div>
+      </header>
+      <div style={{minHeight:0,overflowY:"auto",padding:14,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:12}}>
+        <section style={{minHeight:0}}>
+          <Kk>Faction Control</Kk>
+          <div style={{display:"grid",gap:7,marginBottom:12}}>{round.factions.map(f=><button key={f.id} onClick={()=>setSelectedFaction(f.id)} style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) auto",gap:8,alignItems:"center",padding:9,borderRadius:9,border:`1px solid ${selectedFaction===f.id?f.color+"99":"rgba(255,255,255,.1)"}`,background:selectedFaction===f.id?`${f.color}18`:"rgba(255,255,255,.04)",color:"var(--tx)",textAlign:"left",cursor:"pointer"}}>
+            <span style={{minWidth:0}}><span style={{display:"block",fontSize:".76rem",fontWeight:1000,color:f.color}}>{f.name}</span><span style={{display:"block",fontSize:".58rem",color:"rgba(255,255,255,.6)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{f.members} viewers, {f.boost}</span><span style={{display:"block",height:4,borderRadius:999,background:"rgba(255,255,255,.08)",marginTop:6}}><span style={{display:"block",height:"100%",width:`${Math.max(8,(f.score/maxFactionScore)*100)}%`,borderRadius:"inherit",background:`linear-gradient(90deg,${f.color},rgba(255,255,255,.32))`}}/></span></span>
+            <strong style={{fontSize:".7rem",color:"var(--am)"}}>{fsn(f.score)}</strong>
+          </button>)}</div>
+          <Kk>Mansion Rooms</Kk>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7}}>{round.rooms.map(r=>{const controller=round.factions.find(f=>f.id===r.control);const active=selectedRoom===r.id;return <button key={r.id} onClick={()=>investigateRoom(r.id)} style={{position:"relative",overflow:"hidden",minHeight:92,padding:9,borderRadius:10,border:`1px solid ${active?r.tone+"aa":"rgba(255,255,255,.1)"}`,background:`linear-gradient(140deg,${r.tone}18,rgba(255,255,255,.035)),rgba(7,9,16,.82)`,color:"#fff",cursor:"pointer",textAlign:"left"}}>
+            <div style={{position:"absolute",right:8,top:8,width:30,height:30,borderRadius:9,display:"grid",placeItems:"center",background:`${r.tone}22`,color:r.tone,fontSize:".58rem",fontWeight:1000}}>{r.glyph}</div>
+            <div style={{fontWeight:1000,fontSize:".75rem",paddingRight:34,lineHeight:1.2}}>{r.name}</div>
+            <div style={{fontSize:".56rem",color:"rgba(255,255,255,.6)",marginTop:5}}>Heat {r.heat}% - scans {r.scans}</div>
+            <div style={{height:4,borderRadius:999,background:"rgba(255,255,255,.1)",marginTop:8}}><div style={{height:"100%",width:`${r.heat}%`,borderRadius:"inherit",background:`linear-gradient(90deg,${r.tone},${controller?.color||r.tone})`}}/></div>
+            <div style={{fontSize:".54rem",fontWeight:900,color:controller?.color||"var(--mt)",marginTop:7}}>Held by {controller?.name||"no faction"}</div>
+          </button>})}</div>
+        </section>
+        <section style={{minHeight:0}}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr auto",alignItems:"center",gap:10,marginBottom:8}}><Kk>AI Host Feed</Kk><span style={{fontSize:".68rem",fontWeight:1000,color:phaseTone}}>{seconds}s</span></div>
+          <div style={{position:"relative",minHeight:292,borderRadius:12,border:"1px solid rgba(255,255,255,.12)",overflow:"hidden",background:"linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),radial-gradient(circle at 50% 36%,rgba(255,138,168,.2),transparent 20%),linear-gradient(150deg,#090d18,#160719 52%,#0d1320)"}}>
+            <div style={{position:"absolute",inset:18,border:"1px solid rgba(255,255,255,.1)",borderRadius:12,boxShadow:"inset 0 0 50px rgba(255,255,255,.035)"}}/>
+            <div style={{position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)",width:150,height:150,borderRadius:"50%",border:"1px solid rgba(255,138,168,.36)",display:"grid",placeItems:"center",background:"radial-gradient(circle,rgba(255,45,120,.2),rgba(0,212,255,.08) 48%,rgba(0,0,0,.18))",boxShadow:"0 0 70px rgba(255,45,120,.26)",animation:"drift 4s ease-in-out infinite"}}>
+              <div style={{textAlign:"center"}}><I n={round.revealed?"check":"mystery"} s={34} c={round.revealed?"var(--gn)":"#ff8aa8"}/><div style={{fontSize:".56rem",letterSpacing:".14em",textTransform:"uppercase",fontWeight:1000,color:"rgba(255,255,255,.62)",marginTop:8}}>{round.revealed?"Solved":"Locked Case"}</div></div>
+            </div>
+            {MANSION_TOYS.slice(0,6).map((t,i)=><div key={t.id} style={{position:"absolute",left:`${10+(i%3)*39}%`,top:`${12+Math.floor(i/3)*64}%`,width:38,height:38,borderRadius:12,display:"grid",placeItems:"center",border:`1px solid ${t.tone}55`,background:`${t.tone}14`,color:t.tone,fontSize:".56rem",fontWeight:1000,boxShadow:`0 0 ${10+i*2}px ${t.tone}22`}}>{i+1}</div>)}
+            <div style={{position:"absolute",left:12,right:12,bottom:12,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6}}>{[{k:"Heat",v:roomHeat+"%"},{k:"Clues",v:`${round.revealedClues.length}/${round.clues.length}`},{k:"Phase",v:phase}].map(x=><div key={x.k} style={{padding:8,borderRadius:8,border:"1px solid rgba(255,255,255,.1)",background:"rgba(4,6,12,.62)",textAlign:"center"}}><div style={{fontSize:".52rem",color:"rgba(255,255,255,.55)",fontWeight:900,textTransform:"uppercase"}}>{x.k}</div><div style={{fontSize:".78rem",fontWeight:1000,color:x.k==="Phase"?phaseTone:"#fff",marginTop:2}}>{x.v}</div></div>)}</div>
+          </div>
+          <div style={{marginTop:10,display:"grid",gap:7}}>{round.revealedClues.slice(-4).reverse().map((c,i)=><div key={`${c.text}-${i}`} style={{padding:9,borderRadius:9,border:`1px solid ${c.truth?"rgba(34,197,94,.28)":"rgba(255,171,0,.22)"}`,background:c.truth?"rgba(34,197,94,.07)":"rgba(255,171,0,.055)",fontSize:".68rem",lineHeight:1.38,color:"rgba(255,255,255,.78)"}}><span style={{fontWeight:1000,color:c.truth?"var(--gn)":"var(--am)",marginRight:6}}>{c.truth?"Clean":"Noise"}</span>{c.text}</div>)}</div>
+          {round.revealed&&<div style={{marginTop:10,padding:12,borderRadius:10,border:"1px solid rgba(34,197,94,.34)",background:"linear-gradient(135deg,rgba(34,197,94,.12),rgba(0,212,255,.05))"}}>
+            <div style={{fontSize:".62rem",letterSpacing:".12em",textTransform:"uppercase",fontWeight:1000,color:"var(--gn)"}}>Reveal</div>
+            <div style={{fontWeight:1000,fontSize:".92rem",lineHeight:1.3,marginTop:5}}>{mansionGuessText(solvedGuess)}</div>
+            <div style={{fontSize:".7rem",color:"rgba(255,255,255,.66)",marginTop:6}}>{round.result?.name} wins for {round.factions.find(f=>f.id===round.result?.faction)?.name||"the room"} with {round.result?.correct}/4 correct.</div>
+          </div>}
+        </section>
+        <section style={{minHeight:0}}>
+          <Kk>Battle Console</Kk>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:8}}><Btn small onClick={()=>powerMove("scan")} style={{borderColor:"rgba(0,212,255,.38)",color:"var(--cy)"}}>Scan {fsn(econ.power)}</Btn><Btn small onClick={()=>powerMove("sabotage")} style={{borderColor:"rgba(139,92,246,.38)",color:"var(--vi)"}}>Sabotage {fsn(econ.power)}</Btn><Btn small onClick={()=>powerMove("surge")} style={{borderColor:"rgba(255,45,120,.38)",color:"var(--pk)"}}>Surge {fsn(econ.power)}</Btn><Btn small onClick={simulateEvent}>Sim Event</Btn></div>
+          <div style={{padding:10,borderRadius:10,border:"1px solid rgba(255,255,255,.1)",background:"rgba(255,255,255,.045)",marginBottom:9}}>
+            <div style={{fontSize:".66rem",fontWeight:1000,color:selectedFactionObj?.color||"var(--cy)"}}>Playing for {selectedFactionObj?.name}</div>
+            <div style={{fontSize:".62rem",lineHeight:1.4,color:"rgba(255,255,255,.6)",marginTop:3}}>Current target room: {selectedRoomObj?.name}. Performer stays out of the admin loop; the host simulates clues, rival moves, and scoring.</div>
+          </div>
+          <div style={{display:"grid",gap:7}}>
+            {[["roomId","Room",MANSION_ROOMS.map(r=>[r.id,r.name])],["toyId","Toy",MANSION_TOYS.map(t=>[t.id,t.name])],["scenario","Scenario",MANSION_SCENARIOS.map(s=>[s,s])],["motive","Motive",MANSION_MOTIVES.map(m=>[m,m])]].map(([key,label,opts])=><label key={key} style={{display:"grid",gap:4,fontSize:".62rem",fontWeight:900,color:"rgba(255,255,255,.62)"}}>{label}<select value={accusation[key]} disabled={!!submitted||round.revealed} onChange={e=>setAccusation(p=>({...p,[key]:e.target.value}))} style={{height:34,borderRadius:8,border:"1px solid rgba(255,255,255,.12)",background:"rgba(8,10,16,.9)",color:"#fff",font:"inherit",fontSize:".7rem",fontWeight:800,padding:"0 8px"}}>{opts.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select></label>)}
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7,marginTop:9}}><Btn primary small disabled={!!submitted||round.revealed} onClick={submitAccusation}>Accuse {fsn(econ.accuse)}</Btn><Btn small disabled={round.revealed} onClick={finishRound}>Reveal Now</Btn></div>
+          {submitted&&<div style={{marginTop:8,padding:8,borderRadius:8,border:"1px solid rgba(255,45,120,.28)",background:"rgba(255,45,120,.07)",fontSize:".65rem",lineHeight:1.35,color:"rgba(255,255,255,.72)"}}><strong style={{color:"var(--pk)"}}>Locked:</strong> {mansionGuessText(submitted)}</div>}
+          <div style={{display:"grid",gridTemplateColumns:"1fr auto",alignItems:"center",gap:8,marginTop:12}}><Kk>Top Contestants</Kk><button onClick={newCase} style={{height:28,padding:"0 9px",borderRadius:14,border:"1px solid rgba(255,255,255,.12)",background:"rgba(255,255,255,.05)",color:"var(--mt)",font:"inherit",fontSize:".58rem",fontWeight:1000,cursor:"pointer"}}>New Case</button></div>
+          <div style={{display:"grid",gap:5}}>{round.leaders.slice(0,5).map((l,i)=>{const f=round.factions.find(x=>x.id===l.faction)||round.factions[0];return <div key={l.name} style={{display:"grid",gridTemplateColumns:"18px minmax(0,1fr) auto",gap:7,alignItems:"center",padding:"6px 0",borderBottom:i<4?"1px solid rgba(255,255,255,.08)":"none",fontSize:".68rem"}}><span style={{fontWeight:1000,color:i===0?"var(--am)":"var(--mt)"}}>{i+1}</span><span style={{minWidth:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}><span style={{color:f.color,fontWeight:1000,marginRight:5}}>{l.name}</span><span style={{color:"rgba(255,255,255,.45)"}}>{l.status}</span></span><strong style={{color:"var(--am)"}}>{fsn(l.score)}</strong></div>})}</div>
+          <Kk>Event Log</Kk>
+          <div style={{display:"grid",gap:5}}>{round.log.slice(0,5).map((line,i)=><div key={`${line}-${i}`} style={{fontSize:".62rem",lineHeight:1.35,color:i===0?"rgba(255,255,255,.86)":"rgba(255,255,255,.54)",padding:"5px 0",borderBottom:i<4?"1px solid rgba(255,255,255,.07)":"none"}}>{line}</div>)}</div>
+        </section>
+      </div>
+    </div>
+    {notice&&<div className="ai" style={{position:"absolute",left:"50%",top:70,transform:"translateX(-50%)",zIndex:4,padding:"8px 13px",borderRadius:9,border:"1px solid rgba(255,171,0,.34)",background:"rgba(10,13,22,.92)",color:"var(--am)",fontSize:".7rem",fontWeight:1000,boxShadow:"0 18px 60px rgba(0,0,0,.38)"}}>{notice}</div>}
+  </G>;
+}
+
+/* ═══ GAME ENGINE — 12 Unique Modes ═══ */
+function GE({game,onClose,onSB,sparks=0,onSpend=()=>{},userName="VelvetKing"}){
   const [qs,setQs]=useState(FBQ.sort(()=>Math.random()-.5).slice(0,5));
   const [s,setS]=useState({qi:0,fb:"",ft:"info",m:0,wr:null,sp:false,td:null,tp:"",tm:15,cP:null,cO:null,cMood:null,bid:301,hb:300,at:45,hs:0,hr:1,
     dg:makeDropGrid(),dw:false,lr:0,lb:false,br:false,bt:null,bres:null,bms:0,jl:3,js:0,jw:false,tc:[],drawing:false,tmode:"pulse"});
@@ -786,6 +1200,8 @@ function GE({game,onClose,onSB,sparks=0,onSpend=()=>{}}){
   const beginTrace=e=>{e.currentTarget.setPointerCapture?.(e.pointerId);const p=pt(e);setS(v=>({...v,drawing:true,tc:[...v.tc.slice(-2),{id:Date.now(),mode:v.tmode,pts:[p]}],m:Math.min(100,v.m+4)}))};
   const moveTrace=e=>setS(v=>{if(!v.drawing)return v;const p=pt(e),tc=[...v.tc],last=tc[tc.length-1];if(!last)return v;tc[tc.length-1]={...last,pts:[...last.pts,p].slice(-80)};return {...v,tc}});
   const endTrace=e=>{e.currentTarget.releasePointerCapture?.(e.pointerId);u("drawing",false)};
+
+  if(game.type==="mansion")return <MansionBattle onClose={onClose} sparks={sparks} onSpend={onSpend} userName={userName}/>;
 
   return<Pn onClose={onClose} title={game.name} icon={game.icon} ic={game.color} style={{position:"absolute",right:12,top:84,bottom:76,zIndex:24,width:"min(430px,36vw)",maxHeight:"none",background:"linear-gradient(180deg,rgba(10,13,22,.96),rgba(9,10,18,.9))",boxShadow:"0 30px 90px rgba(0,0,0,.45)"}}>
     <div style={{height:4,borderRadius:999,background:"rgba(255,255,255,.05)",marginBottom:8}}><div style={{height:"100%",borderRadius:"inherit",width:`${s.m}%`,transition:"width .4s",background:"linear-gradient(90deg,var(--cy),var(--lm),var(--pk))"}}/></div>
@@ -957,8 +1373,266 @@ function RequestChatMessage({item}){
   </div>;
 }
 
-function LB({user,onPerf,onWallet,cat,setCat,onMenu,performers=PERFS}){
+function BattleScene({game,round,seconds,phase,reward,joined,userScore,selectedTeam,targetTeam,lastMove,momentum}){
+  const progress=Math.max(5,Math.min(100,((64-seconds)/64)*100));
+  const active=round.teams.find(t=>t.name===selectedTeam)||round.teams[0]||{name:"Your Team",score:0,color:game.color};
+  const rival=round.teams.find(t=>t.name===targetTeam)||round.teams.find(t=>t.name!==active.name)||active;
+  const activeColor=active.color||game.color;
+  const statRow=<div className="battle-stat-grid" style={{position:"absolute",left:12,right:12,bottom:12,display:"grid",gridTemplateColumns:"var(--battle-compact-columns,repeat(3,1fr))",gap:7,zIndex:5}}>
+    {[["Reward cap",reward?`${fsn(reward)} sparks`:"status only"],["Your pressure",joined?fsn(userScore):"spectating"],["Target",targetTeam||rival.name]].map(([k,v])=><div key={k} style={{padding:8,borderRadius:9,border:"1px solid rgba(255,255,255,.1)",background:"rgba(4,6,12,.72)",textAlign:"center",backdropFilter:"blur(10px)"}}><div style={{fontSize:".52rem",fontWeight:900,textTransform:"uppercase",color:"rgba(255,255,255,.5)"}}>{k}</div><div style={{fontSize:".74rem",fontWeight:1000,color:k==="Reward cap"?"var(--am)":k==="Target"?rival.color:"#fff",marginTop:2,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{v}</div></div>)}
+  </div>;
+  const core=<div className="battle-core-card" style={{position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)",width:"76%",maxWidth:420,padding:18,borderRadius:14,border:`1px solid ${activeColor}60`,background:"linear-gradient(135deg,rgba(5,8,16,.76),rgba(20,25,38,.66))",backdropFilter:"blur(12px)",textAlign:"center",boxShadow:`0 24px 90px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.04)`,zIndex:4}}>
+    <I n={game.icon} s={42} c={activeColor}/><div style={{fontSize:".6rem",letterSpacing:".14em",textTransform:"uppercase",fontWeight:1000,color:"rgba(255,255,255,.55)",marginTop:9}}>{phase}</div>
+    <div style={{fontSize:"2.2rem",fontWeight:1000,color:activeColor,lineHeight:1,marginTop:5}}>{seconds}s</div>
+    <div style={{height:8,borderRadius:999,background:"rgba(255,255,255,.1)",marginTop:13,overflow:"hidden"}}><div style={{height:"100%",width:`${progress}%`,background:`linear-gradient(90deg,${activeColor},var(--am),var(--cy))`,animation:"battleMeter 1.8s ease-in-out infinite"}}/></div>
+    {lastMove&&<div style={{marginTop:9,fontSize:".58rem",fontWeight:1000,color:"rgba(255,255,255,.62)",textTransform:"uppercase",letterSpacing:".08em"}}>{lastMove}</div>}
+  </div>;
+  const base={position:"relative",minHeight:330,borderRadius:14,overflow:"hidden",border:"1px solid rgba(255,255,255,.12)",backgroundColor:"rgba(7,10,18,.9)"};
+  if(game.id==="gacha-vault")return <div className="battle-scene" style={{...base,background:"linear-gradient(135deg,rgba(251,191,36,.13),rgba(8,10,18,.96) 48%,rgba(255,45,120,.08))"}}>
+    <div style={{position:"absolute",inset:"12% 8% 26%",borderRadius:18,border:"1px solid rgba(251,191,36,.22)",background:"linear-gradient(135deg,rgba(251,191,36,.08),rgba(255,255,255,.025))",transform:"rotateX(58deg)",boxShadow:"0 60px 90px rgba(251,191,36,.08)"}}/>
+    {[0,1,2,3,4].map(i=><div key={i} className="battle-scene-card" style={{position:"absolute",left:`${18+i*13}%`,top:`${24+(i%2)*7}%`,width:72,height:104,borderRadius:10,border:`1px solid ${i===2?"#fff":game.color}66`,background:`linear-gradient(145deg,${i===2?"rgba(255,255,255,.16)":"rgba(251,191,36,.12)"},rgba(0,0,0,.45))`,boxShadow:`0 20px 60px ${game.color}22`,animation:`vaultFlip ${3+i*.3}s ease-in-out infinite`,animationDelay:`${i*.12}s`,display:"grid",placeItems:"center"}}><I n={i===2?"diamond":"key"} s={24} c={i===2?"#fff":game.color}/></div>)}
+    <div style={{position:"absolute",right:34,top:46,width:126,height:126,borderRadius:"50%",border:`10px solid ${game.color}44`,boxShadow:`inset 0 0 36px ${game.color}22,0 0 42px ${game.color}24`,animation:"orbit 9s linear infinite"}}><div style={{position:"absolute",left:"50%",top:"50%",width:54,height:54,transform:"translate(-50%,-50%)",borderRadius:"50%",border:`2px solid ${game.color}`,display:"grid",placeItems:"center",fontWeight:1000,color:game.color}}>SSR</div></div>
+    {core}{statRow}
+  </div>;
+  if(game.id==="season-pass")return <div className="battle-scene" style={{...base,background:"linear-gradient(180deg,rgba(251,191,36,.16),rgba(8,10,18,.96) 42%,rgba(139,92,246,.12))"}}>
+    {[0,1,2,3,4].map(i=><div key={i} style={{position:"absolute",left:`${12+i*17}%`,bottom:78,width:"12%",height:`${56+i*34}px`,borderRadius:"10px 10px 0 0",border:`1px solid ${i<3?game.color:"rgba(255,255,255,.18)"}`,background:`linear-gradient(180deg,${game.color}${20+i*8},rgba(255,255,255,.03))`,boxShadow:`0 0 ${14+i*6}px ${game.color}18`}}><div style={{position:"absolute",top:-24,left:0,right:0,textAlign:"center",fontSize:".56rem",fontWeight:1000,color:i<3?game.color:"rgba(255,255,255,.4)"}}>T{i+1}</div></div>)}
+    <div style={{position:"absolute",left:"50%",top:"22%",transform:"translateX(-50%)",width:120,height:90,display:"grid",placeItems:"center",animation:"crownRise 2.8s ease-in-out infinite"}}><I n="crown" s={68} c={game.color}/></div>
+    {core}{statRow}
+  </div>;
+  if(game.id==="puzzle-fever"||game.id==="craft-fantasy")return <div className="battle-scene" style={{...base,background:`linear-gradient(135deg,${game.color}12,rgba(7,10,18,.94))`}}>
+    <div style={{position:"absolute",left:24,top:20,right:24,bottom:80,display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:7,transform:game.id==="craft-fantasy"?"rotateX(54deg) rotateZ(-8deg)":"none",transformOrigin:"center"}}>
+      {Array.from({length:35}).map((_,i)=><div key={i} style={{borderRadius:game.id==="craft-fantasy"?4:8,border:"1px solid rgba(255,255,255,.09)",background:`linear-gradient(145deg,${[game.color,"#00d4ff","#ff2d78","#ffab00"][i%4]}${i%5===0?"55":"24"},rgba(255,255,255,.03))`,boxShadow:i%6===0?`0 0 24px ${game.color}33`:"none",animation:`tilePop ${2+(i%5)*.2}s ease-in-out infinite`,animationDelay:`${i*.03}s`}}/>)}
+    </div>
+    {core}{statRow}
+  </div>;
+  if(game.id==="suite-heist")return <div className="battle-scene" style={{...base,background:"linear-gradient(135deg,rgba(139,92,246,.14),rgba(7,10,18,.96))"}}>
+    <div style={{position:"absolute",inset:20,border:"1px solid rgba(139,92,246,.34)",backgroundImage:"linear-gradient(rgba(139,92,246,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,.14) 1px,transparent 1px)",backgroundSize:"42px 42px",borderRadius:12}}/>
+    {[[18,24,28,18],[58,18,18,28],[28,58,34,18],[68,60,18,24]].map(([l,t,w,h],i)=><div key={i} style={{position:"absolute",left:`${l}%`,top:`${t}%`,width:`${w}%`,height:`${h}%`,border:"1px solid rgba(255,255,255,.14)",borderRadius:8,background:"rgba(255,255,255,.025)"}}/>)}
+    {[0,1,2,3].map(i=><div key={i} style={{position:"absolute",left:`${12+i*22}%`,top:`${26+i%2*28}%`,width:"38%",height:2,background:`linear-gradient(90deg,transparent,${game.color},transparent)`,transform:`rotate(${i%2?24:-18}deg)`,boxShadow:`0 0 18px ${game.color}`,animation:"battleMeter 1.4s ease-in-out infinite"}}/>)}
+    <div style={{position:"absolute",right:46,bottom:104}}><I n="key" s={54} c={game.color}/></div>
+    {core}{statRow}
+  </div>;
+  if(game.id==="kart-heat")return <div className="battle-scene" style={{...base,background:"linear-gradient(135deg,rgba(0,212,255,.12),rgba(7,10,18,.96))"}}>
+    <div style={{position:"absolute",left:"8%",top:"18%",right:"8%",bottom:"28%",borderRadius:999,border:"24px solid rgba(0,212,255,.16)",boxShadow:"inset 0 0 0 2px rgba(255,255,255,.12),0 0 36px rgba(0,212,255,.16)"}}/>
+    {[0,1,2,3].map(i=><div key={i} style={{position:"absolute",left:"11%",top:`${28+i*9}%`,width:46,height:16,borderRadius:8,background:[game.color,"#ffab00","#ff2d78","#22c55e"][i],boxShadow:"0 0 20px rgba(255,255,255,.18)",animation:`laneRun ${2.4+i*.35}s linear infinite`,animationDelay:`${i*.2}s`}}/>)}
+    {core}{statRow}
+  </div>;
+  if(game.id==="arena-draft")return <div className="battle-scene" style={{...base,background:"linear-gradient(135deg,rgba(6,182,212,.13),rgba(7,10,18,.96))"}}>
+    {[0,1,2].map(i=><div key={i} style={{position:"absolute",left:"10%",right:"10%",top:`${23+i*17}%`,height:12,borderRadius:999,background:`linear-gradient(90deg,${activeColor}44,rgba(255,255,255,.08),${rival.color}44)`,boxShadow:`0 0 20px ${activeColor}22`}}/>)}
+    {[["Control",18,23,activeColor],["Burst",46,40,game.color],["Guard",72,57,rival.color]].map(([l,x,y,c])=><div key={l} style={{position:"absolute",left:`${x}%`,top:`${y}%`,padding:"10px 12px",borderRadius:10,border:`1px solid ${c}55`,background:`${c}14`,fontSize:".64rem",fontWeight:1000,color:c}}>{l}</div>)}
+    {core}{statRow}
+  </div>;
+  if(game.id==="boss-raid")return <div className="battle-scene" style={{...base,background:"linear-gradient(135deg,rgba(244,114,182,.14),rgba(7,10,18,.96))"}}>
+    <div style={{position:"absolute",left:"50%",top:"38%",transform:"translate(-50%,-50%)",width:210,height:150,borderRadius:"48% 52% 42% 58%",border:`1px solid ${game.color}66`,background:`linear-gradient(145deg,${game.color}20,rgba(0,0,0,.4))`,boxShadow:`0 0 80px ${game.color}22`,display:"grid",placeItems:"center"}}><I n="flame" s={62} c={game.color}/></div>
+    <div style={{position:"absolute",left:"20%",right:"20%",top:"62%",height:12,borderRadius:999,background:"rgba(255,255,255,.12)",overflow:"hidden"}}><div style={{height:"100%",width:`${Math.max(8,100-progress)}%`,background:`linear-gradient(90deg,${game.color},#ffab00)`}}/></div>
+    {[0,1,2,3].map(i=><div key={i} style={{position:"absolute",left:`${16+i*19}%`,bottom:95,width:48,height:48,borderRadius:14,border:"1px solid rgba(255,255,255,.12)",background:"rgba(255,255,255,.05)",display:"grid",placeItems:"center",fontSize:".55rem",fontWeight:1000,color:["#22c55e","#ff2d78","#00d4ff","#fbbf24"][i]}}>{["HEAL","DPS","TANK","CALL"][i]}</div>)}
+    {core}{statRow}
+  </div>;
+  if(game.id==="rhythm-pulse")return <div className="battle-scene" style={{...base,background:"linear-gradient(135deg,rgba(255,171,0,.13),rgba(7,10,18,.96))"}}>
+    {[0,1,2,3].map(i=><div key={i} style={{position:"absolute",left:28,right:28,top:`${22+i*13}%`,height:4,borderRadius:999,background:"rgba(255,255,255,.1)"}}><div style={{width:38,height:38,borderRadius:"50%",background:[game.color,"#00d4ff","#ff2d78","#22c55e"][i],transform:"translateY(-17px)",boxShadow:`0 0 28px ${[game.color,"#00d4ff","#ff2d78","#22c55e"][i]}55`,animation:`laneRun ${1.5+i*.18}s linear infinite`}}/></div>)}
+    <div style={{position:"absolute",left:"12%",right:"12%",bottom:100,height:68,display:"flex",alignItems:"center",gap:4}}>{Array.from({length:28}).map((_,i)=><div key={i} style={{flex:1,height:10+(i%7)*7,borderRadius:4,background:`linear-gradient(180deg,${game.color},rgba(255,255,255,.1))`,animation:`tilePop ${1.2+(i%5)*.1}s ease-in-out infinite`}}/>)}</div>
+    {core}{statRow}
+  </div>;
+  return <div className="battle-scene" style={{...base,background:"linear-gradient(135deg,rgba(255,45,120,.14),rgba(7,10,18,.96))"}}>
+    <div style={{position:"absolute",left:"50%",top:"42%",width:250,height:250,marginLeft:-125,marginTop:-125,borderRadius:"50%",border:`2px solid ${game.color}66`,boxShadow:`0 0 70px ${game.color}24`,animation:"orbit 14s linear infinite"}}/>
+    {[0,1,2,3,4,5].map(i=><div key={i} style={{position:"absolute",left:`${16+(i%3)*30}%`,top:`${22+Math.floor(i/3)*34}%`,width:58,height:58,borderRadius:16,border:`1px solid ${i%2?activeColor:rival.color}55`,background:`linear-gradient(145deg,${i%2?activeColor:rival.color}18,rgba(255,255,255,.035))`,display:"grid",placeItems:"center",fontSize:".58rem",fontWeight:1000,color:i%2?activeColor:rival.color,animation:`battleShard ${2.4+i*.2}s ease-in-out infinite`}}>{i%2?"YOU":"RIVAL"}</div>)}
+    {core}{statRow}
+  </div>;
+}
+
+function LobbyBattleHub({game,user,onSpend=()=>{},onClose,performer=null}) {
+  const hostName=performer?.name||"Lobby";
+  const moves=battleMovesForGame(game);
+  const [round,setRound]=useState(()=>makeLobbyBattleRound(game,hostName));
+  const [seconds,setSeconds]=useState(64);
+  const [joined,setJoined]=useState(false);
+  const [selectedTeam,setSelectedTeam]=useState(game.teams[0]);
+  const [targetTeam,setTargetTeam]=useState(game.teams[1]||game.teams[0]);
+  const [userScore,setUserScore]=useState(0);
+  const [momentum,setMomentum]=useState(0);
+  const [lastMove,setLastMove]=useState("");
+  const [scout,setScout]=useState(0);
+  const [decisionLog,setDecisionLog]=useState([]);
+  const [notice,setNotice]=useState("");
+  const awardRef=useRef(false);
+  const balance=Number(user?.sparks||0);
+  const reward=lobbyRewardForGame(game);
+  const bestScore=Math.max(...round.teams.map(t=>t.score),1,userScore);
+  const phase=round.finished?"Complete":seconds<16?"Final Burn":seconds<38?"Power Window":"Open Entry";
+  const ping=msg=>{setNotice(msg);setTimeout(()=>setNotice(""),1900)};
+  const spend=(amount,label)=>{
+    if(amount<=0)return true;
+    if(balance<amount){ping(`Need ${fsn(amount)} sparks to ${label}.`);return false}
+    onSpend(-amount);
+    return true;
+  };
+  const join=()=>{
+    if(joined){ping("You are already in this battle.");return}
+    if(!spend(game.entry,`enter ${game.name}`))return;
+    const starter=Math.floor(520+Math.random()*520);
+    setJoined(true);
+    setUserScore(starter);
+    setRound(prev=>{
+      const teams=prev.teams.map(t=>t.name===selectedTeam?{...t,score:t.score+Math.floor(starter*.32),heat:Math.min(100,t.heat+10)}:t);
+      const leaders=[{name:user.name,score:starter,team:selectedTeam,status:"entered"},...prev.leaders].sort((a,b)=>b.score-a.score).slice(0,8);
+      return {...prev,teams,leaders,log:[`${user.name} joined ${selectedTeam} and entered ${game.name}${game.entry?` for ${fsn(game.entry)} sparks`:" free"}.`,...prev.log].slice(0,8)};
+    });
+  };
+  const sim=()=>{
+    setRound(prev=>{
+      if(prev.finished)return prev;
+      const teamIndex=Math.floor(Math.random()*prev.teams.length);
+      const gain=Math.floor(40+Math.random()*130);
+      const eventTeam=prev.teams[teamIndex];
+      const teams=prev.teams.map((team,i)=>i===teamIndex?{...team,score:team.score+gain,heat:Math.min(100,team.heat+8)}:{...team,score:team.score+Math.floor(Math.random()*24),heat:Math.max(12,team.heat-2)});
+      const leaders=prev.leaders.map((leader,i)=>i===teamIndex?{...leader,score:leader.score+gain,status:"surging"}:{...leader,score:leader.score+Math.floor(Math.random()*26),status:leader.status==="surging"?"hot":leader.status}).sort((a,b)=>b.score-a.score);
+      return {...prev,teams,leaders,tick:prev.tick+1,log:[`${eventTeam.name} ${lobbyPick(LOBBY_BATTLE_EVENTS)}.`,...prev.log].slice(0,8)};
+    });
+    if(joined&&!round.finished)setUserScore(s=>s+Math.floor(24+Math.random()*88));
+  };
+  const powerMove=()=>{
+    if(round.finished)return;
+    resolveMove(moves.find(m=>m.paid)||moves[moves.length-1]);
+  };
+  const readRoom=()=>{
+    if(round.finished)return;
+    if(!joined){ping("Enter first, then read the room.");return}
+    const boost=45+Math.floor(Math.random()*45);
+    setScout(boost);
+    setLastMove("Room read primed");
+    setDecisionLog(p=>[{label:"Read Room",text:`Next move gains +${boost} precision against ${targetTeam}.`,tone:"var(--cy)"},...p].slice(0,4));
+    setRound(prev=>({...prev,log:[`${user.name} read the room and found an opening against ${targetTeam}.`,...prev.log].slice(0,8)}));
+  };
+  const resolveMove=move=>{
+    if(!move||round.finished)return;
+    if(!joined){ping("Choose a faction and enter before making strategic moves.");return}
+    const cost=move.paid?game.moveCost:(move.cost||0);
+    if(!spend(cost,move.label.toLowerCase()))return;
+    const realTarget=targetTeam===selectedTeam?battleOtherTeam(round.teams,selectedTeam):targetTeam;
+    const roll=Math.random();
+    const success=roll>move.risk;
+    const variance=Math.floor(Math.random()*70);
+    const gain=Math.max(20,(success?move.gain:(move.fail||Math.floor(move.gain*.25)))+variance+scout);
+    const targetDelta=success?(move.target||0):Math.abs(move.target||0)>0?Math.floor(Math.abs(move.target)*.45):0;
+    const msg=success?`${user.name} ${move.copy} for +${fsn(gain)} pressure.`:`${user.name} tried ${move.label}, but ${realTarget} partially countered it.`;
+    setScout(0);
+    setMomentum(m=>Math.max(-100,Math.min(100,m+gain+(targetDelta<0?Math.abs(targetDelta):0)-(success?0:45))));
+    setLastMove(move.label);
+    setUserScore(s=>Math.max(0,s+gain));
+    setDecisionLog(p=>[{label:move.label,text:`${success?"Hit":"Countered"}: +${fsn(gain)} you${targetDelta<0?`, ${fsn(Math.abs(targetDelta))} drained from ${realTarget}`:targetDelta>0?`, ${realTarget} gained ${fsn(targetDelta)}`:""}.`,tone:success?game.color:"var(--am)"},...p].slice(0,4));
+    setRound(prev=>{
+      const teams=prev.teams.map(team=>{
+        if(team.name===selectedTeam)return {...team,score:Math.max(0,team.score+gain),heat:Math.min(100,team.heat+Math.floor(8+gain/70))};
+        if(team.name===realTarget)return {...team,score:Math.max(0,team.score+targetDelta),heat:Math.max(8,team.heat+(targetDelta<0?-8:4))};
+        return {...team,score:team.score+Math.floor(Math.random()*14)};
+      });
+      const withoutUser=prev.leaders.filter(l=>l.name!==user.name);
+      const leaders=[{name:user.name,score:userScore+gain,team:selectedTeam,status:"playing"},...withoutUser].map(l=>l.name===realTarget?{...l,score:Math.max(0,l.score+targetDelta)}:l).sort((a,b)=>b.score-a.score).slice(0,8);
+      return {...prev,teams,leaders,log:[msg,...prev.log].slice(0,8)};
+    });
+  };
+  const finish=()=>{
+    setRound(prev=>{
+      if(prev.finished)return prev;
+      const userEntry=joined?{name:user.name,score:userScore+Math.floor(Math.random()*240),team:selectedTeam,status:"entered"}:null;
+      const contenders=[...prev.leaders.map(x=>({...x,score:x.score+Math.floor(Math.random()*360)})),...(userEntry?[userEntry]:[])].sort((a,b)=>b.score-a.score);
+      return {...prev,finished:true,winner:contenders[0],leaders:contenders.slice(0,8),log:[`${contenders[0].name} won ${game.name} with ${fsn(contenders[0].score)} pressure.`,...prev.log].slice(0,8)};
+    });
+  };
+  const reset=()=>{
+    setRound(makeLobbyBattleRound(game,hostName));
+    setSeconds(64);
+    setJoined(false);
+    setSelectedTeam(game.teams[0]);
+    setTargetTeam(game.teams[1]||game.teams[0]);
+    setUserScore(0);
+    setMomentum(0);
+    setLastMove("");
+    setScout(0);
+    setDecisionLog([]);
+    setNotice("");
+    awardRef.current=false;
+  };
+  useEffect(()=>{if(round.finished)return;const t=setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>clearInterval(t)},[round.finished]);
+  useEffect(()=>{if(round.finished)return;const t=setInterval(sim,1600);return()=>clearInterval(t)},[round.finished,joined,userScore,balance]);
+  useEffect(()=>{if(seconds===0&&!round.finished)finish()},[seconds,round.finished,joined,userScore]);
+  useEffect(()=>{
+    if(!round.finished||!joined||awardRef.current||round.winner?.name!==user.name)return;
+    awardRef.current=true;
+    if(reward>0){onSpend(reward);ping(`You won ${fsn(reward)} bonus sparks.`)}
+    else ping("You won status credit. Free battles do not mint sparks.");
+  },[round.finished,round.winner,joined,user.name,reward,onSpend]);
+  return <div className="ai" style={{position:"fixed",inset:0,zIndex:90,background:"rgba(3,5,10,.78)",backdropFilter:"blur(18px)",display:"grid",placeItems:"center",padding:"clamp(10px,3vw,28px)"}}>
+    <div className="battle-modal-panel" style={{position:"relative",width:"calc(100vw - 20px)",maxWidth:1180,maxHeight:"92vh",overflow:"hidden",borderRadius:18,border:`1px solid ${game.color}66`,background:"linear-gradient(135deg,rgba(255,255,255,.1),rgba(7,9,16,.96) 36%,rgba(255,255,255,.04))",boxShadow:`0 34px 120px rgba(0,0,0,.62),0 0 90px ${game.color}22`}}>
+      <div style={{position:"absolute",inset:0,pointerEvents:"none",background:`radial-gradient(circle at 16% 0%,${game.color}24,transparent 28%),radial-gradient(circle at 86% 20%,rgba(0,212,255,.12),transparent 26%)`}}/>
+      <header style={{position:"relative",display:"flex",justifyContent:"space-between",alignItems:"start",gap:12,padding:"16px 18px",borderBottom:"1px solid rgba(255,255,255,.1)",background:"rgba(5,8,16,.52)"}}>
+        <div style={{minWidth:0}}><div style={{display:"flex",gap:7,flexWrap:"wrap",alignItems:"center"}}><Tag color={game.color}>{game.archetype}</Tag><Tag color="var(--cy)">{game.players} viewers</Tag><Tag color={game.entry?"var(--am)":"var(--gn)"}>{game.entry?`${fsn(game.entry)} sparks entry`:"Free entry"}</Tag>{performer&&<Tag color={performer.accent||game.color}>Hosted by {performer.name.split(" ")[0]}</Tag>}</div>
+          <h2 style={{fontSize:"1.38rem",fontWeight:1000,lineHeight:1.08,marginTop:8}}>{game.name}</h2><p style={{fontSize:".72rem",lineHeight:1.45,color:"rgba(255,255,255,.66)",maxWidth:700,marginTop:5}}>{game.hook}</p></div>
+        <button onClick={onClose} aria-label="Close battle" style={{width:36,height:36,borderRadius:18,border:"1px solid rgba(255,255,255,.14)",background:"rgba(255,255,255,.055)",color:"var(--mt)",display:"grid",placeItems:"center",cursor:"pointer",flexShrink:0}}><I n="close" s={14}/></button>
+      </header>
+      <div className="battle-modal-body" style={{position:"relative",display:"grid",gridTemplateColumns:"var(--battle-body-columns,minmax(0,1.2fr) minmax(280px,.8fr))",gap:12,padding:14,overflowY:"auto",maxHeight:"calc(92vh - 112px)",minWidth:0}}>
+        <section style={{minWidth:0}}>
+          <BattleScene game={game} round={round} seconds={seconds} phase={phase} reward={reward} joined={joined} userScore={userScore} selectedTeam={selectedTeam} targetTeam={targetTeam} lastMove={lastMove} momentum={momentum}/>
+          <div className="battle-team-grid" style={{display:"grid",gridTemplateColumns:"var(--battle-compact-columns,repeat(auto-fit,minmax(170px,1fr)))",gap:8,marginTop:10}}>
+            {round.teams.map(team=><button type="button" key={team.name} onClick={()=>joined?setTargetTeam(team.name):setSelectedTeam(team.name)} style={{padding:10,borderRadius:10,border:`1px solid ${team.name===selectedTeam?team.color:team.name===targetTeam?"var(--am)":team.color+"44"}`,background:`linear-gradient(135deg,${team.color}${team.name===selectedTeam?"24":"12"},rgba(255,255,255,.025))`,color:"var(--tx)",textAlign:"left",cursor:"pointer"}}>
+              <div style={{display:"flex",justifyContent:"space-between",gap:8,fontSize:".7rem",fontWeight:1000}}><span style={{color:team.color}}>{team.name}</span><span>{fsn(team.score)}</span></div>
+              <div style={{height:5,borderRadius:999,background:"rgba(255,255,255,.1)",marginTop:8}}><div style={{height:"100%",width:`${Math.max(8,(team.score/bestScore)*100)}%`,borderRadius:"inherit",background:`linear-gradient(90deg,${team.color},rgba(255,255,255,.34))`}}/></div>
+              <div style={{fontSize:".52rem",fontWeight:1000,textTransform:"uppercase",letterSpacing:".08em",color:team.name===selectedTeam?"var(--gn)":team.name===targetTeam?"var(--am)":"rgba(255,255,255,.34)",marginTop:6}}>{team.name===selectedTeam?"Your faction":team.name===targetTeam?"Current target":joined?"Tap to target":"Tap to join"}</div>
+            </button>)}
+          </div>
+        </section>
+        <aside style={{display:"grid",gap:10,alignContent:"start",minWidth:0}}>
+          <section style={{padding:12,borderRadius:12,border:"1px solid rgba(255,255,255,.1)",background:"rgba(255,255,255,.045)"}}>
+            <Kk>Business Rules</Kk>
+            <div className="battle-rule-grid" style={{display:"grid",gridTemplateColumns:"var(--battle-compact-columns,1fr 1fr)",gap:7,marginTop:8}}>
+              {[["Entry",game.entry?`${fsn(game.entry)} sparks`:"Free"],["USD guide",game.entry?lobbyUsdHint(game.entry):"$0.00"],["Prize cap",reward?`${fsn(reward)} bonus`:"No spark mint"],["Reserve",game.entry?`${game.houseHold}% platform`:"N/A"],["Creator pool",game.creatorPool?`${game.creatorPool}%`:"Status"],["Reward return",game.entry?`${Math.round(game.returnRate*100)}% cap basis`:"0%"]].map(([k,v])=><div key={k} style={{padding:8,borderRadius:8,border:"1px solid rgba(255,255,255,.08)",background:"rgba(0,0,0,.18)"}}><div style={{fontSize:".52rem",color:"rgba(255,255,255,.48)",fontWeight:900,textTransform:"uppercase"}}>{k}</div><div style={{fontSize:".72rem",fontWeight:1000,marginTop:2,color:k==="Prize cap"?"var(--am)":"#fff"}}>{v}</div></div>)}
+            </div>
+            <p style={{fontSize:".62rem",lineHeight:1.45,color:"rgba(255,255,255,.58)",marginTop:8}}>Closed-loop entertainment rewards only. Bonus Sparks have no cash value, cannot transfer, and stay capped below the round economy.</p>
+          </section>
+          <section style={{padding:12,borderRadius:12,border:"1px solid rgba(255,255,255,.1)",background:"rgba(255,255,255,.045)"}}>
+            <Kk>Your Strategy</Kk>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7,marginTop:8}}>
+              <div style={{padding:8,borderRadius:8,border:"1px solid rgba(255,255,255,.08)",background:"rgba(0,0,0,.18)"}}><div style={{fontSize:".52rem",textTransform:"uppercase",fontWeight:1000,color:"rgba(255,255,255,.45)"}}>Faction</div><div style={{fontSize:".72rem",fontWeight:1000,color:"var(--gn)",marginTop:2}}>{selectedTeam}</div></div>
+              <div style={{padding:8,borderRadius:8,border:"1px solid rgba(255,255,255,.08)",background:"rgba(0,0,0,.18)"}}><div style={{fontSize:".52rem",textTransform:"uppercase",fontWeight:1000,color:"rgba(255,255,255,.45)"}}>Target</div><div style={{fontSize:".72rem",fontWeight:1000,color:"var(--am)",marginTop:2}}>{targetTeam}</div></div>
+            </div>
+            <div className="battle-control-grid" style={{display:"grid",gridTemplateColumns:"var(--battle-compact-columns,1fr 1fr)",gap:7,marginTop:8}}><Btn primary small disabled={joined||round.finished} onClick={join}>{joined?"Entered":game.entry?`Enter ${fsn(game.entry)}`:"Enter Free"}</Btn><Btn small disabled={!joined||round.finished} onClick={readRoom}>Read Room</Btn><Btn small disabled={!joined||round.finished} onClick={powerMove}>Premium {fsn(game.moveCost)}</Btn><Btn small onClick={round.finished?reset:finish}>{round.finished?"Next Round":"End Round"}</Btn></div>
+            <div style={{display:"grid",gap:7,marginTop:9}}>
+              {moves.map(move=>{
+                const cost=move.paid?game.moveCost:(move.cost||0);
+                return <button key={move.id} type="button" disabled={!joined||round.finished} onClick={()=>resolveMove(move)} className="battle-action" style={{padding:10,borderRadius:9,border:`1px solid ${move.paid?"rgba(255,171,0,.36)":"rgba(255,255,255,.11)"}`,background:move.paid?"linear-gradient(135deg,rgba(255,171,0,.12),rgba(255,45,120,.08))":"rgba(255,255,255,.035)",color:"var(--tx)",font:"inherit",textAlign:"left",cursor:!joined||round.finished?"not-allowed":"pointer",opacity:(!joined||round.finished)?.55:1}}>
+                  <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"start"}}><span style={{fontSize:".72rem",fontWeight:1000,color:move.paid?"var(--am)":game.color}}>{move.label}</span><span style={{fontSize:".58rem",fontWeight:1000,color:cost?"var(--am)":"var(--gn)",whiteSpace:"nowrap"}}>{cost?`${fsn(cost)} sparks`:"Free"}</span></div>
+                  <div style={{fontSize:".6rem",lineHeight:1.35,color:"rgba(255,255,255,.58)",marginTop:4}}>{move.intent} · risk {Math.round(move.risk*100)}% · {move.target<0?`drains target ${fsn(Math.abs(move.target))}`:"builds your faction"}</div>
+                </button>;
+              })}
+            </div>
+            {notice&&<div className="ai" style={{marginTop:8,padding:8,borderRadius:8,border:"1px solid rgba(255,171,0,.28)",background:"rgba(255,171,0,.07)",fontSize:".66rem",fontWeight:900,color:"var(--am)"}}>{notice}</div>}
+            {round.finished&&<div style={{marginTop:8,padding:9,borderRadius:9,border:"1px solid rgba(34,197,94,.32)",background:"rgba(34,197,94,.08)",fontSize:".7rem",lineHeight:1.4}}><strong style={{color:"var(--gn)"}}>Winner:</strong> {round.winner?.name} with {fsn(round.winner?.score)} pressure.</div>}
+          </section>
+          {decisionLog.length>0&&<section style={{padding:12,borderRadius:12,border:"1px solid rgba(255,255,255,.1)",background:"rgba(255,255,255,.045)"}}>
+            <Kk>Decision Output</Kk>{decisionLog.map((item,i)=><div key={`${item.label}-${i}`} style={{padding:"7px 0",borderBottom:i<decisionLog.length-1?"1px solid rgba(255,255,255,.07)":"none"}}><div style={{fontSize:".66rem",fontWeight:1000,color:item.tone}}>{item.label}</div><div style={{fontSize:".62rem",lineHeight:1.35,color:"rgba(255,255,255,.62)",marginTop:2}}>{item.text}</div></div>)}
+          </section>}
+          <section style={{padding:12,borderRadius:12,border:"1px solid rgba(255,255,255,.1)",background:"rgba(255,255,255,.045)"}}>
+            <Kk>Why This Works</Kk><p style={{fontSize:".66rem",lineHeight:1.45,color:"rgba(255,255,255,.64)"}}>{game.inspired}</p><p style={{fontSize:".62rem",lineHeight:1.4,color:"rgba(255,255,255,.5)",marginTop:6}}>Visual target: {game.visual}.</p>
+          </section>
+          <section style={{padding:12,borderRadius:12,border:"1px solid rgba(255,255,255,.1)",background:"rgba(255,255,255,.045)"}}>
+            <Kk>Leaderboard</Kk>{round.leaders.slice(0,5).map((leader,i)=><div key={leader.name} style={{display:"grid",gridTemplateColumns:"18px minmax(0,1fr) auto",gap:7,alignItems:"center",padding:"6px 0",borderBottom:i<4?"1px solid rgba(255,255,255,.07)":"none",fontSize:".68rem"}}><span style={{fontWeight:1000,color:i===0?"var(--am)":"var(--mt)"}}>{i+1}</span><span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{leader.name}<span style={{color:"rgba(255,255,255,.38)",marginLeft:5}}>{leader.team}</span></span><strong style={{color:"var(--am)"}}>{fsn(leader.score)}</strong></div>)}</section>
+          <section style={{padding:12,borderRadius:12,border:"1px solid rgba(255,255,255,.1)",background:"rgba(255,255,255,.045)"}}>
+            <Kk>AI Feed</Kk>{round.log.slice(0,5).map((line,i)=><div key={`${line}-${i}`} style={{fontSize:".62rem",lineHeight:1.35,color:i===0?"rgba(255,255,255,.84)":"rgba(255,255,255,.52)",padding:"5px 0",borderBottom:i<4?"1px solid rgba(255,255,255,.07)":"none"}}>{line}</div>)}</section>
+        </aside>
+      </div>
+    </div>
+  </div>;
+}
+
+function LB({user,onPerf,onWallet,cat,setCat,onMenu,performers=PERFS,onSC=()=>{}}){
   const f=cat==="All"?performers:performers.filter(p=>(p.cats||[]).includes(cat));const tier=gl(user.spent);
+  const battleParams=typeof window!=="undefined"?new URLSearchParams(window.location.search):new URLSearchParams();
+  const battleParam=battleParams.get("battle"),hostParam=battleParams.get("performer")||battleParams.get("host");
+  const initialHost=performers.find(p=>p.id===hostParam)||null;
+  const [battleHost,setBattleHost]=useState(()=>initialHost);
+  const [battle,setBattle]=useState(()=>LOBBY_BATTLE_GAMES.find(g=>g.id===battleParam)||(initialHost?performerLobbyBattles(initialHost)[0]:null)||null);
+  const featured=f[0],featuredBattles=performerLobbyBattles(featured);
+  const openBattle=(game,host=null)=>{setBattleHost(host);setBattle(game)};
   return<div style={{minHeight:"100vh",background:"var(--bg)",padding:"12px clamp(10px,3vw,30px)"}}>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
       <div style={{display:"flex",alignItems:"center",gap:7}}>
@@ -971,19 +1645,43 @@ function LB({user,onPerf,onWallet,cat,setCat,onMenu,performers=PERFS}){
       </div></div>
     <div style={{display:"flex",gap:3,overflowX:"auto",marginBottom:12,paddingBottom:2}}>{CATS.slice(0,10).map(c=><button key={c} onClick={()=>setCat(c)} style={{padding:"4px 11px",borderRadius:999,border:cat===c?"1px solid var(--pk)":"1px solid var(--bd)",background:cat===c?"rgba(255,45,120,.08)":"none",color:cat===c?"var(--pk)":"var(--mt)",fontWeight:700,fontSize:".7rem",cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>{c}</button>)}</div>
     {/* Featured */}
-    {f[0]&&<div className="ai" onClick={()=>onPerf(f[0])} style={{position:"relative",borderRadius:12,overflow:"hidden",marginBottom:14,minHeight:200,cursor:"pointer",border:"1px solid var(--bd)",background:`linear-gradient(135deg,${f[0].accent}10,transparent 40%),linear-gradient(180deg,#0c1628,#0d0f1a)`,animation:"glow 3s ease infinite"}}>
+    {featured&&<div className="ai" onClick={()=>onPerf(featured)} style={{position:"relative",borderRadius:12,overflow:"hidden",marginBottom:14,minHeight:200,cursor:"pointer",border:"1px solid var(--bd)",background:`linear-gradient(135deg,${featured.accent}10,transparent 40%),linear-gradient(180deg,#0c1628,#0d0f1a)`,animation:"glow 3s ease infinite"}}>
       <div style={{position:"absolute",inset:0,display:"flex",alignItems:"flex-end",padding:18}}>
-        <div style={{flex:1}}><Lv/><h2 style={{fontSize:"clamp(1.2rem,2.4vw,1.7rem)",fontWeight:900,marginTop:5,lineHeight:1.1}}>{f[0].name}</h2>
-          <p style={{color:"var(--mt)",fontSize:".8rem",marginTop:1}}>{f[0].vibe}</p>
-          <div style={{display:"flex",gap:3,marginTop:5,flexWrap:"wrap"}}><Tag color="var(--pk)"><I n="gamepad" s={7} c="var(--pk)"/> {f[0].game}</Tag><Tag color="var(--cy)"><I n="users" s={7} c="var(--cy)"/> {f[0].viewers}</Tag></div></div>
+        <div style={{flex:1}}><Lv/><h2 style={{fontSize:"clamp(1.2rem,2.4vw,1.7rem)",fontWeight:900,marginTop:5,lineHeight:1.1}}>{featured.name}</h2>
+          <p style={{color:"var(--mt)",fontSize:".8rem",marginTop:1}}>{featured.vibe}</p>
+          <div style={{display:"flex",gap:3,marginTop:5,flexWrap:"wrap"}}><Tag color="var(--pk)"><I n="gamepad" s={7} c="var(--pk)"/> {featured.game}</Tag><Tag color="var(--cy)"><I n="users" s={7} c="var(--cy)"/> {featured.viewers}</Tag></div>
+          {featuredBattles.length>0&&<div style={{display:"flex",gap:5,marginTop:9,flexWrap:"wrap"}}>
+            {featuredBattles.slice(0,3).map(g=><button key={g.id} type="button" onClick={e=>{e.stopPropagation();openBattle(g,featured)}} style={{height:26,padding:"0 9px",borderRadius:13,border:`1px solid ${g.color}55`,background:`${g.color}16`,color:g.color,font:"inherit",fontSize:".58rem",fontWeight:1000,cursor:"pointer"}}><I n={g.icon} s={9} c={g.color} st={{marginRight:3}}/>{g.name}</button>)}
+          </div>}</div>
         <Btn primary small>View Profile</Btn></div></div>}
+    <div style={{padding:16,border:"1px solid rgba(255,255,255,.1)",borderRadius:12,background:"linear-gradient(135deg,rgba(255,45,120,.08),rgba(0,212,255,.04),rgba(255,255,255,.025))",marginBottom:14,overflow:"hidden",position:"relative"}}>
+      <div style={{position:"absolute",left:"-18%",top:18,width:"54%",height:42,background:"linear-gradient(90deg,transparent,rgba(255,45,120,.3),transparent)",animation:"battleSweep 5s ease-in-out infinite",pointerEvents:"none"}}/>
+      <div style={{position:"relative",display:"flex",justifyContent:"space-between",gap:12,alignItems:"end",marginBottom:10,flexWrap:"wrap"}}>
+        <div><Kk>Lobby Battle Arcade</Kk><Tt s="1.12rem">Ten AI-hosted community battles built for viewer rivalry.</Tt><p style={{fontSize:".68rem",color:"var(--mt)",lineHeight:1.45,maxWidth:720}}>High-grossing game loops, adult-platform theming, capped Spark economics, and lobby-wide spectacle. Free games build habit; paid games fund creator pools, platform reserve, and capped bonus rewards.</p></div>
+        <Tag color="var(--am)"><I n="shield" s={10} c="var(--am)"/> closed-loop rewards</Tag>
+      </div>
+      <div style={{position:"relative",display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(210px,1fr))",gap:8}}>
+        {LOBBY_BATTLE_GAMES.map(game=><button key={game.id} className="battle-card" type="button" onClick={()=>openBattle(game,null)} style={{minHeight:154,padding:12,borderRadius:10,border:`1px solid ${game.color}38`,background:`linear-gradient(150deg,${game.color}14,rgba(255,255,255,.035) 45%,rgba(0,0,0,.12))`,color:"var(--tx)",textAlign:"left",cursor:"pointer",position:"relative",overflow:"hidden"}}>
+          <div style={{position:"absolute",right:10,top:10,width:34,height:34,borderRadius:9,display:"grid",placeItems:"center",background:`${game.color}18`}}><I n={game.icon} s={17} c={game.color}/></div>
+          <div style={{fontSize:".58rem",letterSpacing:".1em",textTransform:"uppercase",fontWeight:1000,color:game.color,paddingRight:42}}>{game.archetype}</div>
+          <div style={{fontWeight:1000,fontSize:".88rem",marginTop:6,paddingRight:42}}>{game.name}</div>
+          <p style={{fontSize:".62rem",lineHeight:1.35,color:"rgba(255,255,255,.62)",marginTop:6,minHeight:34}}>{game.hook}</p>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:6,marginTop:10}}>
+            <span style={{fontSize:".62rem",fontWeight:1000,color:game.entry?"var(--am)":"var(--gn)"}}>{game.entry?`${fsn(game.entry)} sparks`:"Free"}</span>
+            <span style={{fontSize:".58rem",fontWeight:900,color:"rgba(255,255,255,.5)"}}>{game.players} players</span>
+          </div>
+        </button>)}
+      </div>
+    </div>
     <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:7}}><I n="live" s={11} c="var(--pk)"/><h3 style={{fontWeight:800,fontSize:".84rem"}}>Live Now — {cat}</h3></div>
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:8,marginBottom:16}}>
-      {f.map((p,i)=><G key={p.id} className="ai" onClick={()=>onPerf(p)} style={{padding:0,overflow:"hidden",cursor:"pointer",animationDelay:`${i*.04}s`}}>
+      {f.map((p,i)=>{const hosted=performerLobbyBattles(p);return <G key={p.id} className="ai" onClick={()=>onPerf(p)} style={{padding:0,overflow:"hidden",cursor:"pointer",animationDelay:`${i*.04}s`}}>
         <div style={{height:90,position:"relative",background:`linear-gradient(135deg,${p.accent}10,transparent 50%),linear-gradient(180deg,#0c1628,#0d0f1a)`}}>
           <div style={{position:"absolute",top:6,left:6}}><Lv/></div><div style={{position:"absolute",top:6,right:6}}><Tag color={HEAT[p.level]}>{p.level}</Tag></div></div>
         <div style={{padding:"7px 9px"}}><div style={{display:"flex",justifyContent:"space-between"}}><h4 style={{fontWeight:700,fontSize:".8rem"}}>{p.name}</h4><span style={{fontSize:".62rem",color:"var(--mt)"}}>{p.viewers}</span></div>
-          <p style={{color:"var(--mt)",fontSize:".68rem",marginTop:1}}>{p.vibe}</p></div></G>)}
+          <p style={{color:"var(--mt)",fontSize:".68rem",marginTop:1}}>{p.vibe}</p>
+          {hosted.length>0&&<div style={{display:"flex",gap:4,flexWrap:"wrap",marginTop:7}}>{hosted.slice(0,2).map(g=><button key={g.id} type="button" onClick={e=>{e.stopPropagation();openBattle(g,p)}} style={{height:24,padding:"0 7px",borderRadius:12,border:`1px solid ${g.color}44`,background:`${g.color}12`,color:g.color,font:"inherit",fontSize:".55rem",fontWeight:1000,cursor:"pointer"}}>{g.name}</button>)}</div>}
+        </div></G>})}
     </div>
     {/* How VYBE Works */}
     <div style={{padding:16,border:"1px solid var(--bd)",borderRadius:12,background:"var(--cd)",marginBottom:14}}>
@@ -999,13 +1697,14 @@ function LB({user,onPerf,onWallet,cat,setCat,onMenu,performers=PERFS}){
       </div></div>
     {/* Games */}
     <div style={{padding:16,border:"1px solid var(--bd)",borderRadius:12,background:"var(--cd)",marginBottom:14}}>
-      <Kk>11 Game Modes — Spark-Backed Play</Kk>
+      <Kk>12 Game Modes — Spark-Backed Play</Kk>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:5,marginTop:8}}>
         {GAMES.map(g=><div key={g.id} style={{padding:"7px 8px",borderRadius:7,border:"1px solid var(--bd)"}}>
           <div style={{display:"flex",alignItems:"center",gap:3}}><I n={g.icon} s={12} c={g.color}/><span style={{fontWeight:700,fontSize:".72rem"}}>{g.name}</span></div>
           <p style={{fontSize:".62rem",color:"var(--mt)",lineHeight:1.3,marginTop:1}}>{g.desc}</p>
           <div style={{marginTop:4,fontSize:".56rem",fontWeight:900,color:"var(--am)",display:"flex",alignItems:"center",gap:2}}><I n="spark" s={8} c="var(--am)"/>{gameEconomyLine(g.type)}</div></div>)}</div>
     </div>
+    {battle&&<LobbyBattleHub game={battle} user={user} onSpend={onSC} performer={battleHost} onClose={()=>setBattle(null)}/>}
     <div style={{padding:10,borderTop:"1px solid var(--bd)",fontSize:".56rem",color:"var(--mt)",textAlign:"center"}}>VYBE Inc. · 18 USC §2257 workflow · 80/20 · CCBill/Segpay · <a href="/terms" style={{color:"var(--cy)"}}>Terms</a> · <a href="/privacy" style={{color:"var(--cy)"}}>Privacy</a> · <a href="/2257" style={{color:"var(--cy)"}}>2257</a> · <a href="/dmca" style={{color:"var(--cy)"}}>DMCA</a></div>
   </div>;}
 
@@ -1156,7 +1855,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
       <div style={{overflowY:"auto",maxHeight:"calc(100% - 76px)",paddingRight:3}}>{(perf.requests||[]).map((r,i)=><button key={i} onClick={()=>addReq(r)} disabled={user.sparks<r.sparks} style={{display:"flex",justifyContent:"space-between",alignItems:"center",width:"100%",padding:"8px 0",background:"none",border:"none",borderBottom:i<perf.requests.length-1?"1px solid var(--bd)":"none",cursor:user.sparks>=r.sparks?"pointer":"not-allowed",opacity:user.sparks>=r.sparks?1:.35,color:"var(--tx)",textAlign:"left"}}>
         <div><div style={{fontWeight:700,fontSize:".8rem"}}>{r.name}</div><div style={{fontSize:".66rem",color:"var(--mt)"}}>{r.desc}</div></div>
         <span style={{fontWeight:800,fontSize:".76rem",color:"var(--am)",display:"flex",alignItems:"center",gap:2,flexShrink:0}}><I n="spark" s={10} c="var(--am)"/>{r.sparks.toLocaleString()}</span></button>)}</div></Pn>}
-    {!media.fullscreen&&gm&&<GE game={gm} sparks={user.sparks} onSpend={onSC} onClose={()=>setGm(null)} onSB={sb}/>}
+    {!media.fullscreen&&gm&&<GE game={gm} sparks={user.sparks} onSpend={onSC} onClose={()=>setGm(null)} onSB={sb} userName={user.name}/>}
     {/* Action Bar */}
     {!media.fullscreen&&<div style={{position:"absolute",bottom:0,left:0,right:0,zIndex:15}}>
       <div style={{display:"grid",gridTemplateColumns:"minmax(210px,1fr) auto minmax(210px,1fr)",alignItems:"center",gap:12,padding:"8px 12px",background:"linear-gradient(to top,rgba(5,8,16,.96) 68%,transparent)"}}>
@@ -1543,13 +2242,35 @@ function PerfDash({perfData,onGoLive,onLogout}){
 
 /* ═══ MAIN APP ═══ */
 function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
+  const [postMode,setPostMode]=useState("photo");
+  const [postAccess,setPostAccess]=useState("free");
+  const [postDraft,setPostDraft]=useState({text:"",price:"120",scheduled:"Now"});
+  const [postCanvas,setPostCanvas]=useState({surface:"reel",mood:"Champagne Heat",cover:"Spotlight",cta:"Unlock full drop"});
+  const [studioPosts,setStudioPosts]=useState(()=>content.map((item,i)=>({
+    ...item,
+    dislikes:item.dislikes??Math.max(0,Math.round((item.likes||80)*.04)),
+    shares:item.shares??18+i*7,
+    access:item.locked?"paid":"free",
+    price:item.price||0,
+    media:item.type==="post"?"status":item.type,
+    surface:item.type==="video"?"reel":item.type==="photo"?"carousel":"story",
+    mood:["Champagne Heat","Afterdark Game","Velvet Preview","Subscriber First"][i%4],
+    saves:36+i*11
+  })));
+  const [prefTab,setPrefTab]=useState("pricing");
+  const [pricing,setPricing]=useState(()=>({subscription:p.sub?.price||24.99,privateSession:65,vipSession:250,photo:120,video:240,gameEntry:25,requestBase:150}));
+  const [toggles,setToggles]=useState(()=>({games:true,requests:true,paidPosts:true,schedulePublic:true,instantCashout:true,freeTrial:(p.sub?.trial||0)>0,subOnlyGames:true}));
+  const [activeGameIds,setActiveGameIds]=useState(()=>p.caps?.games||[]);
+  const [scheduleSlots,setScheduleSlots]=useState(()=>(p.schedule||[]).map((s,i)=>({...s,type:i%2?"Subscribers":"Live room",note:i===0?"Featured room slot":""})));
+  const [slotDraft,setSlotDraft]=useState({day:"Mon",time:"9:00 PM",type:"Live room",note:""});
+  const [cashoutStatus,setCashoutStatus]=useState("");
   const modules=[
-    {id:"home",label:"Command",icon:"live",tone:"#d6b15e"},
-    {id:"analytics",label:"Signals",icon:"trophy",tone:"#58d7c4"},
-    {id:"content",label:"Vault",icon:"eye",tone:"#b98cff"},
-    {id:"inbox",label:"Patrons",icon:"users",tone:"#ff8aa8"},
-    {id:"store",label:"Offers",icon:"gift",tone:"#ffbd66"},
-    {id:"settings",label:"Room",icon:"user",tone:"#8fb5ff"},
+    {id:"home",label:"Studio",icon:"live",tone:"#d6b15e"},
+    {id:"content",label:"Posts",icon:"eye",tone:"#b98cff"},
+    {id:"schedule",label:"Schedule",icon:"clock",tone:"#58d7c4"},
+    {id:"money",label:"Money",icon:"wallet",tone:"#ffbd66"},
+    {id:"preferences",label:"Prefs",icon:"gear",tone:"#8fb5ff"},
+    {id:"analytics",label:"Signals",icon:"trophy",tone:"#ff8aa8"},
   ];
   const active=modules.find(m=>m.id===tab)||modules[0];
   const compact=typeof window!=="undefined"&&window.innerWidth<900;
@@ -1557,10 +2278,24 @@ function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
   const panel={border:`1px solid ${line}`,background:"linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.032))",borderRadius:10,boxShadow:"0 24px 70px rgba(0,0,0,.26)"};
   const label={fontSize:".62rem",fontWeight:900,letterSpacing:".13em",textTransform:"uppercase",color:dim};
   const copy={fontSize:".72rem",lineHeight:1.55,color:soft};
-  const title={home:"Session Command",analytics:"Signal Map",content:"Asset Vault",inbox:"Patron Intelligence",store:"Offer Architect",settings:"Room Identity"}[tab]||"Session Command";
-  const subtitle={home:"Prepare the room, read audience pressure, and launch with every operational risk visible.",analytics:"A VYBE-native read on retention, spend velocity, and room heat.",content:"Clips, drops, subscriber previews, and paid media staged from one clean vault.",inbox:"Known patrons, intent, loyalty, limits, and relationship history.",store:"Design requests, rewards, bundles, and timed premium offers without clutter.",settings:"Shape the public room promise, entry card, and compliance posture."}[tab];
+  const title={home:"Performer Command",content:"Post Studio",schedule:"Schedule Builder",money:"Cashout Desk",preferences:"Preferences",analytics:"Signal Map"}[tab]||"Performer Command";
+  const subtitle={home:"One clean cockpit for live readiness, audience pressure, and the exact levers that make a room earn.",content:"A VYBE-native social feed for free updates, subscriber posts, and simple paid photo or video drops.",schedule:"Create live blocks, subscriber windows, private availability, and VIP nights without hunting through settings.",money:"See available earnings and request a payout whenever the processor, reserve, and tax checks allow it.",preferences:"Pricing, games, request menu, subscriptions, and trial choices live here with category tabs and focused dropdowns.",analytics:"A VYBE-native read on retention, spend velocity, and room heat."}[tab];
   const topFans=fans.slice(0,4);
   const bars=[46,62,38,76,57,84,68,92,74,88,63,79];
+  const field={width:"100%",height:38,border:`1px solid ${line}`,borderRadius:8,background:"rgba(0,0,0,.18)",color:ink,padding:"0 10px",font:"inherit",fontSize:".75rem",outline:"none"};
+  const textarea={width:"100%",minHeight:112,border:`1px solid ${line}`,borderRadius:9,background:"rgba(0,0,0,.18)",color:ink,padding:12,font:"inherit",fontSize:".78rem",lineHeight:1.5,resize:"vertical",outline:"none"};
+  const money=n=>`$${Number(n||0).toLocaleString(undefined,{maximumFractionDigits:Number(n)%1?2:0})}`;
+  const updatePrice=(key,value)=>setPricing(prev=>({...prev,[key]:value}));
+  const toggleFlag=key=>setToggles(prev=>({...prev,[key]:!prev[key]}));
+  const toggleGame=id=>setActiveGameIds(prev=>prev.includes(id)?prev.filter(gameId=>gameId!==id):[...prev,id]);
+  const publishPost=()=>{const text=postDraft.text.trim()||`${postCanvas.mood} is staged for tonight. ${postAccess==="paid"?postCanvas.cta:"Come warm the room before we go live."}`;const paid=postAccess==="paid";setStudioPosts(prev=>[{type:postMode,text,time:"Just now",likes:0,dislikes:0,comments:0,shares:0,saves:0,access:postAccess,price:paid?Number(postDraft.price||0):0,locked:paid||postAccess==="subscribers",media:postMode,surface:postCanvas.surface,mood:postCanvas.mood,cover:postCanvas.cover},...prev]);setPostDraft({text:"",price:postDraft.price,scheduled:"Now"});};
+  const reactToPost=(index,key)=>setStudioPosts(prev=>prev.map((post,i)=>i===index?{...post,[key]:(post[key]||0)+1}:post));
+  const addSlot=()=>{setScheduleSlots(prev=>[...prev,{...slotDraft}]);setSlotDraft({day:"Mon",time:"9:00 PM",type:"Live room",note:""});};
+  const Toggle=({label,body,checked,onClick,tone=active.tone})=><button type="button" onClick={onClick} style={{width:"100%",display:"grid",gridTemplateColumns:"minmax(0,1fr) 54px",gap:12,alignItems:"center",padding:12,border:`1px solid ${checked?tone+"88":line}`,borderRadius:9,background:checked?`${tone}12`:"rgba(255,255,255,.025)",color:ink,textAlign:"left",cursor:"pointer"}}>
+    <span><span style={{display:"block",fontSize:".78rem",fontWeight:1000}}>{label}</span><span style={{display:"block",...copy,fontSize:".62rem",marginTop:2}}>{body}</span></span>
+    <span style={{width:48,height:28,borderRadius:999,padding:3,background:checked?"linear-gradient(135deg,#ff2d78,#ffab00)":"rgba(255,255,255,.1)",justifySelf:"end",boxShadow:checked?`0 0 24px ${tone}26`:"none"}}><span style={{display:"block",width:22,height:22,borderRadius:"50%",background:checked?"#fff":"rgba(246,239,229,.45)",transform:checked?"translateX(20px)":"translateX(0)",transition:"transform .18s ease"}}/></span>
+  </button>;
+  const Seg=({items,value,onChange})=><div style={{display:"flex",gap:5,padding:4,border:`1px solid ${line}`,borderRadius:10,background:"rgba(0,0,0,.16)",flexWrap:"wrap"}}>{items.map(item=><button key={item.id} type="button" onClick={()=>onChange(item.id)} style={{height:30,padding:"0 10px",border:0,borderRadius:7,background:value===item.id?`${active.tone}24`:"transparent",color:value===item.id?ink:soft,font:"inherit",fontSize:".68rem",fontWeight:1000,cursor:"pointer"}}>{item.label}</button>)}</div>;
   const Empty=({icon,title,body})=><div style={{minHeight:180,display:"grid",placeItems:"center",textAlign:"center",color:soft}}><div><I n={icon} s={30} c="rgba(246,239,229,.22)"/><div style={{fontWeight:900,fontSize:".82rem",marginTop:10,color:ink}}>{title}</div><div style={{...copy,maxWidth:280,margin:"5px auto 0"}}>{body}</div></div></div>;
   const Stat=({k,v,sub,tone=active.tone})=><div style={{...panel,padding:compact?10:14,minHeight:compact?78:92}}><div style={{...label,color:dim,fontSize:compact?".55rem":label.fontSize}}>{k}</div><div style={{fontSize:compact?"1.05rem":"1.45rem",fontWeight:1000,marginTop:compact?7:9,color:tone,lineHeight:1}}>{v}</div><div style={{...copy,fontSize:compact?".56rem":".64rem",marginTop:6}}>{sub}</div></div>;
   const HeaderCard=()=> <section style={{...panel,padding:compact?14:18,display:"grid",gridTemplateColumns:compact?"1fr":"minmax(0,1fr) auto",gap:compact?14:18,alignItems:"center",background:"linear-gradient(135deg,rgba(214,177,94,.12),rgba(88,215,196,.04) 42%,rgba(255,138,168,.055))"}}>
@@ -1598,19 +2333,101 @@ function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
     </div>
   </section>;
   const Analytics=()=> <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(4,1fr)",gap:14}}>
-    <Stat k="Average watch" v="18m" sub="session depth" tone="#58d7c4"/><Stat k="Gift conversion" v="11.4%" sub="viewers to senders" tone="#d6b15e"/><Stat k="Return intent" v="64%" sub="saved or followed" tone="#ff8aa8"/><Stat k="Requests" v="27" sub="tonight's menu taps" tone="#b98cff"/>
-    <div style={{gridColumn:compact?"auto":"1 / 4"}}><SparkLine/></div><section style={{...panel,padding:18}}><div style={label}>Friction alerts</div><div style={{marginTop:14,...copy}}>No payment, stream, or age-gate incidents in the current preview. Mobile safe-area pass is still needed before launch.</div></section>
+    <Stat k="Average watch" v="18m" sub="session depth" tone="#58d7c4"/><Stat k="Post reach" v="38k" sub="feed impressions" tone="#b98cff"/><Stat k="Return intent" v="64%" sub="saved or followed" tone="#ff8aa8"/><Stat k="Requests" v="27" sub="tonight's menu taps" tone="#d6b15e"/>
+    <div style={{gridColumn:compact?"auto":"1 / 4"}}><SparkLine/></div><section style={{...panel,padding:18}}><div style={label}>Performer levers</div><div style={{marginTop:14,...copy}}>Games, schedule visibility, trial status, and paid media are all performer-controlled in Preferences. Changes in this prototype update the studio surface immediately.</div></section>
   </div>;
-  const Vault=()=> <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1.2fr .8fr",gap:14}}>
-    <section style={{...panel,padding:18}}><div style={label}>Staged media</div><div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(3,1fr)",gap:10,marginTop:14}}>{content.slice(0,3).map((c,i)=><div key={c.text} style={{minHeight:142,borderRadius:9,border:`1px solid ${line}`,background:`linear-gradient(140deg,rgba(255,255,255,.08),rgba(255,255,255,.025)),linear-gradient(135deg,${[p.accent,"#b98cff","#d6b15e"][i]}33,transparent)`,padding:12,display:"flex",flexDirection:"column",justifyContent:"end"}}><div style={{fontWeight:900,fontSize:".76rem"}}>{c.type.toUpperCase()}</div><div style={{...copy,fontSize:".63rem",marginTop:4}}>{c.text}</div></div>)}</div></section>
-    <section style={{...panel,padding:18}}><div style={label}>Release queue</div><Empty icon="clock" title="Nothing scheduled" body="Drops, story moments, and paid previews will queue here with price and audience rules."/></section>
+  const Drop=({title,meta,children,open=true})=><details open={open} style={{border:`1px solid ${line}`,borderRadius:10,background:"rgba(255,255,255,.028)",overflow:"hidden"}}>
+    <summary style={{listStyle:"none",cursor:"pointer",padding:"13px 14px",display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",fontSize:".78rem",fontWeight:1000}}><span>{title}</span><span style={{...copy,fontSize:".62rem",textAlign:"right"}}>{meta}</span></summary>
+    <div style={{padding:"0 14px 14px",display:"grid",gap:10}}>{children}</div>
+  </details>;
+  const PriceInput=({labelText,value,onChange,prefix="$",suffix})=><label style={{display:"grid",gap:5}}><span style={label}>{labelText}</span><span style={{display:"grid",gridTemplateColumns:"auto minmax(0,1fr) auto",alignItems:"center",border:`1px solid ${line}`,borderRadius:8,background:"rgba(0,0,0,.18)",overflow:"hidden"}}><span style={{paddingLeft:10,color:soft,fontSize:".72rem",fontWeight:900}}>{prefix}</span><input value={value} onChange={e=>onChange(e.target.value)} style={{height:36,border:0,background:"transparent",color:ink,padding:"0 8px",font:"inherit",fontSize:".78rem",outline:"none",width:"100%"}}/><span style={{paddingRight:10,color:soft,fontSize:".66rem",fontWeight:900}}>{suffix}</span></span></label>;
+  const VisualMedia=({post={},large=false,phone=false})=>{const media=post.media||postMode;const mood=post.mood||postCanvas.mood;const tone=media==="video"?"#ff8aa8":media==="photo"?"#b98cff":"#58d7c4";return <div style={{position:"relative",minHeight:phone?360:large?330:190,borderRadius:large?16:12,overflow:"hidden",border:`1px solid ${tone}44`,background:`linear-gradient(135deg,${tone}22,rgba(6,8,15,.96) 44%,rgba(214,177,94,.14))`,boxShadow:large?`0 26px 90px rgba(0,0,0,.36),0 0 70px ${tone}18`:"none"}}>
+    <div style={{position:"absolute",inset:0,background:"linear-gradient(120deg,rgba(255,255,255,.08),transparent 34%,rgba(255,255,255,.04) 72%,transparent)"}}/>
+    <div style={{position:"absolute",left:"8%",right:"8%",top:"9%",height:"44%",borderRadius:large?18:12,border:"1px solid rgba(255,255,255,.12)",background:`linear-gradient(135deg,rgba(255,255,255,.12),${tone}20 38%,rgba(0,0,0,.28))`,transform:"skewY(-3deg)"}}/>
+    <div style={{position:"absolute",right:"12%",top:"18%",width:"32%",height:"58%",borderRadius:"999px 999px 18px 18px",background:`linear-gradient(180deg,${tone}66,rgba(214,177,94,.22) 52%,rgba(0,0,0,.18))`,filter:"blur(.1px)",opacity:.82}}/>
+    <div style={{position:"absolute",left:"10%",bottom:"21%",width:"56%",height:large?62:42,borderRadius:999,background:`linear-gradient(90deg,transparent,${tone}88,transparent)`,animation:"storySweep 4.8s ease-in-out infinite"}}/>
+    <div style={{position:"absolute",left:large?18:12,right:large?18:12,bottom:large?18:12,display:"grid",gap:8}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}><span style={{padding:"5px 8px",borderRadius:999,background:"rgba(0,0,0,.38)",fontSize:".58rem",fontWeight:1000,color:"rgba(255,255,255,.84)",backdropFilter:"blur(10px)"}}>{mood}</span>{media==="video"&&<span style={{display:"inline-flex",alignItems:"center",gap:5,padding:"5px 8px",borderRadius:999,background:"rgba(255,138,168,.18)",fontSize:".58rem",fontWeight:1000,color:"#ffd5df"}}><I n="play" s={9} c="#ffd5df"/>0:28</span>}</div>
+      <div style={{height:large?8:5,borderRadius:999,background:"rgba(255,255,255,.18)",overflow:"hidden"}}><span style={{display:"block",height:"100%",width:media==="video"?"68%":media==="photo"?"46%":"28%",background:`linear-gradient(90deg,${tone},#d6b15e)`}}/></div>
+    </div>
+  </div>};
+  const StoryRail=()=> <section style={{...panel,padding:14,overflow:"hidden"}}><div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",marginBottom:12}}><div><div style={label}>Story line</div><div style={{fontSize:".82rem",fontWeight:1000,marginTop:4}}>Fast moments fans can tap through</div></div><span style={{...copy,fontSize:".62rem"}}>24h drops</span></div><div style={{display:"grid",gridTemplateColumns:compact?"repeat(3,1fr)":"repeat(6,1fr)",gap:9}}>{["Warmup","Poll","Preview","Behind","Unlock","Live"].map((x,i)=><button key={x} type="button" style={{minHeight:compact?92:118,border:`1px solid ${i===2?"#d6b15e88":line}`,borderRadius:12,background:`linear-gradient(160deg,${["#58d7c4","#8fb5ff","#d6b15e","#ff8aa8","#b98cff","#ffbd66"][i]}1f,rgba(255,255,255,.028))`,color:ink,cursor:"pointer",padding:9,textAlign:"left",display:"flex",flexDirection:"column",justifyContent:"space-between"}}><span style={{width:28,height:28,borderRadius:999,border:`2px solid ${["#58d7c4","#8fb5ff","#d6b15e","#ff8aa8","#b98cff","#ffbd66"][i]}`,display:"grid",placeItems:"center"}}><I n={["clock","chat","eye","live","lock","spark"][i]} s={12}/></span><span style={{fontSize:".68rem",fontWeight:1000}}>{x}</span></button>)}</div></section>;
+  const PostStudio=()=> {
+    const featured=studioPosts[0]||{};
+    const totalLikes=studioPosts.reduce((s,x)=>s+(x.likes||0),0),totalShares=studioPosts.reduce((s,x)=>s+(x.shares||0),0),totalSaves=studioPosts.reduce((s,x)=>s+(x.saves||0),0);
+    const insightRows=[["Hook strength","86%","First line is clear and visual","#58d7c4"],["Paid unlocks","$624","Projected if posted before live","#d6b15e"],["Subscriber pull","14%","Preview converts better than status","#ff8aa8"],["Share velocity",`${totalShares}`,"Fans push visual drops farther","#8fb5ff"]];
+    const surfaces=[{id:"story",label:"Story",icon:"clock",body:"24h tease"},{id:"reel",label:"Reel",icon:"play",body:"motion first"},{id:"carousel",label:"Carousel",icon:"cards",body:"photo set"},{id:"vault",label:"Vault",icon:"lock",body:"paid unlock"},{id:"poll",label:"Poll",icon:"chat",body:"fan choice"}];
+    return <div style={{display:"grid",gap:14}}>
+      <StoryRail/>
+      <section style={{...panel,padding:compact?14:18,background:"linear-gradient(135deg,rgba(185,140,255,.1),rgba(255,138,168,.06) 46%,rgba(214,177,94,.06))"}}>
+        <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"minmax(0,1fr) 320px",gap:16,alignItems:"stretch"}}>
+          <div style={{display:"grid",gap:12}}>
+            <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"start",flexWrap:"wrap"}}><div><div style={label}>Creator canvas</div><h2 style={{fontSize:compact?"1.28rem":"1.75rem",fontWeight:1000,lineHeight:1.05,marginTop:6}}>Build a drop people want to tap, save, unlock, and share.</h2></div><button type="button" onClick={publishPost} style={{height:42,padding:"0 16px",border:0,borderRadius:9,background:"linear-gradient(135deg,#d6b15e,#ff8aa8)",color:"#17110d",font:"inherit",fontWeight:1000,cursor:"pointer",boxShadow:"0 18px 44px rgba(214,177,94,.18)"}}><I n="plus" s={13} c="#17110d" st={{marginRight:7}}/>Publish drop</button></div>
+            <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(5,1fr)",gap:8}}>{surfaces.map(item=><button key={item.id} type="button" onClick={()=>setPostCanvas(prev=>({...prev,surface:item.id}))} style={{minHeight:82,padding:10,border:`1px solid ${postCanvas.surface===item.id?active.tone+"99":line}`,borderRadius:10,background:postCanvas.surface===item.id?`${active.tone}18`:"rgba(0,0,0,.14)",color:ink,cursor:"pointer",textAlign:"left"}}><I n={item.icon} s={15} c={postCanvas.surface===item.id?active.tone:dim}/><div style={{fontSize:".72rem",fontWeight:1000,marginTop:8}}>{item.label}</div><div style={{...copy,fontSize:".58rem"}}>{item.body}</div></button>)}</div>
+            <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1.1fr .9fr",gap:12}}>
+              <div style={{display:"grid",gap:10}}><textarea value={postDraft.text} onChange={e=>setPostDraft(prev=>({...prev,text:e.target.value}))} placeholder="Write the tease, payoff, or unlock promise..." style={{...textarea,minHeight:142,fontSize:".9rem",background:"rgba(0,0,0,.24)"}}/>
+                <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(4,1fr)",gap:8}}>
+                  <label style={{display:"grid",gap:5}}><span style={label}>Media</span><select value={postMode} onChange={e=>setPostMode(e.target.value)} style={field}><option value="post">Status</option><option value="photo">Photo set</option><option value="video">Video clip</option></select></label>
+                  <label style={{display:"grid",gap:5}}><span style={label}>Access</span><select value={postAccess} onChange={e=>setPostAccess(e.target.value)} style={field}><option value="free">Free</option><option value="subscribers">Subscribers</option><option value="paid">Paid unlock</option></select></label>
+                  <label style={{display:"grid",gap:5}}><span style={label}>Price</span><input value={postAccess==="paid"?postDraft.price:"0"} disabled={postAccess!=="paid"} onChange={e=>setPostDraft(prev=>({...prev,price:e.target.value}))} style={{...field,opacity:postAccess==="paid"?1:.45}}/></label>
+                  <label style={{display:"grid",gap:5}}><span style={label}>Release</span><select value={postDraft.scheduled} onChange={e=>setPostDraft(prev=>({...prev,scheduled:e.target.value}))} style={field}><option>Now</option><option>Tonight</option><option>Next live room</option><option>Subscribers first</option></select></label>
+                </div>
+              </div>
+              <div style={{display:"grid",gap:8}}>{["Champagne Heat","Afterdark Game","Velvet Preview","Subscriber First"].map(mood=><button key={mood} type="button" onClick={()=>setPostCanvas(prev=>({...prev,mood}))} style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8,minHeight:38,padding:"0 10px",border:`1px solid ${postCanvas.mood===mood?"#d6b15e88":line}`,borderRadius:8,background:postCanvas.mood===mood?"rgba(214,177,94,.08)":"rgba(255,255,255,.025)",color:postCanvas.mood===mood?ink:soft,font:"inherit",fontSize:".72rem",fontWeight:1000,cursor:"pointer",textAlign:"left"}}>{mood}<span style={{width:8,height:8,borderRadius:8,background:postCanvas.mood===mood?"#d6b15e":dim}}/></button>)}<label style={{display:"grid",gap:5,marginTop:4}}><span style={label}>CTA</span><input value={postCanvas.cta} onChange={e=>setPostCanvas(prev=>({...prev,cta:e.target.value}))} style={field}/></label></div>
+            </div>
+          </div>
+          <div style={{position:"relative",display:"grid",placeItems:"center"}}>
+            <div style={{width:"min(290px,100%)",padding:10,borderRadius:28,border:"1px solid rgba(246,239,229,.14)",background:"linear-gradient(180deg,rgba(255,255,255,.09),rgba(0,0,0,.2))",boxShadow:"0 30px 90px rgba(0,0,0,.45)"}}>
+              <div style={{borderRadius:22,overflow:"hidden",background:"#090a10"}}><VisualMedia phone post={{media:postMode,mood:postCanvas.mood}}/><div style={{padding:12}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}><strong style={{fontSize:".78rem"}}>{p.name}</strong><span style={{fontSize:".58rem",fontWeight:1000,color:"#58d7c4"}}>{postDraft.scheduled}</span></div><p style={{fontSize:".7rem",lineHeight:1.45,color:"rgba(246,239,229,.76)",marginTop:7}}>{postDraft.text||`${postCanvas.mood} preview. ${postAccess==="paid"?postCanvas.cta:"Tap in before the room opens."}`}</p><div style={{display:"flex",gap:6,marginTop:10,flexWrap:"wrap"}}>{postAccess==="paid"?<Tag color="#d6b15e">{postDraft.price} sparks</Tag>:postAccess==="subscribers"?<Tag color="#b98cff">Subscribers</Tag>:<Tag color="#58d7c4">Free</Tag>}<Tag color="#ff8aa8">{postCanvas.surface}</Tag></div></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"minmax(0,1fr) 340px",gap:14}}>
+        <section style={{...panel,padding:18}}><div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"end",marginBottom:14}}><div><div style={label}>Feed command</div><h2 style={{fontSize:"1.08rem",fontWeight:1000,marginTop:5}}>A visual grid built for desire, clarity, and unlock intent.</h2></div><div style={{display:"flex",gap:7,flexWrap:"wrap"}}>{["All","Free","Subs","Paid"].map(x=><button key={x} type="button" style={{height:30,padding:"0 10px",border:`1px solid ${line}`,borderRadius:999,background:x==="All"?"rgba(185,140,255,.16)":"rgba(255,255,255,.025)",color:x==="All"?ink:soft,font:"inherit",fontSize:".62rem",fontWeight:1000,cursor:"pointer"}}>{x}</button>)}</div></div>
+          <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1.05fr .95fr",gap:10}}>
+            {studioPosts.map((post,i)=><article key={`${post.text}-${i}`} style={{border:`1px solid ${i===0?"#d6b15e66":line}`,borderRadius:14,background:i===0?"linear-gradient(180deg,rgba(214,177,94,.07),rgba(255,255,255,.025))":"rgba(0,0,0,.16)",overflow:"hidden",gridRow:i===0&&!compact?"span 2":"auto"}}>
+              <VisualMedia post={post} large={i===0}/>
+              <div style={{padding:14}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}><strong style={{fontSize:".8rem"}}>{p.name}</strong><span style={{...copy,fontSize:".6rem"}}>{post.time} ago</span></div><p style={{fontSize:".8rem",lineHeight:1.55,marginTop:7,color:"rgba(246,239,229,.88)"}}>{post.text}</p>
+              <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:10}}>{post.access==="free"?<Tag color="#58d7c4">Free</Tag>:post.access==="subscribers"?<Tag color="#b98cff">Subscribers</Tag>:<Tag color="#d6b15e">{post.price} sparks</Tag>}<Tag color={post.media==="video"?"#ff8aa8":"#8fb5ff"}>{post.surface||post.media}</Tag></div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr) auto",gap:5,alignItems:"center",marginTop:12}}>{[["likes","heart"],["dislikes","thumbdown"],["comments","chat"],["shares","share"],["saves","bookmark"]].map(([key,icon])=><button key={key} type="button" onClick={()=>reactToPost(i,key)} title={key} style={{height:32,border:`1px solid ${line}`,borderRadius:8,background:"rgba(255,255,255,.035)",color:soft,cursor:"pointer",font:"inherit",fontSize:".62rem",fontWeight:900,display:"inline-flex",alignItems:"center",justifyContent:"center",gap:4}}><I n={icon} s={11}/>{post[key]||0}</button>)}<button type="button" style={{height:32,padding:"0 9px",border:`1px solid ${line}`,borderRadius:8,background:"rgba(255,255,255,.035)",color:soft,cursor:"pointer",font:"inherit",fontSize:".62rem",fontWeight:900}}>Edit</button></div></div>
+            </article>)}
+          </div>
+        </section>
+        <aside style={{display:"grid",gap:14,alignContent:"start"}}>
+          <section style={{...panel,padding:18}}><div style={label}>Release intelligence</div><div style={{display:"grid",gap:9,marginTop:13}}>{insightRows.map(([k,v,b,t])=><div key={k} style={{padding:11,borderRadius:10,border:`1px solid ${line}`,background:`linear-gradient(135deg,${t}10,rgba(255,255,255,.02))`}}><div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center"}}><span style={{fontSize:".72rem",fontWeight:1000}}>{k}</span><strong style={{color:t}}>{v}</strong></div><div style={{...copy,fontSize:".6rem",marginTop:3}}>{b}</div></div>)}</div></section>
+          <section style={{...panel,padding:18}}><div style={label}>Creative tools</div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:12}}>{[["Cover","eye"],["Teaser","play"],["Poll","chat"],["Remix","refresh"],["Paywall","lock"],["Boost","spark"]].map(([x,i])=><button key={x} type="button" style={{height:50,border:`1px solid ${line}`,borderRadius:9,background:"rgba(255,255,255,.025)",color:soft,font:"inherit",fontSize:".66rem",fontWeight:1000,cursor:"pointer",display:"grid",placeItems:"center",gap:3}}><I n={i} s={13}/>{x}</button>)}</div><div style={{...copy,marginTop:12}}>The goal is not just upload. It is packaging: cover frame, tease length, access rule, price, comments, and a remix path for the next drop.</div></section>
+          <section style={{...panel,padding:18}}><div style={label}>Audience reaction</div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginTop:12}}>{[["Likes",totalLikes,"#ff8aa8"],["Shares",totalShares,"#d6b15e"],["Saves",totalSaves,"#58d7c4"]].map(([k,v,t])=><div key={k} style={{padding:10,borderRadius:9,border:`1px solid ${line}`,background:"rgba(255,255,255,.025)",textAlign:"center"}}><div style={{fontSize:".58rem",fontWeight:1000,color:dim,textTransform:"uppercase"}}>{k}</div><div style={{fontSize:"1rem",fontWeight:1000,color:t,marginTop:4}}>{v}</div></div>)}</div></section>
+        </aside>
+      </div>
+    </div>;
+  };
+  const Schedule=()=> <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"360px minmax(0,1fr)",gap:14}}>
+    <section style={{...panel,padding:18}}><div style={label}>Create availability</div><div style={{display:"grid",gap:10,marginTop:14}}>
+      <label style={{display:"grid",gap:5}}><span style={label}>Day</span><select value={slotDraft.day} onChange={e=>setSlotDraft(prev=>({...prev,day:e.target.value}))} style={field}>{["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=><option key={d}>{d}</option>)}</select></label>
+      <label style={{display:"grid",gap:5}}><span style={label}>Time</span><input value={slotDraft.time} onChange={e=>setSlotDraft(prev=>({...prev,time:e.target.value}))} style={field}/></label>
+      <label style={{display:"grid",gap:5}}><span style={label}>Type</span><select value={slotDraft.type} onChange={e=>setSlotDraft(prev=>({...prev,type:e.target.value}))} style={field}><option>Live room</option><option>Subscribers</option><option>Private bookings</option><option>VIP only</option></select></label>
+      <label style={{display:"grid",gap:5}}><span style={label}>Note</span><input value={slotDraft.note} onChange={e=>setSlotDraft(prev=>({...prev,note:e.target.value}))} placeholder="Optional room promise" style={field}/></label>
+      <button type="button" onClick={addSlot} style={{height:38,border:0,borderRadius:8,background:"linear-gradient(135deg,#58d7c4,#d6b15e)",color:"#101019",font:"inherit",fontWeight:1000,cursor:"pointer"}}><I n="plus" s={13} c="#101019" st={{marginRight:6}}/>Add slot</button>
+      <Toggle label="Show schedule publicly" body="Fans see live blocks and can set alerts." checked={toggles.schedulePublic} onClick={()=>toggleFlag("schedulePublic")} tone="#58d7c4"/>
+    </div></section>
+    <section style={{...panel,padding:18}}><div style={label}>Calendar</div><div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(7,1fr)",gap:8,marginTop:14}}>{["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(day=>{const slots=scheduleSlots.filter(s=>s.day===day);return <div key={day} style={{minHeight:132,padding:10,borderRadius:9,border:`1px solid ${line}`,background:slots.length?"rgba(88,215,196,.055)":"rgba(255,255,255,.018)"}}><div style={{fontSize:".68rem",fontWeight:1000,color:slots.length?"#58d7c4":dim}}>{day}</div>{slots.map((slot,i)=><div key={`${slot.time}-${i}`} style={{marginTop:8,padding:8,borderRadius:7,background:"rgba(0,0,0,.2)",border:`1px solid ${line}`}}><div style={{fontSize:".72rem",fontWeight:1000}}>{slot.time}</div><div style={{...copy,fontSize:".58rem"}}>{slot.type}</div></div>)}</div>})}</div>
+      <div style={{display:"grid",gap:8,marginTop:14}}>{scheduleSlots.map((slot,i)=><div key={`${slot.day}-${slot.time}-${i}`} style={{display:"grid",gridTemplateColumns:compact?"1fr":"70px 110px minmax(0,1fr) auto",gap:10,alignItems:"center",padding:10,borderRadius:9,border:`1px solid ${line}`,background:"rgba(255,255,255,.025)"}}><strong style={{fontSize:".78rem",color:"#58d7c4"}}>{slot.day}</strong><span style={{fontSize:".78rem",fontWeight:900}}>{slot.time}</span><span style={copy}>{slot.type}{slot.note?` - ${slot.note}`:""}</span><button type="button" onClick={()=>setScheduleSlots(prev=>prev.filter((_,idx)=>idx!==i))} style={{height:28,padding:"0 9px",border:`1px solid ${line}`,borderRadius:7,background:"transparent",color:soft,font:"inherit",fontSize:".62rem",fontWeight:900,cursor:"pointer"}}>Remove</button></div>)}</div>
+    </section>
   </div>;
-  const Patrons=()=> <div style={{display:"grid",gridTemplateColumns:compact?"1fr":".8fr 1.2fr",gap:14}}><PatronList/><section style={{...panel,padding:18}}><div style={label}>Relationship ledger</div>{topFans.map((fan,i)=><div key={fan.name} style={{display:"grid",gridTemplateColumns:compact?"1fr auto":"120px minmax(0,1fr) auto",gap:12,padding:"12px 0",borderBottom:i<topFans.length-1?`1px solid ${line}`:"none",alignItems:"center"}}><strong style={{fontSize:".78rem"}}>{fan.name}</strong><span style={copy}>{fan.sessions} sessions, prefers games, responds to direct acknowledgements.</span><span style={{fontSize:".68rem",fontWeight:1000,color:"#58d7c4"}}>{fan.online?"LIVE":"LATER"}</span></div>)}</section></div>;
-  const Offers=()=> <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1fr 1fr",gap:14}}>
-    <section style={{...panel,padding:18}}><div style={label}>Request architecture</div>{p.requests.slice(0,6).map((r,i)=><div key={r.name} style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) auto",gap:12,padding:"11px 0",borderBottom:i<5?`1px solid ${line}`:"none"}}><div><div style={{fontWeight:900,fontSize:".78rem"}}>{r.name}</div><div style={{...copy,fontSize:".64rem"}}>{r.desc}</div></div><strong style={{fontSize:".74rem",color:"#ffbd66"}}>{r.sparks}</strong></div>)}</section>
-    <section style={{...panel,padding:18}}><div style={label}>Payout flow</div><div style={{fontSize:"2rem",fontWeight:1000,marginTop:18,color:"#58d7c4"}}>${earn.pending.toLocaleString()}</div><div style={copy}>Projected pending payout after platform split and chargeback reserve. This panel becomes a real settlement view once the backend ledger is active.</div></section>
-  </div>;
-  const Room=()=> <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1fr 1fr",gap:14}}><RoomCard/><section style={{...panel,padding:18}}><div style={label}>Entry promise</div><textarea defaultValue={"Come ready to play. Tonight is intimate, game-led, and subscriber moments come first."} style={{width:"100%",minHeight:122,marginTop:14,border:`1px solid ${line}`,borderRadius:9,background:"rgba(0,0,0,.18)",color:ink,padding:12,font:"inherit",fontSize:".78rem",lineHeight:1.5,resize:"vertical",outline:"none"}}/><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,marginTop:12,flexWrap:"wrap"}}><span style={copy}>Shown before viewers enter the room.</span><button type="button" style={{height:34,padding:"0 12px",border:`1px solid ${line}`,borderRadius:8,background:"rgba(255,255,255,.06)",color:ink,font:"inherit",fontWeight:900,cursor:"pointer"}}>Save draft</button></div></section></div>;
+  const Money=()=>{const available=Math.max(0,earn.pending-186);const requestCashout=()=>{setCashoutStatus(`Cashout request queued for ${money(available)}.`);setTimeout(()=>setCashoutStatus(""),2600)};return <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1fr 1fr",gap:14}}>
+    <section style={{...panel,padding:18,background:"linear-gradient(135deg,rgba(88,215,196,.12),rgba(214,177,94,.06),rgba(255,255,255,.025))"}}><div style={label}>Available now</div><div style={{fontSize:compact?"2.2rem":"3rem",fontWeight:1000,color:"#58d7c4",lineHeight:1,marginTop:14}}>{money(available)}</div><div style={{...copy,marginTop:10}}>Pending after 80/20 split, processor holds, chargeback reserve, and tax profile checks. The button is always visible so performers never wonder where cashout lives.</div><button type="button" onClick={requestCashout} style={{height:44,marginTop:16,padding:"0 18px",border:0,borderRadius:9,background:"linear-gradient(135deg,#58d7c4,#d6b15e)",color:"#101019",font:"inherit",fontWeight:1000,cursor:"pointer"}}><I n="wallet" s={15} c="#101019" st={{marginRight:7}}/>Cash out now</button>{cashoutStatus&&<div style={{marginTop:12,padding:10,borderRadius:8,border:"1px solid rgba(88,215,196,.35)",background:"rgba(88,215,196,.08)",fontSize:".72rem",fontWeight:900,color:"#8af0df"}}>{cashoutStatus}</div>}</section>
+    <section style={{...panel,padding:18}}><div style={label}>Payout controls</div><div style={{display:"grid",gap:10,marginTop:14}}><Toggle label="Instant cashout" body="Show instant option when the payout provider supports it." checked={toggles.instantCashout} onClick={()=>toggleFlag("instantCashout")} tone="#58d7c4"/><Drop title="Payout method" meta="CCBill demo rail"><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>{["Debit card","Bank ACH","Wire","Crypto review"].map((x,i)=><button key={x} type="button" style={{height:36,border:`1px solid ${i===0?"#58d7c488":line}`,borderRadius:8,background:i===0?"rgba(88,215,196,.08)":"rgba(255,255,255,.025)",color:i===0?"#8af0df":soft,font:"inherit",fontSize:".68rem",fontWeight:1000,cursor:"pointer"}}>{x}</button>)}</div></Drop><Drop title="Ledger" meta={`${money(earn.pending)} pending`}><div style={{display:"grid",gap:7}}>{[["Live room gifts",1240],["Private bookings",820],["Paid posts",516],["Reserve hold",-186]].map(([k,v])=><div key={k} style={{display:"flex",justifyContent:"space-between",fontSize:".74rem",color:v<0?soft:ink}}><span>{k}</span><strong style={{color:v<0?"#ff8aa8":"#d6b15e"}}>{v<0?"-":""}{money(Math.abs(v))}</strong></div>)}</div></Drop></div></section>
+  </div>};
+  const Preferences=()=>{const prefTabs=[{id:"pricing",label:"Pricing"},{id:"games",label:"Games"},{id:"services",label:"What I Do"},{id:"subscription",label:"Subscription"}];return <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"260px minmax(0,1fr)",gap:14}}>
+    <aside style={{...panel,padding:12,alignSelf:"start"}}><div style={label}>Preference tabs</div><div style={{display:"grid",gap:7,marginTop:12}}>{prefTabs.map(item=><button key={item.id} type="button" onClick={()=>setPrefTab(item.id)} style={{height:42,padding:"0 12px",border:`1px solid ${prefTab===item.id?active.tone+"88":line}`,borderRadius:8,background:prefTab===item.id?`${active.tone}14`:"rgba(255,255,255,.02)",color:prefTab===item.id?ink:soft,font:"inherit",fontSize:".72rem",fontWeight:1000,cursor:"pointer",textAlign:"left"}}>{item.label}</button>)}</div></aside>
+    <section style={{...panel,padding:18}}>
+      {prefTab==="pricing"&&<div style={{display:"grid",gap:12}}><Drop title="Performer rates" meta="Shown on profile" open><div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(3,1fr)",gap:10}}><PriceInput labelText="Subscription" value={pricing.subscription} onChange={v=>updatePrice("subscription",v)} suffix="/mo"/><PriceInput labelText="Private session" value={pricing.privateSession} onChange={v=>updatePrice("privateSession",v)} suffix="/30m"/><PriceInput labelText="VIP session" value={pricing.vipSession} onChange={v=>updatePrice("vipSession",v)} suffix="/night"/></div></Drop><Drop title="Paid media defaults" meta="Used by Post Studio"><div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(3,1fr)",gap:10}}><PriceInput labelText="Photo set" value={pricing.photo} onChange={v=>updatePrice("photo",v)} prefix="" suffix="sparks"/><PriceInput labelText="Video clip" value={pricing.video} onChange={v=>updatePrice("video",v)} prefix="" suffix="sparks"/><PriceInput labelText="Request floor" value={pricing.requestBase} onChange={v=>updatePrice("requestBase",v)} prefix="" suffix="sparks"/></div></Drop></div>}
+      {prefTab==="games"&&<div style={{display:"grid",gap:12}}><Drop title="Game availability" meta={`${activeGameIds.length} active`} open><Toggle label="Games in my room" body="Turns the whole game shelf on or off for viewers." checked={toggles.games} onClick={()=>toggleFlag("games")} tone="#8fb5ff"/><div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(3,minmax(0,1fr))",gap:8}}>{GAMES.map(game=>{const on=activeGameIds.includes(game.id);return <button key={game.id} type="button" onClick={()=>toggleGame(game.id)} style={{minHeight:96,padding:10,border:`1px solid ${on?game.color+"88":line}`,borderRadius:9,background:on?`${game.color}12`:"rgba(255,255,255,.018)",color:ink,textAlign:"left",cursor:"pointer",opacity:toggles.games?1:.45}}><div style={{display:"flex",justifyContent:"space-between",gap:8}}><I n={game.icon} s={16} c={on?game.color:dim}/><span style={{fontSize:".6rem",fontWeight:1000,color:on?game.color:dim}}>{on?"ON":"OFF"}</span></div><div style={{fontSize:".74rem",fontWeight:1000,marginTop:8}}>{game.name}</div><div style={{...copy,fontSize:".58rem",marginTop:3}}>{gameEconomyLine(game.type)}</div></button>})}</div></Drop><Drop title="Game pricing" meta={`${pricing.gameEntry} spark default`}><PriceInput labelText="Default paid entry" value={pricing.gameEntry} onChange={v=>updatePrice("gameEntry",v)} prefix="" suffix="sparks"/><Toggle label="Subscriber-only bonus games" body="Subscribers get selected games or lower entry prices." checked={toggles.subOnlyGames} onClick={()=>toggleFlag("subOnlyGames")} tone="#8fb5ff"/></Drop></div>}
+      {prefTab==="services"&&<div style={{display:"grid",gap:12}}><Drop title="What I will do" meta="Public boundaries" open><div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1fr 1fr",gap:10}}><Toggle label="Custom requests" body="Let fans buy menu requests you approve." checked={toggles.requests} onClick={()=>toggleFlag("requests")} tone="#ff8aa8"/><Toggle label="Paid media posts" body="Allow priced photo and video drops." checked={toggles.paidPosts} onClick={()=>toggleFlag("paidPosts")} tone="#ff8aa8"/></div></Drop><Drop title="Request menu" meta="Editable Sparks"><div style={{display:"grid",gap:8}}>{p.requests.slice(0,6).map((r,i)=><div key={r.name} style={{display:"grid",gridTemplateColumns:compact?"1fr":"minmax(0,1fr) 110px auto",gap:8,alignItems:"center",padding:9,border:`1px solid ${line}`,borderRadius:8,background:"rgba(255,255,255,.022)"}}><div><div style={{fontSize:".76rem",fontWeight:1000}}>{r.name}</div><div style={{...copy,fontSize:".58rem"}}>{r.desc}</div></div><input defaultValue={r.sparks} style={field}/><button type="button" style={{height:34,padding:"0 10px",border:`1px solid ${line}`,borderRadius:7,background:"transparent",color:soft,font:"inherit",fontSize:".62rem",fontWeight:900,cursor:"pointer"}}>{i%2?"Pause":"Live"}</button></div>)}</div></Drop></div>}
+      {prefTab==="subscription"&&<div style={{display:"grid",gap:12}}><Drop title="Subscription offer" meta={toggles.freeTrial?"7-day trial on":"trial waived"} open><PriceInput labelText="Monthly subscription" value={pricing.subscription} onChange={v=>updatePrice("subscription",v)} suffix="/mo"/><Toggle label="Offer free 7-day trial" body={toggles.freeTrial?"New subscribers can sample before billing.":"Waived: new subscribers are billed immediately."} checked={toggles.freeTrial} onClick={()=>toggleFlag("freeTrial")} tone="#d6b15e"/><div style={{padding:11,borderRadius:9,border:`1px solid ${toggles.freeTrial?line:"#d6b15e88"}`,background:toggles.freeTrial?"rgba(255,255,255,.02)":"rgba(214,177,94,.08)",fontSize:".72rem",lineHeight:1.5,color:toggles.freeTrial?soft:"#f3d78c"}}>{toggles.freeTrial?"The public profile will show a free 7-day trial before the monthly price.":"The public profile will not force a free trial. The CTA changes to Subscribe and charge starts immediately."}</div></Drop><Drop title="Subscriber perks" meta="Visible before purchase"><div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(2,1fr)",gap:8}}>{["Priority booking","Subscriber feed","DM access","Schedule alerts","Sub-only games","10% session discount"].map(perk=><label key={perk} style={{display:"flex",alignItems:"center",gap:8,padding:9,border:`1px solid ${line}`,borderRadius:8,background:"rgba(255,255,255,.025)",fontSize:".72rem",fontWeight:900}}><input type="checkbox" defaultChecked style={{accentColor:"#d6b15e"}}/>{perk}</label>)}</div></Drop></div>}
+    </section>
+  </div>};
 
   return <div style={{minHeight:"100vh",display:"grid",gridTemplateColumns:compact?"74px minmax(0,1fr)":"92px minmax(0,1fr)",background:"radial-gradient(circle at 8% 0%,rgba(214,177,94,.16),transparent 34%),radial-gradient(circle at 100% 14%,rgba(88,215,196,.1),transparent 34%),#090a10",color:ink}}>
     <aside style={{borderRight:`1px solid ${line}`,background:"rgba(8,9,14,.78)",backdropFilter:"blur(18px)",padding:"18px 10px",display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
@@ -1642,13 +2459,13 @@ function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
           {tab==="home"&&<div style={{display:"grid",gridTemplateColumns:compact?"1fr":"minmax(0,1.55fr) minmax(300px,.85fr)",gap:14}}>
             <div style={{display:"grid",gap:14}}><HeaderCard/><SparkLine/></div>
             <div style={{display:"grid",gap:14}}><Readiness/><PatronList/></div>
-            <div style={{gridColumn:"1 / -1",display:"grid",gridTemplateColumns:compact?"1fr":"1fr 1fr 1fr",gap:14}}><RoomCard/><section style={{...panel,padding:18}}><div style={label}>Compliance channel</div><div style={{...copy,marginTop:12}}>Age verification, content boundaries, payment risk, and creator safety are surfaced as live operational checks instead of hidden settings.</div></section><section style={{...panel,padding:18}}><div style={label}>Next action</div><div style={{fontSize:"1rem",fontWeight:1000,marginTop:12}}>Rewrite the intro card</div><p style={{...copy,marginTop:8}}>The room is technically ready. The public promise needs more luxury and less generic live-stream wording.</p></section></div>
+            <div style={{gridColumn:"1 / -1",display:"grid",gridTemplateColumns:compact?"1fr":"1fr 1fr 1fr",gap:14}}><RoomCard/><section style={{...panel,padding:18}}><div style={label}>Preference health</div><div style={{...copy,marginTop:12}}>{activeGameIds.length} games active, {toggles.freeTrial?"7-day trial on":"trial waived"}, paid media {toggles.paidPosts?"enabled":"paused"}, public schedule {toggles.schedulePublic?"visible":"hidden"}.</div></section><section style={{...panel,padding:18}}><div style={label}>Next action</div><div style={{fontSize:"1rem",fontWeight:1000,marginTop:12}}>Post tonight's paid preview</div><p style={{...copy,marginTop:8}}>The studio is ready. A quick photo or video drop can warm subscribers before the room goes live.</p></section></div>
           </div>}
           {tab==="analytics"&&<Analytics/>}
-          {tab==="content"&&<Vault/>}
-          {tab==="inbox"&&<Patrons/>}
-          {tab==="store"&&<Offers/>}
-          {tab==="settings"&&<Room/>}
+          {tab==="content"&&<PostStudio/>}
+          {tab==="schedule"&&<Schedule/>}
+          {tab==="money"&&<Money/>}
+          {tab==="preferences"&&<Preferences/>}
         </div>
       </div>
     </main>
@@ -1661,13 +2478,16 @@ export default function App(){
   const visualPreview=searchParams.get("vybePreview")==="gift";
   const roomPreview=searchParams.get("vybePreview")==="room";
   const studioPreview=searchParams.get("vybePreview")==="studio";
-  const previewMode=visualPreview||roomPreview||studioPreview;
-  const previewView=visualPreview||roomPreview?"room":"lobby";
+  const profilePreview=searchParams.get("vybePreview")==="profile";
+  const lobbyPreview=searchParams.get("vybePreview")==="lobby";
+  const previewMode=visualPreview||roomPreview||studioPreview||lobbyPreview||profilePreview;
+  const previewView=visualPreview||roomPreview?"room":profilePreview?"profile":"lobby";
   const giftDebug=searchParams.get("giftDebug")==="1";
   const [authed,setAuthed]=useState(previewMode);const [authUser,setAuthUser]=useState(previewMode?{email:"preview@vybe.local",name:"VelvetKing",role:studioPreview?"performer":"viewer",ageVerified:true}:null);const [apiToken,setApiToken]=useState(null);
   const [ok,setOk]=useState(previewMode);const [ck,setCk]=useState(()=>previewMode||(typeof window!=="undefined"&&window.localStorage?.getItem("vybe_cookie_ok")==="1"));const [vw,setVw]=useState(previewMode?previewView:"lobby");
   const [path,setPath]=useState(initialPath);const [authOpen,setAuthOpen]=useState(false);const [authMode,setAuthMode]=useState(initialPath==="/signup"?"register":"login");const [publicGate,setPublicGate]=useState(false);const [pendingAge,setPendingAge]=useState(null);
-  const [performers,setPerformers]=useState(PERFS);const [pf,setPf]=useState((visualPreview||roomPreview)?PERFS[0]:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
+  const previewPerf=PERFS.find(p=>p.id===(searchParams.get("performer")||searchParams.get("host")))||PERFS[0];
+  const [performers,setPerformers]=useState(PERFS);const [pf,setPf]=useState((visualPreview||roomPreview||profilePreview)?previewPerf:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
   const [user,setUser]=useState({name:"VelvetKing",email:"preview@vybe.local",phone:"",twoFactor:false,primaryRail:"card",cryptoNetwork:"Universal router",cryptoWallet:"",passwordUpdated:false,
     paymentMethods:[{id:"card-demo",name:"Card",detail:"No card saved yet",status:"Add method",icon:"card",color:"var(--am)"},{id:"wallet-demo",name:"Digital wallet",detail:"Apple/Google/PayPal ready",status:"Available",icon:"wallet",color:"var(--cy)"},{id:"bank-demo",name:"Bank",detail:"ACH/debit connection",status:"Optional",icon:"shield",color:"var(--gn)"},{id:"crypto-demo",name:"Crypto wallet",detail:"Universal router not connected",status:"Connect wallet",icon:"crypto",color:"var(--vi)"}],
     sparks:2500,purchasedSparks:2300,bonusSparks:200,bonusExpiry:"Jun 15",spent:450,gamesPlayed:87,winRate:72,sparksEarned:1240,totalSessions:23,topStreak:8,perfCount:4,
@@ -1737,8 +2557,8 @@ export default function App(){
     {!authed&&<Auth onAuth={handleAuth} initialMode={authMode}/>}
     {authed&&!ok&&!isPerf&&<AgeV onDone={completeAuthedAge} onLeave={leaveAdultFlow}/>}
     {authed&&ok&&isPerf&&vw!=="room"&&<PerfDash perfData={perfSelf} onGoLive={handleGoLive} onLogout={logout}/>}
-    {authed&&ok&&!isPerf&&vw==="lobby"&&<LB user={user} performers={performers} onPerf={vp} onWallet={()=>setMd("wallet")} cat={cat} setCat={setCat} onMenu={()=>setMn(true)}/>}
-    {authed&&ok&&!isPerf&&vw==="profile"&&pf&&<PF perf={pf} user={user} onBack={bk} onLive={gl2} onBook={gb} onVip={gv} onWallet={()=>setMd("wallet")}/>}
+    {authed&&ok&&!isPerf&&vw==="lobby"&&<LB user={user} performers={performers} onPerf={vp} onWallet={()=>setMd("wallet")} cat={cat} setCat={setCat} onMenu={()=>setMn(true)} onSC={sc}/>}
+    {authed&&ok&&!isPerf&&vw==="profile"&&pf&&<PF perf={pf} user={user} onBack={bk} onLive={gl2} onBook={gb} onVip={gv} onWallet={()=>setMd("wallet")} onSC={sc}/>}
     {authed&&ok&&vw==="room"&&pf&&<RM perf={pf} user={user} onBack={isPerf?()=>setVw("lobby"):bp} onSC={sc} onWallet={()=>setMd("wallet")} onBook={gb} onVip={gv} onGiftSent={triggerDemoGift}/>}
     <HM open={mn} onClose={()=>setMn(false)} cat={cat} setCat={setCat} onProfile={()=>{setMn(false);setMd("viewer")}}/>
     {md==="wallet"&&<WL user={user} onClose={()=>setMd(null)} onBuy={by} onManagePayments={()=>setMd("viewer")}/>}

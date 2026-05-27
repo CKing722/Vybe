@@ -449,7 +449,11 @@ function PublicInfoPage({path,go,onJoin,onLogin,onAdult}) {
 
 function LegalPage({path,go,onJoin,onLogin,onAdult}) {
   const page=LEGAL_COPY[path]||LEGAL_COPY["/terms"];
-  return <div style={{minHeight:"100vh",background:"var(--bg)"}}><PublicNav go={go} onJoin={onJoin} onLogin={onLogin} onAdult={onAdult}/><main style={{maxWidth:900,margin:"0 auto",padding:"60px clamp(16px,5vw,54px)"}}><Kk>{page.eyebrow}</Kk><Tt s="clamp(2rem,5vw,3.5rem)">{page.title}</Tt><G style={{padding:"22px clamp(16px,4vw,30px)",marginTop:20,background:"rgba(255,255,255,.035)"}}>{page.body.map((p,i)=><p key={i} style={{fontSize:".88rem",lineHeight:1.75,color:i===0?"rgba(255,255,255,.78)":"var(--mt)",marginTop:i?14:0}}>{p}</p>)}<div style={{marginTop:20,padding:14,borderRadius:12,border:"1px solid rgba(255,171,0,.22)",background:"rgba(255,171,0,.06)",fontSize:".72rem",lineHeight:1.55,color:"var(--mt)"}}>Placeholder content. Final production language must be reviewed by counsel before launch, payment processing, or public performer onboarding.</div></G></main><PublicFooter go={go}/></div>;
+  const [dmca,setDmca]=useState({claimantName:"",claimantEmail:"",copyrightedWork:"",contentUrl:"",signature:"",swornStatement:false});
+  const [sent,setSent]=useState("");
+  const submitDmca=async()=>{setSent("");try{await apiJson("/api/compliance/dmca",{method:"POST",body:{...dmca,swornStatement:dmca.swornStatement}});setSent("DMCA notice received. Trust & Safety will review it.")}catch(error){setSent(error.message||"Unable to submit DMCA notice")}};
+  const field=(label,key,type="text")=><label style={{display:"block"}}><span style={{fontSize:".62rem",fontWeight:900,letterSpacing:".08em",textTransform:"uppercase",color:"var(--mt)"}}>{label}</span><input type={type} value={dmca[key]} onChange={e=>setDmca(p=>({...p,[key]:e.target.value}))} style={{marginTop:5}}/></label>;
+  return <div style={{minHeight:"100vh",background:"var(--bg)"}}><PublicNav go={go} onJoin={onJoin} onLogin={onLogin} onAdult={onAdult}/><main style={{maxWidth:900,margin:"0 auto",padding:"60px clamp(16px,5vw,54px)"}}><Kk>{page.eyebrow}</Kk><Tt s="clamp(2rem,5vw,3.5rem)">{page.title}</Tt><G style={{padding:"22px clamp(16px,4vw,30px)",marginTop:20,background:"rgba(255,255,255,.035)"}}>{page.body.map((p,i)=><p key={i} style={{fontSize:".88rem",lineHeight:1.75,color:i===0?"rgba(255,255,255,.78)":"var(--mt)",marginTop:i?14:0}}>{p}</p>)}<div style={{marginTop:20,padding:14,borderRadius:12,border:"1px solid rgba(255,171,0,.22)",background:"rgba(255,171,0,.06)",fontSize:".72rem",lineHeight:1.55,color:"var(--mt)"}}>Placeholder content. Final production language must be reviewed by counsel before launch, payment processing, or public performer onboarding.</div></G>{path==="/dmca"&&<G style={{padding:"22px clamp(16px,4vw,30px)",marginTop:16,background:"rgba(255,255,255,.035)"}}><Kk>Takedown Intake</Kk><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:12,marginTop:10}}>{field("Claimant name","claimantName")}{field("Claimant email","claimantEmail","email")}{field("Content URL","contentUrl")}{field("Signature","signature")}</div><label style={{display:"block",marginTop:12}}><span style={{fontSize:".62rem",fontWeight:900,letterSpacing:".08em",textTransform:"uppercase",color:"var(--mt)"}}>Copyrighted work</span><textarea value={dmca.copyrightedWork} onChange={e=>setDmca(p=>({...p,copyrightedWork:e.target.value}))} style={{width:"100%",minHeight:90,marginTop:5,borderRadius:8,border:"1px solid var(--bd)",background:"var(--cd)",color:"var(--tx)",padding:10,font:"inherit",resize:"vertical"}}/></label><label style={{display:"flex",gap:8,alignItems:"flex-start",marginTop:12,fontSize:".72rem",color:"var(--mt)",lineHeight:1.45}}><input type="checkbox" checked={dmca.swornStatement} onChange={e=>setDmca(p=>({...p,swornStatement:e.target.checked}))} style={{marginTop:2,accentColor:"var(--pk)"}}/>I state under penalty of perjury that the information in this notice is accurate and I am authorized to act for the rights holder.</label><div style={{display:"flex",alignItems:"center",gap:12,marginTop:14,flexWrap:"wrap"}}><Btn primary onClick={submitDmca}>Submit Notice</Btn>{sent&&<span style={{fontSize:".72rem",fontWeight:900,color:sent.includes("received")?"var(--gn)":"var(--pk)"}}>{sent}</span>}</div></G>}</main><PublicFooter go={go}/></div>;
 }
 
 /* ═══ MENU ═══ */
@@ -1261,7 +1265,7 @@ function Auth({onAuth,onClose,initialMode="login"}){
         ? await apiJson("/api/auth/login",{method:"POST",body:{email:f.email,password:f.pass}})
         : await apiJson("/api/auth/register",{method:"POST",body:{email:f.email,password:f.pass,display_name:f.name,role}});
       const u=payload.user||{};
-      onAuth({id:u.id,email:u.email||f.email,name:u.display_name||f.name||f.email.split("@")[0],role:u.role||role,accessToken:payload.accessToken,twoFactorEnabled:u.two_factor_enabled});
+      onAuth({id:u.id,email:u.email||f.email,name:u.display_name||f.name||f.email.split("@")[0],role:u.role||role,accessToken:payload.accessToken,twoFactorEnabled:u.two_factor_enabled,ageVerified:!!(u.age_verified||u.is_verified)});
     }catch(error){
       setErr(error.message||"Authentication failed");
     }finally{
@@ -1660,9 +1664,9 @@ export default function App(){
   const previewMode=visualPreview||roomPreview||studioPreview;
   const previewView=visualPreview||roomPreview?"room":"lobby";
   const giftDebug=searchParams.get("giftDebug")==="1";
-  const [authed,setAuthed]=useState(previewMode);const [authUser,setAuthUser]=useState(previewMode?{email:"preview@vybe.local",name:"VelvetKing",role:studioPreview?"performer":"viewer"}:null);const [apiToken,setApiToken]=useState(null);
-  const [ok,setOk]=useState(previewMode);const [ck,setCk]=useState(previewMode);const [vw,setVw]=useState(previewMode?previewView:"lobby");
-  const [path,setPath]=useState(initialPath);const [authOpen,setAuthOpen]=useState(false);const [authMode,setAuthMode]=useState(initialPath==="/signup"?"register":"login");const [publicGate,setPublicGate]=useState(false);
+  const [authed,setAuthed]=useState(previewMode);const [authUser,setAuthUser]=useState(previewMode?{email:"preview@vybe.local",name:"VelvetKing",role:studioPreview?"performer":"viewer",ageVerified:true}:null);const [apiToken,setApiToken]=useState(null);
+  const [ok,setOk]=useState(previewMode);const [ck,setCk]=useState(()=>previewMode||(typeof window!=="undefined"&&window.localStorage?.getItem("vybe_cookie_ok")==="1"));const [vw,setVw]=useState(previewMode?previewView:"lobby");
+  const [path,setPath]=useState(initialPath);const [authOpen,setAuthOpen]=useState(false);const [authMode,setAuthMode]=useState(initialPath==="/signup"?"register":"login");const [publicGate,setPublicGate]=useState(false);const [pendingAge,setPendingAge]=useState(null);
   const [performers,setPerformers]=useState(PERFS);const [pf,setPf]=useState((visualPreview||roomPreview)?PERFS[0]:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
   const [user,setUser]=useState({name:"VelvetKing",email:"preview@vybe.local",phone:"",twoFactor:false,primaryRail:"card",cryptoNetwork:"Universal router",cryptoWallet:"",passwordUpdated:false,
     paymentMethods:[{id:"card-demo",name:"Card",detail:"No card saved yet",status:"Add method",icon:"card",color:"var(--am)"},{id:"wallet-demo",name:"Digital wallet",detail:"Apple/Google/PayPal ready",status:"Available",icon:"wallet",color:"var(--cy)"},{id:"bank-demo",name:"Bank",detail:"ACH/debit connection",status:"Optional",icon:"shield",color:"var(--gn)"},{id:"crypto-demo",name:"Crypto wallet",detail:"Universal router not connected",status:"Connect wallet",icon:"crypto",color:"var(--vi)"}],
@@ -1692,9 +1696,14 @@ export default function App(){
   useGiftSocket({roomId:vw==="room"&&pf?pf.id:null,onGiftAnimation:handleSocketGift});
 
   useEffect(()=>{apiJson("/api/performers?live=true").then(d=>{if(Array.isArray(d?.performers)&&d.performers.length)setPerformers(d.performers.map(normalizeFrontendPerformer))}).catch(()=>{})},[]);
-  useEffect(()=>{if(!apiToken||authUser?.role!=="viewer")return;apiJson("/api/me",{token:apiToken}).then(profile=>setUser(u=>userFromProfile(profile,u))).catch(()=>{})},[apiToken,authUser?.role]);
-  const handleAuth=(u)=>{setApiToken(u.accessToken||null);setAuthUser(u);setUser(p=>({...p,name:u.name,email:u.email||p.email,twoFactor:!!u.twoFactorEnabled}));setAuthed(true);if(u.role==="performer")setOk(true)};/*performers skip age verify*/
-  const logout=()=>{setAuthed(false);setAuthUser(null);setApiToken(null);setOk(false);setVw("lobby")};
+  useEffect(()=>{if(!apiToken||authUser?.role!=="viewer")return;apiJson("/api/me",{token:apiToken}).then(profile=>{setUser(u=>userFromProfile(profile,u));if(profile?.user?.ageVerified)setOk(true)}).catch(()=>{})},[apiToken,authUser?.role]);
+  useEffect(()=>{if(!apiToken||authUser?.role!=="viewer"||!ok)return;apiJson("/api/loyalty/daily-login",{method:"POST",token:apiToken}).then(r=>{if(r?.balance)setUser(u=>userFromProfile({viewer:r.balance,user:{displayName:u.name,email:u.email}},u))}).catch(()=>{});apiJson("/api/loyalty/calendar-rewards",{method:"POST",token:apiToken}).then(r=>{if(r?.balance)setUser(u=>userFromProfile({viewer:r.balance,user:{displayName:u.name,email:u.email}},u))}).catch(()=>{})},[apiToken,authUser?.role,ok]);
+  const rememberCookies=()=>{if(typeof window!=="undefined")window.localStorage?.setItem("vybe_cookie_ok","1");setCk(true)};
+  const recordAgeVerification=useCallback(async(token,data={})=>{if(!token){setPendingAge(data);return null}const result=await apiJson("/api/compliance/age-verification",{method:"POST",token,body:{provider:data.provider||"demo_yoti",providerRef:data.providerRef||data.provider_ref||`demo-age-${Date.now()}`,status:"verified",metadata:{source:"frontend_age_gate"}}});setPendingAge(null);setAuthUser(a=>a?{...a,ageVerified:true}:a);return result},[]);
+  const completePublicAge=async data=>{setPendingAge(data);setOk(true);setPublicGate(false);openAuth("register")};
+  const completeAuthedAge=async data=>{await recordAgeVerification(apiToken,data);setOk(true)};
+  const handleAuth=async u=>{const token=u.accessToken||null;setApiToken(token);setAuthUser(u);setUser(p=>({...p,name:u.name,email:u.email||p.email,twoFactor:!!u.twoFactorEnabled}));setAuthed(true);setAuthOpen(false);if(u.role==="performer"){setOk(true);return}if(u.ageVerified){setOk(true);return}if(pendingAge&&token){try{await recordAgeVerification(token,pendingAge);setOk(true)}catch(error){window.alert?.(error.message||"Age verification could not be recorded");setOk(false)}return}setOk(false)};/*performers skip viewer age gate*/
+  const logout=()=>{setAuthed(false);setAuthUser(null);setApiToken(null);setOk(false);setPendingAge(null);setVw("lobby")};
   const isPerf=authed&&authUser?.role==="performer";
   const perfSelf=isPerf?(performers[0]||PERFS[0]):null;
 
@@ -1708,6 +1717,8 @@ export default function App(){
   useEffect(()=>{if(typeof window==="undefined")return;const onPop=()=>setPath(window.location.pathname);window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[]);
   const openAuth=mode=>{setAuthMode(mode);setAuthOpen(true)};
   const requestAdultAccess=()=>{if(authed){setVw("lobby");return}setPublicGate(true)};
+  const leaveAdultFlow=()=>{if(typeof window!=="undefined")window.location.href="https://www.google.com"};
+  const handleGoLive=async()=>{try{if(apiToken&&authUser?.role==="performer"){const r=await apiJson("/api/performers/me/live",{method:"POST",token:apiToken,body:{isLive:true}});setPf(normalizeFrontendPerformer({...perfSelf,id:r.performerId||perfSelf?.id,backendId:r.performerId||perfSelf?.backendId,isLive:r.isLive??true}))}else{setPf(perfSelf)}setVw("room")}catch(error){window.alert?.(error.message||"Performer verification and paperwork must be complete before going live")}};
 
   if(visualPreview)return <VybeLuxuryPreview/>;
 
@@ -1718,14 +1729,14 @@ export default function App(){
       <HomePage go={go} onJoin={()=>openAuth("register")} onLogin={()=>openAuth("login")} onAdult={requestAdultAccess}/>;
     const showAuth=authOpen||path==="/login"||path==="/signup";
     const showAge=(publicGate||path==="/explore")&&!ok;
-    return<><style>{css}</style>{page}{showAge&&<AgeV onDone={()=>{setOk(true);setPublicGate(false);openAuth("register")}}/>}{showAuth&&<Auth onAuth={handleAuth} onClose={()=>{setAuthOpen(false);if(path==="/login"||path==="/signup")go("/")}} initialMode={path==="/signup"?"register":authMode}/>} {!ck&&<CK onOk={()=>setCk(true)}/>}</>;
+    return<><style>{css}</style>{page}{showAge&&<AgeV onDone={completePublicAge} onLeave={leaveAdultFlow}/>}{showAuth&&<Auth onAuth={handleAuth} onClose={()=>{setAuthOpen(false);if(path==="/login"||path==="/signup")go("/")}} initialMode={path==="/signup"?"register":authMode}/>} {!ck&&<CK onOk={rememberCookies}/>}</>;
   }
 
   return<>
     <style>{css}</style>
     {!authed&&<Auth onAuth={handleAuth} initialMode={authMode}/>}
-    {authed&&!ok&&!isPerf&&<AgeV onDone={()=>setOk(true)}/>}
-    {authed&&ok&&isPerf&&vw!=="room"&&<PerfDash perfData={perfSelf} onGoLive={()=>{setPf(perfSelf);setVw("room")}} onLogout={logout}/>}
+    {authed&&!ok&&!isPerf&&<AgeV onDone={completeAuthedAge} onLeave={leaveAdultFlow}/>}
+    {authed&&ok&&isPerf&&vw!=="room"&&<PerfDash perfData={perfSelf} onGoLive={handleGoLive} onLogout={logout}/>}
     {authed&&ok&&!isPerf&&vw==="lobby"&&<LB user={user} performers={performers} onPerf={vp} onWallet={()=>setMd("wallet")} cat={cat} setCat={setCat} onMenu={()=>setMn(true)}/>}
     {authed&&ok&&!isPerf&&vw==="profile"&&pf&&<PF perf={pf} user={user} onBack={bk} onLive={gl2} onBook={gb} onVip={gv} onWallet={()=>setMd("wallet")}/>}
     {authed&&ok&&vw==="room"&&pf&&<RM perf={pf} user={user} onBack={isPerf?()=>setVw("lobby"):bp} onSC={sc} onWallet={()=>setMd("wallet")} onBook={gb} onVip={gv} onGiftSent={triggerDemoGift}/>}
@@ -1734,7 +1745,7 @@ export default function App(){
     {md==="book"&&pf&&<BK perf={pf} sparks={user.sparks} pkgs={BOOK.filter(p=>p.mins<=pf.caps.maxMins)} label="Book Private Session" onOk={cs} onClose={()=>setMd(null)}/>}
     {md==="vip"&&pf&&<BK perf={pf} sparks={user.sparks} pkgs={VIPPK} label="VIP Session" onOk={cs} onClose={()=>setMd(null)}/>}
     {md==="viewer"&&<ViewerProfile user={user} onClose={()=>setMd(null)} onSave={updateViewer} onWallet={()=>setMd("wallet")}/>}
-    {authed&&ok&&!ck&&<CK onOk={()=>setCk(true)}/>}
+    {authed&&ok&&!ck&&<CK onOk={rememberCookies}/>}
     <GiftSpectacleOverlay giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={advanceDemoGift}/>
     <PlatformBanner giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={()=>{}}/>
     <SparkStormShell events={giftEvents} stormThreshold={3}/>

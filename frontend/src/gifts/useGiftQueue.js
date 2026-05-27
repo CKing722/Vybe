@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 /*
   useGiftQueue
@@ -6,20 +6,20 @@ import { useState, useRef, useCallback } from "react";
   subsequent gifts (up to maxSize) so rapid sending never drops events.
 
   Returns:
-    current  - active gift item {giftId, sender, recipient} or null
-    enqueue  - add a gift item; plays immediately if idle, queues if busy
-    advance  - call in onDone to dismiss current and play next queued gift
+    current     - active gift item {giftId, sender, recipient} or null
+    enqueue     - add a gift item; plays immediately if idle, queues if busy
+    advance     - call in onDone to dismiss current and play next queued gift
+    queueLength - number of gifts waiting behind the current one
 */
 export default function useGiftQueue(maxSize = 4) {
-  const [current, setCurrent] = useState(null);
-  const queueRef = useRef([]);
+  const [state, setState] = useState({ current: null, queue: [] });
 
   const enqueue = useCallback(
     (item) => {
-      setCurrent((prev) => {
-        if (!prev) return item;
-        if (queueRef.current.length < maxSize) {
-          queueRef.current.push(item);
+      setState((prev) => {
+        if (!prev.current) return { current: item, queue: prev.queue };
+        if (prev.queue.length < maxSize) {
+          return { current: prev.current, queue: [...prev.queue, item] };
         }
         return prev;
       });
@@ -28,9 +28,11 @@ export default function useGiftQueue(maxSize = 4) {
   );
 
   const advance = useCallback(() => {
-    const next = queueRef.current.shift() || null;
-    setCurrent(next);
+    setState((prev) => {
+      const [next = null, ...rest] = prev.queue;
+      return { current: next, queue: rest };
+    });
   }, []);
 
-  return { current, enqueue, advance };
+  return { current: state.current, enqueue, advance, queueLength: state.queue.length };
 }

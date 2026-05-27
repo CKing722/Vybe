@@ -483,6 +483,59 @@ body,#root{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:va
 @keyframes laneRun{0%{transform:translateX(-20%)}100%{transform:translateX(115%)}}
 @keyframes tilePop{0%,100%{transform:scale(.94);opacity:.72}50%{transform:scale(1.06);opacity:1}}
 @keyframes crownRise{0%,100%{transform:translateY(8px) scale(.96)}50%{transform:translateY(-8px) scale(1.04)}}
+@keyframes museHeadIdle{0%,100%{transform:translate3d(-.2%,0,0) rotate(-.35deg)}35%{transform:translate3d(.55%,-.35%,0) rotate(.8deg)}70%{transform:translate3d(-.45%,.12%,0) rotate(-.25deg)}}
+@keyframes museTorsoBreath{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(.16%,-.16%,0) scaleX(1.004) scaleY(1.01)}}
+@keyframes museHipIdle{0%,100%{transform:translate3d(0,0,0) rotate(.12deg)}50%{transform:translate3d(.72%,.12%,0) rotate(.55deg)}}
+@keyframes museLegBalance{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-.22%,.18%,0)}}
+@keyframes museArmIdle{0%,100%{transform:translate3d(0,0,0) rotate(-.25deg)}50%{transform:translate3d(.42%,.2%,0) rotate(1.25deg)}}
+@keyframes museMouthTalk{0%,100%{transform:scaleX(.72) scaleY(.45);opacity:.32}50%{transform:scaleX(1) scaleY(1.15);opacity:.74}}
+@keyframes museBlink{0%,91%,100%{opacity:0;transform:scaleY(.2)}92%,94%{opacity:.62;transform:scaleY(1)}}
+@keyframes museLeanHead{0%,100%{transform:translate3d(0,0,0) rotate(-.2deg)}50%{transform:translate3d(-1.4%,-.75%,0) rotate(-1.8deg) scale(1.012)}}
+@keyframes museLeanTorso{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-.72%,-.35%,0) rotate(-.75deg) scale(1.006)}}
+@keyframes museLeanHips{0%,100%{transform:translate3d(0,0,0) rotate(.1deg)}50%{transform:translate3d(.42%,.12%,0) rotate(.48deg)}}
+@keyframes museCelebrateHead{0%,100%{transform:translate3d(0,0,0) rotate(0)}30%{transform:translate3d(-1.1%,-.9%,0) rotate(-3deg)}64%{transform:translate3d(.8%,-.35%,0) rotate(1.8deg)}}
+@keyframes museCelebrateTorso{0%,100%{transform:translate3d(0,0,0) rotate(0)}36%{transform:translate3d(.35%,-.7%,0) rotate(1.4deg)}68%{transform:translate3d(-.35%,-.2%,0) rotate(-.8deg)}}
+@keyframes museCelebrateHips{0%,100%{transform:translate3d(0,0,0) rotate(.1deg)}36%{transform:translate3d(1.35%,-.12%,0) rotate(1.15deg)}72%{transform:translate3d(-.55%,.05%,0) rotate(-.5deg)}}
+@keyframes museArmCelebrate{0%,100%{transform:translate3d(0,0,0) rotate(0)}45%{transform:translate3d(1.15%,-1.2%,0) rotate(-3.1deg)}}
+@keyframes musePointArm{0%,100%{transform:translate3d(0,0,0) rotate(0)}50%{transform:translate3d(-1.6%,-.45%,0) rotate(-3.6deg)}}
+@keyframes museRigPulse{0%,100%{filter:drop-shadow(0 34px 70px rgba(0,0,0,.58)) saturate(1)}35%{filter:drop-shadow(0 42px 88px rgba(255,45,120,.3)) saturate(1.16) brightness(1.08)}}
+@keyframes museAura{0%,100%{opacity:.34;transform:scale(.96)}50%{opacity:.76;transform:scale(1.06)}}
+@keyframes museTalk{0%,100%{transform:scaleY(.35);opacity:.42}50%{transform:scaleY(1);opacity:.95}}
+@keyframes museSpark{0%{opacity:0;transform:translate3d(0,18px,0) scale(.7)}22%{opacity:1}100%{opacity:0;transform:translate3d(0,-90px,0) scale(1.15)}}
+.muse-avatar-figure{position:relative;display:grid;place-items:center;width:100%;min-height:520px;transform-origin:50% 72%;will-change:contents}
+.muse-avatar-rig{position:relative;z-index:2;height:clamp(500px,68vh,620px);aspect-ratio:910/1729;max-width:92%;isolation:isolate;filter:drop-shadow(0 34px 70px rgba(0,0,0,.58));animation:none}
+.muse-rig-shadow,.muse-rig-layer{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;transform-origin:var(--origin,50% 50%);backface-visibility:hidden}
+.muse-rig-shadow{z-index:1;opacity:.34;filter:saturate(.82) brightness(.62) contrast(1.08)}
+.muse-rig-layer{z-index:2;will-change:transform,filter,opacity}
+.muse-rig-legs{--origin:52% 72%;z-index:2;animation:museLegBalance 6.8s ease-in-out infinite}
+.muse-rig-shoes{--origin:54% 92%;z-index:3;animation:museLegBalance 7.4s ease-in-out infinite reverse}
+.muse-rig-hips{--origin:54% 52%;z-index:4;animation:museHipIdle 5.8s ease-in-out infinite}
+.muse-rig-torso{--origin:50% 34%;z-index:5;animation:museTorsoBreath 4.2s ease-in-out infinite}
+.muse-rig-front-arm{--origin:40% 34%;z-index:6;animation:museArmIdle 5.1s ease-in-out infinite}
+.muse-rig-head{--origin:48% 18%;z-index:7;animation:museHeadIdle 5.4s ease-in-out infinite}
+.muse-rig-mouth{position:absolute;left:45.8%;top:14.35%;z-index:9;width:3.4%;height:.5%;border-radius:999px;background:rgba(255,138,168,.72);box-shadow:0 0 6px rgba(0,0,0,.5);animation:museMouthTalk .34s ease-in-out infinite;transform-origin:center}
+.muse-rig-blink{position:absolute;left:42.7%;top:10.55%;z-index:9;width:9.5%;height:.34%;border-radius:999px;background:rgba(18,11,10,.78);animation:museBlink 5.6s ease-in-out infinite;transform-origin:center}
+.muse-avatar-aura{position:absolute;inset:8% 13% 4%;border-radius:45%;background:radial-gradient(ellipse at 52% 68%,rgba(255,45,120,.34),transparent 54%),radial-gradient(ellipse at 50% 24%,rgba(214,177,94,.26),transparent 46%);filter:blur(18px);animation:museAura 3.8s ease-in-out infinite}
+.muse-avatar-floor{position:absolute;left:12%;right:12%;bottom:4%;height:88px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,45,120,.32),transparent 68%);filter:blur(10px)}
+.muse-avatar-vitals{position:absolute;left:18px;bottom:18px;display:flex;gap:4px;align-items:end;z-index:4;height:28px}
+.muse-avatar-vitals span{width:5px;border-radius:999px;background:linear-gradient(180deg,#ff8aa8,#d6b15e);animation:museTalk .76s ease-in-out infinite;transform-origin:bottom}
+.muse-avatar-vitals span:nth-child(2){animation-delay:.12s}.muse-avatar-vitals span:nth-child(3){animation-delay:.22s}.muse-avatar-vitals span:nth-child(4){animation-delay:.34s}
+.muse-avatar-spark{position:absolute;z-index:3;width:7px;height:7px;border-radius:999px;background:#d6b15e;box-shadow:0 0 18px #d6b15e;animation:museSpark 2.5s ease-in-out infinite;opacity:0}
+.muse-avatar-spark.s1{left:28%;bottom:24%;animation-delay:.1s}.muse-avatar-spark.s2{left:70%;bottom:30%;background:#ff8aa8;box-shadow:0 0 18px #ff8aa8;animation-delay:.7s}.muse-avatar-spark.s3{left:52%;bottom:18%;background:#58d7c4;box-shadow:0 0 18px #58d7c4;animation-delay:1.25s}
+.muse-motion-lean_in .muse-rig-head{animation:museLeanHead 2.2s ease-in-out infinite}
+.muse-motion-lean_in .muse-rig-torso{animation:museLeanTorso 2.2s ease-in-out infinite}
+.muse-motion-lean_in .muse-rig-hips{animation:museLeanHips 2.2s ease-in-out infinite}
+.muse-motion-celebrate_full .muse-rig-head,.muse-motion-acknowledge_small .muse-rig-head{animation:museCelebrateHead 1.75s ease-in-out infinite}
+.muse-motion-celebrate_full .muse-rig-torso,.muse-motion-acknowledge_small .muse-rig-torso{animation:museCelebrateTorso 1.75s ease-in-out infinite}
+.muse-motion-celebrate_full .muse-rig-hips,.muse-motion-acknowledge_small .muse-rig-hips{animation:museCelebrateHips 1.75s ease-in-out infinite}
+.muse-motion-celebrate_full .muse-rig-front-arm,.muse-motion-acknowledge_small .muse-rig-front-arm{animation:museArmCelebrate 1.75s ease-in-out infinite}
+.muse-motion-point_to_game .muse-rig-front-arm{animation:musePointArm 2.1s ease-in-out infinite}
+.muse-motion-point_to_game .muse-rig-head{animation:museLeanHead 2.1s ease-in-out infinite}
+.muse-motion-settle_forward .muse-rig-layer{filter:saturate(.86) brightness(.92)}
+.muse-expression-focused_boundary .muse-avatar-aura{background:radial-gradient(ellipse at 52% 54%,rgba(143,181,255,.28),transparent 56%)}
+.muse-expression-sparkle_wide .muse-avatar-aura,.muse-expression-raised_brow .muse-avatar-aura{background:radial-gradient(ellipse at 52% 68%,rgba(255,45,120,.4),transparent 54%),radial-gradient(ellipse at 50% 24%,rgba(214,177,94,.35),transparent 46%)}
+.muse-expression-sparkle_wide .muse-rig-head,.muse-expression-raised_brow .muse-rig-head{filter:saturate(1.1) brightness(1.06)}
+.muse-burst .muse-avatar-rig{animation:museRigPulse .8s ease-out 1}
 .ai{animation:fi .3s ease both}
 input[type=text],input[type=email],input[type=tel],input[type=password],select{background:var(--cd);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:8px 12px;font:inherit;outline:none;width:100%}input[type=text]:focus,input[type=email]:focus,input[type=tel]:focus,input[type=password]:focus,select:focus{border-color:var(--cy)}
 select option{background:#0d1118;color:#f6efe5}
@@ -2501,15 +2554,178 @@ function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
   </div>;
 }
 
+const MUSE_ROOM_ID="33333333-3333-4333-8333-333333333333";
+const MUSE_VIEWER_ID="11111111-1111-4111-8111-111111111111";
+const MUSE_RIG_BODY_SRC="/assets/muse/muse-rig-body.png";
+const MUSE_RIG_LAYERS=["legs","shoes","hips","torso","front-arm","head"];
+
+function MuseLocalPreview(){
+  const isNarrow=typeof window!=="undefined"&&window.innerWidth<760;
+  const [message,setMessage]=useState("MUSE, welcome me into the room and call the energy.");
+  const [last,setLast]=useState(null);
+  const [state,setState]=useState(null);
+  const [log,setLog]=useState([]);
+  const [busy,setBusy]=useState(false);
+  const [error,setError]=useState("");
+  const [avatarBurst,setAvatarBurst]=useState(false);
+  const [avatarBeat,setAvatarBeat]=useState(0);
+  const appendLog=item=>setLog(p=>[{id:Date.now()+Math.random(),...item},...p].slice(0,8));
+  const loadState=useCallback(async()=>{
+    try{
+      const next=await apiJson(`/api/muse/rooms/${MUSE_ROOM_ID}/state`);
+      setState(next);
+      return next;
+    }catch(e){
+      setError(e.message||"MUSE state unavailable");
+      return null;
+    }
+  },[]);
+  useEffect(()=>{loadState()},[loadState]);
+  const run=async(body,label)=>{
+    setBusy(true);setError("");
+    try{
+      const response=await apiJson(`/api/muse/rooms/${MUSE_ROOM_ID}/events`,{method:"POST",body:{viewerId:MUSE_VIEWER_ID,...body}});
+      setLast(response);
+      setAvatarBeat(p=>p+1);
+      appendLog({label,text:response.text,reason:response.decision?.reason,emotion:response.decision?.emotion});
+      await loadState();
+    }catch(e){
+      setError(e.message||"MUSE event failed");
+    }finally{
+      setBusy(false);
+    }
+  };
+  const runTick=async()=>{
+    setBusy(true);setError("");
+    try{
+      const response=await apiJson(`/api/muse/rooms/${MUSE_ROOM_ID}/tick`,{method:"POST",body:{reason:"local_avatar_preview"}});
+      setLast(response);
+      setAvatarBeat(p=>p+1);
+      appendLog({label:"Room tick",text:response.text,reason:response.decision?.reason,emotion:response.decision?.emotion});
+      await loadState();
+    }catch(e){
+      setError(e.message||"MUSE tick failed");
+    }finally{
+      setBusy(false);
+    }
+  };
+  const reward=async()=>{
+    const armId=last?.decision?.selectedArm?.id||state?.banditArms?.[0]?.id;
+    if(!armId){setError("No bandit arm is available yet");return}
+    setBusy(true);setError("");
+    try{
+      const result=await apiJson(`/api/muse/rooms/${MUSE_ROOM_ID}/rewards`,{method:"POST",body:{armId,metrics:{giftSparks:500,chatMessages:3,retentionDelta:1}}});
+      setAvatarBeat(p=>p+1);
+      appendLog({label:"Reward",text:`${result.arm.label} learned from score ${result.rewardScore}`,reason:"learning",emotion:"focused"});
+      await loadState();
+    }catch(e){
+      setError(e.message||"MUSE reward failed");
+    }finally{
+      setBusy(false);
+    }
+  };
+  const perf=last?.performance||{};
+  const avatar=perf.avatar||{};
+  const voice=perf.voice||{};
+  const metrics=state?.metrics||{};
+  const selectedArm=last?.decision?.selectedArm;
+  const expression=avatar.expression||"bright_smile";
+  const motion=avatar.motion||"idle_talk";
+  const intensity=avatar.intensity??0.62;
+  const motionKey=String(motion).replace(/[^a-z0-9_-]/gi,"_");
+  const expressionKey=String(expression).replace(/[^a-z0-9_-]/gi,"_");
+  useEffect(()=>{
+    if(!avatarBeat)return;
+    setAvatarBurst(true);
+    const timer=setTimeout(()=>setAvatarBurst(false),900);
+    return()=>clearTimeout(timer);
+  },[avatarBeat]);
+  const buttonBase={height:42,border:"1px solid rgba(255,255,255,.14)",borderRadius:9,background:"rgba(255,255,255,.06)",color:"#f8efe9",font:"inherit",fontWeight:1000,cursor:busy?"wait":"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:8};
+  const panel={border:"1px solid rgba(255,255,255,.12)",background:"linear-gradient(180deg,rgba(12,14,22,.84),rgba(8,9,14,.94))",borderRadius:12,boxShadow:"0 24px 80px rgba(0,0,0,.34)"};
+  return <div style={{minHeight:"100vh",width:"100%",overflowX:"hidden",background:"radial-gradient(circle at 24% 18%,rgba(214,177,94,.18),transparent 28%),radial-gradient(circle at 68% 28%,rgba(255,45,120,.2),transparent 30%),linear-gradient(135deg,#07070b,#141018 52%,#090a10)",color:"#f8efe9",padding:isNarrow?"16px 14px":"18px clamp(14px,3vw,34px)"}}>
+    <div style={{maxWidth:1380,margin:"0 auto",display:"grid",gridTemplateRows:"auto minmax(0,1fr)",gap:14}}>
+      <header style={{display:"flex",justifyContent:"space-between",gap:14,alignItems:"end",flexWrap:"wrap"}}>
+        <div><div style={{fontSize:".66rem",fontWeight:1000,letterSpacing:".16em",textTransform:"uppercase",color:"#d6b15e"}}>Local MUSE Lab</div><h1 style={{fontSize:isNarrow?"1.42rem":"clamp(1.6rem,3vw,3.1rem)",fontWeight:1000,lineHeight:1.08,marginTop:5,maxWidth:isNarrow?330:"none"}}>AI performer avatar preview</h1></div>
+        <div style={{display:"grid",gridTemplateColumns:isNarrow?"repeat(2,minmax(0,1fr))":"repeat(auto-fit,minmax(120px,1fr))",gap:8,width:isNarrow?"100%":"min(100%,440px)"}}>
+          {[["Chat",metrics.chatMessages||0,"#58d7c4"],["Gifts",metrics.gifts||0,"#d6b15e"],["Sparks",metrics.giftSparks||0,"#ff8aa8"],["Queue",state?.priorityQueue?.length||0,"#8fb5ff"]].map(([k,v,tone])=><div key={k} style={{...panel,padding:"9px 10px"}}><div style={{fontSize:".55rem",fontWeight:1000,letterSpacing:".1em",textTransform:"uppercase",color:"rgba(248,239,233,.52)"}}>{k}</div><div style={{fontSize:"1.12rem",fontWeight:1000,color:tone,marginTop:2}}>{Number(v).toLocaleString()}</div></div>)}
+        </div>
+      </header>
+      <main style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(360px,100%),1fr))",gap:14,alignItems:"stretch"}}>
+        <section style={{...panel,minHeight:isNarrow?620:680,position:"relative",overflow:"hidden",display:"grid",gridTemplateRows:"minmax(0,1fr) auto"}}>
+          <div style={{position:"absolute",inset:0,background:`radial-gradient(circle at 50% 66%,rgba(255,45,120,${.12+intensity*.18}),transparent 31%),radial-gradient(circle at 48% 22%,rgba(214,177,94,${.12+intensity*.14}),transparent 25%)`}}/>
+          <div style={{position:"relative",display:"grid",placeItems:"center",padding:"28px 20px 0"}}>
+            <div className={`muse-avatar-figure muse-motion-${motionKey} muse-expression-${expressionKey} ${avatarBurst?"muse-burst":""}`}>
+              <div className="muse-avatar-aura"/>
+              <div className="muse-avatar-floor"/>
+              <div className="muse-avatar-rig" aria-label="Animated MUSE avatar rig">
+                <img className="muse-rig-shadow" src={MUSE_RIG_BODY_SRC} alt="MUSE avatar concept"/>
+                {MUSE_RIG_LAYERS.map(layer=><img key={layer} className={`muse-rig-layer muse-rig-${layer}`} src={`/assets/muse/muse-rig-${layer}.png`} alt="" aria-hidden="true"/>)}
+                <span className="muse-rig-mouth" aria-hidden="true"/>
+                <span className="muse-rig-blink" aria-hidden="true"/>
+              </div>
+              <span className="muse-avatar-spark s1"/>
+              <span className="muse-avatar-spark s2"/>
+              <span className="muse-avatar-spark s3"/>
+              <div className="muse-avatar-vitals" aria-hidden="true">
+                {[0,1,2,3].map(i=><span key={i} style={{height:10+intensity*(14+i*4)}}/>)}
+              </div>
+            </div>
+            <div style={{position:"absolute",right:18,top:18,display:"grid",gap:8,zIndex:2}}>
+              <span style={{maxWidth:124,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",padding:"7px 10px",borderRadius:999,border:"1px solid rgba(255,255,255,.14)",background:"rgba(8,9,14,.64)",fontSize:".62rem",fontWeight:1000,color:"#d6b15e"}}>{expression}</span>
+              <span style={{maxWidth:124,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",padding:"7px 10px",borderRadius:999,border:"1px solid rgba(255,255,255,.14)",background:"rgba(8,9,14,.64)",fontSize:".62rem",fontWeight:1000,color:"#58d7c4"}}>{motion}</span>
+            </div>
+          </div>
+          <div style={{position:"relative",padding:18,borderTop:"1px solid rgba(255,255,255,.1)",background:"linear-gradient(180deg,rgba(8,9,14,.4),rgba(8,9,14,.88))"}}>
+            <div style={{fontSize:".6rem",fontWeight:1000,letterSpacing:".14em",textTransform:"uppercase",color:"#d6b15e"}}>MUSE output</div>
+            <p style={{fontSize:"1.08rem",lineHeight:1.5,fontWeight:900,marginTop:8,minHeight:52}}>{last?.text||"Run a chat, gift, request, or room tick to drive the avatar state."}</p>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:12}}>
+              <span style={{fontSize:".66rem",fontWeight:900,color:"rgba(248,239,233,.62)"}}>voice: {voice.provider||"local_mock_tts"}</span>
+              <span style={{fontSize:".66rem",fontWeight:900,color:"rgba(248,239,233,.62)"}}>first audio: {voice.estimatedFirstAudioMs||120}ms</span>
+              <span style={{fontSize:".66rem",fontWeight:900,color:"rgba(248,239,233,.62)"}}>intensity: {Number(intensity).toFixed(2)}</span>
+            </div>
+          </div>
+        </section>
+        <section style={{display:"grid",gridTemplateRows:"auto auto minmax(0,1fr)",gap:12}}>
+          <div style={{...panel,padding:14}}>
+            <div style={{display:"grid",gridTemplateColumns:isNarrow?"1fr":"1fr auto",gap:10,alignItems:"center"}}>
+              <input value={message} onChange={e=>setMessage(e.target.value)} maxLength={480} placeholder="Say something to MUSE" style={{height:42,minWidth:0,borderRadius:9,border:"1px solid rgba(255,255,255,.14)",background:"rgba(255,255,255,.06)",color:"#fff",font:"inherit",padding:"0 12px",fontWeight:800}}/>
+              <button type="button" disabled={busy} onClick={()=>run({type:"chat",message},"Chat")} style={{...buttonBase,padding:"0 16px",background:"linear-gradient(135deg,#d6b15e,#ff8aa8)",color:"#140f12",border:0}}><I n="chat" s={15} c="#140f12"/>Send</button>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:isNarrow?"repeat(2,minmax(0,1fr))":"repeat(4,minmax(0,1fr))",gap:8,marginTop:10}}>
+              <button type="button" disabled={busy} onClick={()=>run({type:"gift",giftName:"Crown Drop",sparkCost:500},"Gift")} style={buttonBase}><I n="crown" s={15} c="#d6b15e"/>Crown</button>
+              <button type="button" disabled={busy} onClick={()=>run({type:"request",requestName:"Personal Shoutout",sparkCost:400},"Request")} style={buttonBase}><I n="request" s={15} c="#ff8aa8"/>Request</button>
+              <button type="button" disabled={busy} onClick={runTick} style={buttonBase}><I n="live" s={15} c="#58d7c4"/>Tick</button>
+              <button type="button" disabled={busy} onClick={reward} style={buttonBase}><I n="brain" s={15} c="#8fb5ff"/>Reward</button>
+            </div>
+            {error&&<div style={{marginTop:10,padding:10,borderRadius:8,border:"1px solid rgba(255,138,168,.42)",background:"rgba(255,45,120,.12)",color:"#ffb4c8",fontSize:".76rem",fontWeight:900}}>{error}</div>}
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+            <div style={{...panel,padding:14}}><div style={{fontSize:".6rem",fontWeight:1000,letterSpacing:".12em",textTransform:"uppercase",color:"rgba(248,239,233,.52)"}}>Decision</div><div style={{fontSize:"1rem",fontWeight:1000,marginTop:8,color:"#ff8aa8"}}>{last?.decision?.reason||"waiting"}</div><p style={{fontSize:".72rem",lineHeight:1.45,color:"rgba(248,239,233,.64)",marginTop:6}}>{last?.decision?.tool||"tool pending"} · {last?.decision?.priority||"priority pending"}</p></div>
+            <div style={{...panel,padding:14}}><div style={{fontSize:".6rem",fontWeight:1000,letterSpacing:".12em",textTransform:"uppercase",color:"rgba(248,239,233,.52)"}}>Learning</div><div style={{fontSize:"1rem",fontWeight:1000,marginTop:8,color:"#58d7c4"}}>{selectedArm?.label||state?.banditArms?.[0]?.label||"room pulse"}</div><p style={{fontSize:".72rem",lineHeight:1.45,color:"rgba(248,239,233,.64)",marginTop:6}}>{selectedArm?.mode||state?.banditArms?.[0]?.mode||"talk"} arm · guardrailed engagement</p></div>
+          </div>
+          <div style={{...panel,padding:14,minHeight:0,overflow:"hidden"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginBottom:10}}><div style={{fontSize:".6rem",fontWeight:1000,letterSpacing:".12em",textTransform:"uppercase",color:"rgba(248,239,233,.52)"}}>Event log</div><button type="button" onClick={loadState} style={{height:28,padding:"0 10px",borderRadius:8,border:"1px solid rgba(255,255,255,.12)",background:"rgba(255,255,255,.05)",color:"#f8efe9",font:"inherit",fontSize:".62rem",fontWeight:900,cursor:"pointer"}}>Refresh</button></div>
+            <div style={{display:"grid",gap:8,maxHeight:318,overflowY:"auto",paddingRight:4}}>
+              {(log.length?log:[{id:"empty",label:"Ready",text:"The local MUSE preview is connected to the backend room state.",reason:"idle",emotion:"calm"}]).map(item=><div key={item.id} style={{padding:10,borderRadius:9,border:"1px solid rgba(255,255,255,.1)",background:"rgba(255,255,255,.035)"}}><div style={{display:"flex",justifyContent:"space-between",gap:8}}><strong style={{fontSize:".78rem",color:"#d6b15e"}}>{item.label}</strong><span style={{fontSize:".62rem",fontWeight:900,color:"rgba(248,239,233,.52)"}}>{item.reason}</span></div><p style={{fontSize:".76rem",lineHeight:1.42,color:"rgba(248,239,233,.76)",marginTop:5}}>{item.text}</p></div>)}
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>;
+}
+
 export default function App(){
   const searchParams=typeof window!=="undefined"?new URLSearchParams(window.location.search):new URLSearchParams();
   const initialPath=typeof window!=="undefined"?window.location.pathname:"/";
+  const isLocalPreviewHost=typeof window!=="undefined"&&["localhost","127.0.0.1","::1"].includes(window.location.hostname);
   const visualPreview=searchParams.get("vybePreview")==="gift";
   const roomPreview=searchParams.get("vybePreview")==="room";
   const studioPreview=searchParams.get("vybePreview")==="studio";
   const profilePreview=searchParams.get("vybePreview")==="profile";
   const lobbyPreview=searchParams.get("vybePreview")==="lobby";
-  const previewMode=visualPreview||roomPreview||studioPreview||lobbyPreview||profilePreview;
+  const musePreview=searchParams.get("vybePreview")==="muse"&&isLocalPreviewHost;
+  const previewMode=visualPreview||roomPreview||studioPreview||lobbyPreview||profilePreview||musePreview;
   const previewView=visualPreview||roomPreview?"room":profilePreview?"profile":"lobby";
   const giftDebug=searchParams.get("giftDebug")==="1";
   const [authed,setAuthed]=useState(previewMode);const [authUser,setAuthUser]=useState(previewMode?{email:"preview@vybe.local",name:"VelvetKing",role:studioPreview?"performer":"viewer",ageVerified:true}:null);const [apiToken,setApiToken]=useState(null);
@@ -2524,7 +2740,7 @@ export default function App(){
     favPerfs:["luna","jade","raven"],
     perfHistory:{luna:{sessions:12,sparksSpent:3400,since:"Mar 2026"},jade:{sessions:6,sparksSpent:1200,since:"Apr 2026"},raven:{sessions:3,sparksSpent:800,since:"May 2026"}}});
 
-  const {current:demoGift,enqueue:enqueueDemoGift,advance:advanceDemoGift}=useGiftQueue();
+  const {current:demoGift,enqueue:enqueueDemoGift,advance:advanceDemoGift,queueLength:giftQueueLength}=useGiftQueue();
   const [giftEvents,setGiftEvents]=useState([]);
   const DEMO_GIFTS=["neon_rose","fire_shot","velvet_kiss","diamond_rain","crown_drop","champagne_pour","private_key"];
   let _demoIdx=useRef(0);
@@ -2569,6 +2785,7 @@ export default function App(){
   const leaveAdultFlow=()=>{if(typeof window!=="undefined")window.location.href="https://www.google.com"};
   const handleGoLive=async()=>{try{if(apiToken&&authUser?.role==="performer"){const r=await apiJson("/api/performers/me/live",{method:"POST",token:apiToken,body:{isLive:true}});setPf(normalizeFrontendPerformer({...perfSelf,id:r.performerId||perfSelf?.id,backendId:r.performerId||perfSelf?.backendId,isLive:r.isLive??true}))}else{setPf(perfSelf)}setVw("room")}catch(error){window.alert?.(error.message||"Performer verification and paperwork must be complete before going live")}};
 
+  if(musePreview)return <><style>{css}</style><MuseLocalPreview/></>;
   if(visualPreview)return <VybeLuxuryPreview/>;
 
   if(!previewMode&&!authed){
@@ -2595,7 +2812,7 @@ export default function App(){
     {md==="vip"&&pf&&<BK perf={pf} sparks={user.sparks} pkgs={VIPPK} label="VIP Session" onOk={cs} onClose={()=>setMd(null)}/>}
     {md==="viewer"&&<ViewerProfile user={user} onClose={()=>setMd(null)} onSave={updateViewer} onWallet={()=>setMd("wallet")}/>}
     {authed&&ok&&!ck&&<CK onOk={rememberCookies}/>}
-    <GiftSpectacleOverlay giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={advanceDemoGift}/>
+    <GiftSpectacleOverlay giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={advanceDemoGift} queueLength={giftQueueLength}/>
     <PlatformBanner giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={()=>{}}/>
     <SparkStormShell events={giftEvents} stormThreshold={3}/>
     {authed&&ok&&vw==="room"&&<GiftHistoryFeed events={giftEvents}/>}

@@ -18,7 +18,7 @@ const GIFT_STAGE_ANCHOR = {
      visible  - boolean, mount/unmount trigger
      onDone   - callback fired when animation cycle completes
    ----------------------------------------------------------------------- */
-export default function GiftSpectacleOverlay({ giftId, sender = "Someone", recipient = "this room", visible, onDone, muted = false }) {
+export default function GiftSpectacleOverlay({ giftId, sender = "Someone", recipient = "this room", visible, onDone, muted = false, queueLength = 0 }) {
   const [phase, setPhase] = useState("idle"); // idle | entry | hold | exit | done
   const timers = useRef([]);
   const reducedMotion = useReducedMotion();
@@ -78,10 +78,10 @@ export default function GiftSpectacleOverlay({ giftId, sender = "Someone", recip
     : sender + " sent " + effect.displayName;
 
   if (isHigh) {
-    return <HighTierOverlay effect={effect} pal={pal} typo={typo} sender={sender} recipient={recipient} headline={headline} isBanner={isBanner} phase={phase} reducedMotion={reducedMotion} />;
+    return <HighTierOverlay effect={effect} pal={pal} typo={typo} sender={sender} recipient={recipient} headline={headline} isBanner={isBanner} phase={phase} reducedMotion={reducedMotion} queueLength={queueLength} />;
   }
   if (isMid) {
-    return <MidTierBurst effect={effect} pal={pal} typo={typo} sender={sender} phase={phase} reducedMotion={reducedMotion} />;
+    return <MidTierBurst effect={effect} pal={pal} typo={typo} sender={sender} phase={phase} reducedMotion={reducedMotion} queueLength={queueLength} />;
   }
   return <LowTierToast effect={effect} pal={pal} typo={typo} sender={sender} phase={phase} reducedMotion={reducedMotion} />;
 }
@@ -140,7 +140,7 @@ function LowTierToast({ effect, pal, typo, sender, phase, reducedMotion }) {
 /* -----------------------------------------------------------------------
    High-tier: full-screen cinematic takeover - dims room, centers gift
    ----------------------------------------------------------------------- */
-function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedMotion, isBanner }) {
+function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedMotion, isBanner, queueLength = 0 }) {
   const entering = !reducedMotion && (phase === "entry" || phase === "cinematic-open" || phase === "blackout");
   const exiting = !reducedMotion && phase === "exit";
   const isKey = effect.id === "private_key";
@@ -349,6 +349,20 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedM
             {typo.showSparkCount && <span>{effect.sparkCost.toLocaleString()} sparks</span>}
           </div>
         </div>
+        {queueLength > 0 && (
+          <div style={{
+            marginTop: "12px",
+            padding: "4px 14px",
+            borderRadius: "20px",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.14)",
+            color: "rgba(255,255,255,0.52)",
+            fontSize: "11px",
+            fontWeight: 600,
+            letterSpacing: "0.08em",
+            pointerEvents: "none",
+          }}>+{queueLength} more gift{queueLength > 1 ? "s" : ""}</div>
+        )}
       </div>
     </>
   );
@@ -574,7 +588,7 @@ function SilkMesh({ pal }) {
 /* -----------------------------------------------------------------------
    Mid-tier: prominent center-room moment - more than a toast, less than cinematic
    ----------------------------------------------------------------------- */
-function MidTierBurst({ effect, pal, typo, sender, phase, reducedMotion }) {
+function MidTierBurst({ effect, pal, typo, sender, phase, reducedMotion, queueLength = 0 }) {
   const entering = !reducedMotion && phase === "entry";
   const exiting = !reducedMotion && phase === "exit";
   const holding = !reducedMotion && phase === "hold";
@@ -651,6 +665,21 @@ function MidTierBurst({ effect, pal, typo, sender, phase, reducedMotion }) {
 
   return (
     <div style={wrapStyle} role="status" aria-live="polite" aria-label={sender + " sent " + effect.displayName}>
+      {queueLength > 0 && (
+        <div style={{
+          alignSelf: "flex-end",
+          marginBottom: "4px",
+          padding: "2px 10px",
+          borderRadius: "12px",
+          background: "rgba(255,255,255,0.07)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          color: "rgba(255,255,255,0.44)",
+          fontSize: "10px",
+          fontWeight: 600,
+          letterSpacing: "0.07em",
+          pointerEvents: "none",
+        }}>+{queueLength} more</div>
+      )}
       <div style={cardStyle}>
         {!reducedMotion && <style>{`@keyframes vybe-mid-gem-pulse{0%,100%{filter:drop-shadow(0 0 6px ${pal.primary})}50%{filter:drop-shadow(0 0 18px ${pal.primary}) drop-shadow(0 0 36px ${pal.primary}55)}}`}</style>}
         {!reducedMotion && (

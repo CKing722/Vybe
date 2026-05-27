@@ -156,12 +156,28 @@ const LOYALTY_TIERS = [
   { name: 'Diamond', min: 25000, sparkBack: 20, color: '#67e8f9' },
 ];
 
+const DEMO_ACHIEVEMENTS = [
+  {
+    achievement_key: 'first_win',
+    achieved_at: '2026-01-09T18:00:00.000Z',
+  },
+  {
+    achievement_key: 'crown_drop',
+    achieved_at: '2026-01-08T21:00:00.000Z',
+  },
+  {
+    achievement_key: 'centurion',
+    achieved_at: '2026-01-07T22:00:00.000Z',
+  },
+];
+
 function nowIso() {
   return new Date().toISOString();
 }
 
 function createInitialState() {
   const demoPasswordHash = bcrypt.hashSync('vybe-demo', 4);
+  const createdAt = nowIso();
 
   return {
     users: new Map([
@@ -176,7 +192,7 @@ function createInitialState() {
           two_factor_enabled: false,
           two_factor_secret: null,
           is_active: true,
-          created_at: nowIso(),
+          created_at: createdAt,
         },
       ],
       [
@@ -190,7 +206,7 @@ function createInitialState() {
           two_factor_enabled: false,
           two_factor_secret: null,
           is_active: true,
-          created_at: nowIso(),
+          created_at: createdAt,
         },
       ],
     ]),
@@ -208,6 +224,7 @@ function createInitialState() {
         },
       ],
     ]),
+    viewerAchievements: new Map([[MEMORY_IDS.viewer, DEMO_ACHIEVEMENTS.map((item) => ({ ...item }))]]),
     performerProfiles: new Map([
       ...DEMO_PERFORMERS.map((performer) => [
         performer.id,
@@ -233,6 +250,16 @@ function createInitialState() {
     sparkTransactions: [],
     banners: [],
     viewerPerformerHistory: new Map(),
+    chatMessages: [
+      {
+        id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        sender_id: MEMORY_IDS.performer,
+        recipient_id: MEMORY_IDS.viewer,
+        message: "Welcome back. Want me to pick the first game, or do you want to run the board?",
+        created_at: createdAt,
+      },
+    ],
+    chatReadAt: new Map(),
   };
 }
 
@@ -251,10 +278,15 @@ function snapshotMemoryStore() {
   return {
     users: Array.from(state.users.values()),
     viewerProfiles: Array.from(state.viewerProfiles.values()),
+    viewerAchievements: Array.from(state.viewerAchievements.entries()).map(([userId, achievements]) => ({
+      userId,
+      achievements: achievements.map((item) => ({ ...item })),
+    })),
     performerDirectory: [...state.performerDirectory],
     giftsSent: [...state.giftsSent],
     sparkTransactions: [...state.sparkTransactions],
     banners: [...state.banners],
+    chatMessages: [...(state.chatMessages || [])],
   };
 }
 

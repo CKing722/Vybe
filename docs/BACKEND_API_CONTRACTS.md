@@ -158,6 +158,30 @@ Requires auth.
 
 Returns the current viewer, spark balance, loyalty tier, and performer history.
 
+### `GET /api/me/achievements`
+
+Requires auth.
+
+Returns the viewer's earned achievements (demo data is deterministic when the memory adapter is active).
+
+Returns:
+
+```json
+{
+  "userId": "11111111-1111-4111-8111-111111111111",
+  "achievements": [
+    {
+      "id": "96aaedcb-361f-9690-c485-1b9d41e991da",
+      "key": "first_win",
+      "title": "First Win",
+      "description": "Win your first game.",
+      "category": "games",
+      "achievedAt": "2026-01-09T18:00:00.000Z"
+    }
+  ]
+}
+```
+
 ### `GET /api/me/history/:performerId`
 
 Requires auth.
@@ -217,6 +241,58 @@ Returns:
 Accepts the demo slug `luna` or a performer UUID.
 
 Returns one performer with caps, requests, posts, schedule, stats, and room id.
+
+### `GET /api/performers/:id/feed`
+
+Query parameters:
+
+- `limit` (default 25, max 100)
+
+Returns the performer content feed (demo data is deterministic when the memory adapter is active):
+
+```json
+{
+  "performerId": "22222222-2222-4222-8222-222222222222",
+  "posts": [
+    {
+      "id": "7b0ac662-3ed0-3f19-d9a4-5d463aa4febb",
+      "type": "text",
+      "text": "Tonight's trivia: spicy confessions. Bring it.",
+      "mediaUrl": null,
+      "mediaThumbnailUrl": null,
+      "isSubscriberOnly": false,
+      "sparkPrice": 0,
+      "isEphemeral": false,
+      "expiresAt": null,
+      "likeCount": 0,
+      "commentCount": 0,
+      "viewCount": 0,
+      "createdAt": "2026-01-09T22:00:00.000Z"
+    }
+  ]
+}
+```
+
+### `GET /api/performers/:id/requests`
+
+Returns the performer request menu:
+
+```json
+{
+  "performerId": "22222222-2222-4222-8222-222222222222",
+  "requests": [
+    {
+      "id": "f4b88fbf-25af-9d22-71c0-0f0e50c11849",
+      "name": "Song & Vibe",
+      "description": "She plays your song",
+      "sparkCost": 150,
+      "sortOrder": 0,
+      "isActive": true,
+      "createdAt": "2026-01-10T00:00:00.000Z"
+    }
+  ]
+}
+```
 
 ## Sparks
 
@@ -317,5 +393,56 @@ Response:
       "ans": 0
     }
   ]
+}
+```
+
+## Chat (DM)
+
+### `GET /api/chat/conversations`
+
+Requires auth.
+
+Returns:
+
+```json
+{
+  "conversations": [
+    {
+      "user": {
+        "id": "22222222-2222-4222-8222-222222222222",
+        "displayName": "Luna Voss",
+        "role": "performer",
+        "avatarUrl": null
+      },
+      "lastMessage": {
+        "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "senderId": "22222222-2222-4222-8222-222222222222",
+        "recipientId": "11111111-1111-4111-8111-111111111111",
+        "message": "Welcome back. Want me to pick the first game, or do you want to run the board?",
+        "createdAt": "..."
+      },
+      "lastMessageAt": "...",
+      "unreadCount": 1
+    }
+  ]
+}
+```
+
+### `GET /api/chat/:userId`
+
+Requires auth.
+
+Returns messages with one user (accepts demo performer slug like `luna` or a UUID).
+
+### `POST /api/chat/send`
+
+Requires auth.
+
+Request:
+
+```json
+{
+  "recipient_id": "luna",
+  "message": "Put me on the leaderboard."
 }
 ```

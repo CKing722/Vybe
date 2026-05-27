@@ -3,6 +3,7 @@ import GiftSpectacleOverlay from "./gifts/GiftSpectacleOverlay.jsx";
 import PlatformBanner from "./gifts/PlatformBanner.jsx";
 import SparkStormShell from "./gifts/SparkStormShell.jsx";
 import GiftEffectPreviewControls from "./gifts/GiftEffectPreviewControls.jsx";
+import GiftHistoryFeed from "./gifts/GiftHistoryFeed.jsx";
 import VybeLuxuryPreview from "./gifts/VybeLuxuryPreview.jsx";
 import useGiftQueue from "./gifts/useGiftQueue.js";
 import useGiftSocket from "./gifts/useGiftSocket.js";
@@ -2597,6 +2598,7 @@ export default function App(){
     <GiftSpectacleOverlay giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={advanceDemoGift}/>
     <PlatformBanner giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={()=>{}}/>
     <SparkStormShell events={giftEvents} stormThreshold={3}/>
+    {authed&&ok&&vw==="room"&&<GiftHistoryFeed events={giftEvents}/>}
     {giftDebug&&authed&&ok&&vw==="room"&&<GiftEffectPreviewControls onPreview={triggerDemoGift} activeGiftId={demoGift?.giftId}/>}
   </>;
 }

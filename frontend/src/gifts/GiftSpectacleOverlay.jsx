@@ -121,9 +121,7 @@ function LowTierToast({ effect, pal, typo, sender, phase, reducedMotion }) {
 
   return (
     <div style={s} aria-live="polite" aria-label={sender + " sent " + effect.displayName}>
-      {holding && (
-        <style>{`@keyframes vybe-low-object-drift{0%,100%{transform:translateY(0) rotateY(-12deg)}50%{transform:translateY(-4px) rotateY(14deg)}}`}</style>
-      )}
+      {!reducedMotion && <style>{`@keyframes vybe-low-object-drift{0%,100%{transform:translateY(0) rotateY(-12deg)}50%{transform:translateY(-4px) rotateY(14deg)}}`}</style>}
       {!reducedMotion && <ParticleBurst pal={pal} budget={effect.particleBudget} phase={phase} />}
       <div style={{ width: 38, height: 38, flexShrink: 0, transformStyle: "preserve-3d", animation: holding ? "vybe-low-object-drift 1.8s ease-in-out infinite" : "none" }}>
         <GiftObjectMesh kind={effect.objectKind || effect.id} pal={pal} />
@@ -622,10 +620,8 @@ function MidTierBurst({ effect, pal, typo, sender, phase, reducedMotion }) {
 
   return (
     <div style={wrapStyle} role="status" aria-live="polite" aria-label={sender + " sent " + effect.displayName}>
-      {holding && !reducedMotion && (
-        <style>{`@keyframes vybe-mid-gem-pulse{0%,100%{filter:drop-shadow(0 0 6px ${pal.primary})}50%{filter:drop-shadow(0 0 18px ${pal.primary}) drop-shadow(0 0 36px ${pal.primary}55)}}`}</style>
-      )}
       <div style={cardStyle}>
+        {!reducedMotion && <style>{`@keyframes vybe-mid-gem-pulse{0%,100%{filter:drop-shadow(0 0 6px ${pal.primary})}50%{filter:drop-shadow(0 0 18px ${pal.primary}) drop-shadow(0 0 36px ${pal.primary}55)}}`}</style>}
         {!reducedMotion && (
           <div style={{ position: "absolute", inset: 0, overflow: "hidden", borderRadius: "36px", pointerEvents: "none" }}>
             <CanvasParticleRenderer pal={pal} budget={effect.particleBudget} phase={phase} />
@@ -643,34 +639,6 @@ function MidTierBurst({ effect, pal, typo, sender, phase, reducedMotion }) {
         </div>
       </div>
     </div>
-  );
-}
-
-function DiamondGlyph({ pal, style }) {
-  return (
-    <svg viewBox="0 0 40 44" width="34" height="38" style={style} aria-hidden="true">
-      <defs>
-        <linearGradient id="vybeDiamondFace" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stopColor="#fff" stopOpacity="0.92" />
-          <stop offset="0.36" stopColor={pal.secondary || pal.primary} />
-          <stop offset="1" stopColor={pal.primary} />
-        </linearGradient>
-        <linearGradient id="vybeDiamondSide" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor={pal.primary} stopOpacity="0.5" />
-          <stop offset="1" stopColor={pal.primary} stopOpacity="0.15" />
-        </linearGradient>
-      </defs>
-      {/* shadow facet */}
-      <polygon points="22,3 39,16 21,42 5,16" fill="url(#vybeDiamondSide)" transform="translate(2,3)" />
-      {/* main face */}
-      <polygon points="20,2 37,15 20,41 3,15" fill="url(#vybeDiamondFace)" stroke="#fff" strokeWidth="1.2" strokeLinejoin="round" opacity="0.97" />
-      {/* horizontal divider */}
-      <polyline points="3,15 20,24 37,15" fill="none" stroke="#fff" strokeWidth="0.9" opacity="0.48" />
-      {/* top center shine */}
-      <line x1="20" y1="2" x2="20" y2="24" stroke="#fff" strokeWidth="0.7" opacity="0.28" />
-      {/* highlight facet */}
-      <polygon points="20,2 10,15 20,24 12,15" fill="#fff" opacity="0.14" />
-    </svg>
   );
 }
 

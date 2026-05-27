@@ -130,12 +130,14 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
 
     // live_flag is set to false in cleanup so re-spawn loop stops when phase ends.
     let live_flag = true;
+    let paused = false;
     let particles = spawnParticles(effectiveBudget, w, h);
 
     // trailFade=false: hard-edge particles stay opaque until nearly dead
     const hardEdge = budget.trailFade === false;
 
     function tick() {
+      if (paused) return;
       ctx.clearRect(0, 0, w, h);
       let alive = 0;
 
@@ -204,6 +206,19 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
 
     tick();
 
+    // Pause/resume when the browser tab is hidden to save GPU and battery.
+    function onVisibilityChange() {
+      if (!live_flag) return;
+      if (document.hidden) {
+        paused = true;
+        cancelAnimationFrame(animIdRef.current);
+      } else {
+        paused = false;
+        tick();
+      }
+    }
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
     // Re-size canvas and re-spawn on container resize (handles device rotation).
     let resizeRaf = null;
     const ro = typeof ResizeObserver !== "undefined"
@@ -227,6 +242,7 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
       live_flag = false;
       cancelAnimationFrame(animIdRef.current);
       cancelAnimationFrame(resizeRaf);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       if (ro) ro.disconnect();
     };
   }, [active]); // eslint-disable-line react-hooks/exhaustive-deps

@@ -18,6 +18,7 @@ build/
 logs/
 tmp/
 temp/
+.wrangler/
 
 # OS/editor noise
 .DS_Store

@@ -121,12 +121,12 @@ const GIFTS=[
   {id:"key",name:"Private Key",cost:5000,icon:"key",color:"#8b5cf6",anim:"cinematic"},
 ];
 const SPARK_PKGS=[
-  {sparks:200,price:"$19.99",bonus:0,label:"Starter"},
-  {sparks:550,price:"$49.99",bonus:10,label:"Popular",pop:true},
-  {sparks:1250,price:"$99.99",bonus:25,label:"Premium"},
-  {sparks:4000,price:"$249.99",bonus:60,label:"Elite"},
-  {sparks:10000,price:"$499.99",bonus:100,label:"Whale"},
-  {sparks:25000,price:"$999.99",bonus:150,label:"VIP Drop"},
+  {id:"starter",sparks:100,bonusSparks:0,total:100,price:"$10",per:"$0.100",label:"Starter"},
+  {id:"popular",sparks:250,bonusSparks:25,total:275,price:"$25",per:"$0.091",label:"Popular",pop:true},
+  {id:"value",sparks:500,bonusSparks:75,total:575,price:"$50",per:"$0.087",label:"Value"},
+  {id:"premium",sparks:1000,bonusSparks:200,total:1200,price:"$100",per:"$0.083",label:"Premium"},
+  {id:"high-roller",sparks:2500,bonusSparks:625,total:3125,price:"$250",per:"$0.080",label:"High Roller"},
+  {id:"whale",sparks:5000,bonusSparks:1500,total:6500,price:"$500",per:"$0.077",label:"Whale"},
 ];
 const PAYMENT_RAILS=[
   {id:"card",name:"Cards",detail:"Visa, Mastercard, Amex, Discover",icon:"card",color:"var(--am)"},
@@ -144,7 +144,13 @@ const VIPPK=[
   {id:"ve",name:"VIP Extended",mins:90,sparks:3000,pop:true,desc:"Longer room, priority requests."},
   {id:"vu",name:"VIP Ultimate",mins:120,sparks:5000,desc:"Full fantasy, highest control."}
 ];
-const LOYALTY=[{name:"Bronze",min:0,back:0,color:"#cd7f32"},{name:"Silver",min:200,back:5,color:"#c0c0c0"},{name:"Gold",min:1000,back:10,color:"#fbbf24"},{name:"Platinum",min:5000,back:15,color:"#a78bfa"},{name:"Diamond",min:25000,back:20,color:"#67e8f9"}];
+const LOYALTY=[
+  {name:"Bronze",min:0,back:0,color:"#cd7f32",perk:"Standard access and daily login sparks"},
+  {name:"Silver",min:200,back:3,color:"#c0c0c0",perk:"Silver badge, chat name, and streak boosts"},
+  {name:"Gold",min:1000,back:5,color:"#fbbf24",perk:"Gold badge, beta access, and leaderboard highlight"},
+  {name:"Platinum",min:5000,back:8,color:"#a78bfa",perk:"Monthly session credit and alpha access"},
+  {name:"Diamond",min:25000,back:10,color:"#67e8f9",perk:"Diamond Table, VIP credit, concierge lane"}
+];
 const FBQ=[{q:"What makes anticipation more exciting than the reward itself?",opts:["Dopamine loop","Serotonin burst","Oxytocin rush","Cortisol spike"],ans:0},{q:"Which sense is most powerful for physical arousal?",opts:["Touch","Smell","Sight","Hearing"],ans:0},{q:"What type of touch creates the most anticipation?",opts:["Firm pressure","Light slow tracing","Quick tapping","Static holding"],ans:1},{q:"Which color lingerie is statistically rated most attractive?",opts:["Black","Red","White","Purple"],ans:1},{q:"What does 'aftercare' mean in intimacy?",opts:["Skincare","Emotional comfort after a scene","Follow-up texts","Review"],ans:1},{q:"Which scent is most associated with arousal?",opts:["Vanilla","Lavender","Jasmine","Peppermint"],ans:0},{q:"What voice pitch is rated most attractive?",opts:["High breathy","Deep and slow","Fast energetic","Monotone"],ans:1},{q:"Eye contact held 4+ seconds signals what?",opts:["Aggression","Deep attraction","Confusion","Boredom"],ans:1},{q:"What makes 'playing hard to get' work?",opts:["Scarcity value","Disinterest","Reduces dopamine","Triggers fear"],ans:0},{q:"What is 'sensate focus' in therapy?",opts:["Visual meditation","Mindful non-goal touch","Aromatherapy","Sound healing"],ans:1},{q:"What hormone drives bonding and trust?",opts:["Testosterone","Dopamine","Oxytocin","Adrenaline"],ans:2},{q:"Which compliment style creates the most attraction?",opts:["Physical appearance","Specific observational","Generic flattery","Celebrity comparison"],ans:1},{q:"What is 'mirroring' in attraction?",opts:["Using a webcam","Copying body language","Matching outfits","Repeating words"],ans:1},{q:"Which environment most increases intimacy?",opts:["Bright lights","Dim warm lighting","Cold temperature","Loud music"],ans:1},{q:"Which trigger most effectively builds desire?",opts:["Direct statements","Mystery and suggestion","Repetition","Logic"],ans:1},{q:"What does 'the chase' activate?",opts:["Fear","Dopamine anticipation loop","Logical reasoning","Memory"],ans:1},{q:"What is social proof in attraction?",opts:["Finding someone attractive because others want them","Photos together","Many friends","Being famous"],ans:0},{q:"Most reported erogenous zone after primary zones?",opts:["Inner thigh","Neck","Lower back","Earlobes"],ans:1},{q:"What % of adults fantasize about someone they know?",opts:["45%","62%","78%","91%"],ans:2},{q:"Which texting behavior builds romantic tension?",opts:["Instant replies","Delayed but thoughtful","One-word answers","Voice notes only"],ans:1}];
 const WSEGS=["Reveal +1","Dare Card","Bonus Sparks","Wildcard","Tease Moment","Mystery Gift","Double Down","Reset"];
 const TDC=[{t:"Truth",x:"Most daring thing you've done on camera?"},{t:"Dare",x:"Slow dance for 30 seconds."},{t:"Truth",x:"Biggest turn-on that surprises people?"},{t:"Dare",x:"Whisper something seductive to camera."},{t:"Truth",x:"When did you feel most desired?"},{t:"Dare",x:"Show your most confident pose."},{t:"Truth",x:"Ideal intimate evening in 3 words?"},{t:"Dare",x:"Most seductive look for 10 seconds."},{t:"Truth",x:"One thing you've never told a viewer?"},{t:"Dare",x:"Move like nobody's watching, 15 seconds."}];
@@ -213,6 +219,14 @@ const requestPalette=name=>{
 };
 const VWR=[{name:"VelvetKing",score:2450,lv:34,badge:"crown"},{name:"DiamondJay",score:1820,lv:28,badge:"diamond"},{name:"AceHigh",score:1340,lv:22,badge:"streak"},{name:"NightOwl",score:890,lv:15,badge:""},{name:"xShadowx",score:620,lv:11,badge:""}];
 const HEAT={warm:"#ffab00",rising:"#f97316",hot:"#ff2d78",finale:"#c6ff00"};
+const PUBLIC_ROUTES=["/","/how-it-works","/games","/sparks","/performers/apply","/terms","/privacy","/dmca","/2257"];
+const LEGAL_COPY={
+  "/terms":{title:"Terms of Service",eyebrow:"Legal",body:["Attorney-drafted Terms of Service will live here before launch. This route is wired so payment processors, reviewers, and compliance partners can inspect the full policy surface.","Sparks are designed as closed-loop, non-transferable digital tokens redeemable only inside VYBE. They have no cash value and cannot be exchanged for currency by viewers.","Production launch requires finalized refund, cancellation, performer, user conduct, arbitration, and acceptable-use language."]},
+  "/privacy":{title:"Privacy Policy",eyebrow:"Privacy",body:["Attorney-drafted privacy policy will live here before launch, including CCPA/CPRA disclosures, cookie categories, data retention, and user rights workflows.","The product direction is to minimize sensitive retention: raw identity documents should be handled by the verification provider whenever legally permissible, while VYBE stores reference tokens and compliance status.","Payment, age verification, analytics, and moderation vendors must be listed before production."]},
+  "/dmca":{title:"DMCA Policy",eyebrow:"Trust & Safety",body:["This page will host the public DMCA policy and takedown intake form. The form should route notices into the moderation queue and preserve all submitted evidence for review.","Launch version needs fields for claimant identity, copyrighted work, allegedly infringing URL, sworn statements, signature, and counter-notice handling.","Do not launch paid content without this workflow and a designated agent process."]},
+  "/2257":{title:"18 U.S.C. 2257 Compliance Statement",eyebrow:"Compliance",body:["The final 2257 statement must identify the custodian of records and the required physical United States address before launch.","No performer should be able to go live, upload content, receive bookings, or receive payouts until identity, age, stage names, model release, contractor agreement, and required tax documents are verified.","This page is infrastructure only until counsel supplies final custodian language."]}
+};
+const HOME_STATS=[["Live rooms previewed","128"],["Games played today","18,420"],["Viewer sparks in motion","2.4M"]];
 
 /* AI Questions */
 const QP='Generate 5 adult-themed trivia for a live interactive game show. Target senses: sensation, fantasy, desire, confession, attraction, intimacy. Return ONLY JSON: [{"q":"question","opts":["A","B","C","D"],"ans":0}]. Playful, suggestive, never explicit.';
@@ -228,8 +242,11 @@ body,#root{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:va
 @keyframes spin{from{transform:rotate(0)}to{transform:rotate(1080deg)}}
 @keyframes bf{0%,100%{background:var(--cd)}50%{background:rgba(255,45,120,.15)}}
 @keyframes rainDown{0%{opacity:1;transform:translateY(-20px)}100%{opacity:0;transform:translateY(60px)}}
+@keyframes drift{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-12px,0)}}
+@keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
 .ai{animation:fi .3s ease both}
 input[type=text],input[type=email],input[type=tel],input[type=password],select{background:var(--cd);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:8px 12px;font:inherit;outline:none;width:100%}input[type=text]:focus,input[type=email]:focus,input[type=tel]:focus,input[type=password]:focus,select:focus{border-color:var(--cy)}
+html{scroll-behavior:smooth}a{color:inherit;text-decoration:none}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}`;
 
 /* ═══ SHARED ═══ */
@@ -241,6 +258,10 @@ const Kk=({children})=><div style={{fontSize:".62rem",fontWeight:700,letterSpaci
 const Tt=({children,s})=><h2 style={{fontSize:s||"1.3rem",fontWeight:800,marginBottom:3,lineHeight:1.15}}>{children}</h2>;
 const Pn=({children,onClose,title,icon,ic,style:s={}})=><G className="ai" style={{padding:14,overflowY:"auto",...s}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><span style={{fontWeight:800,fontSize:".82rem",display:"flex",alignItems:"center",gap:5}}>{icon&&<I n={icon} s={14} c={ic||"var(--pk)"}/>}{title}</span><button onClick={onClose} style={{background:"none",border:"none",color:"var(--mt)",cursor:"pointer",display:"flex"}}><I n="close" s={13}/></button></div>{children}</G>;
 const gl=s=>(LOYALTY.slice().reverse().find(t=>s>=t.min)||LOYALTY[0]);
+const applySparkDelta=(u,d)=>{
+  if(d<0){const cost=Math.min(u.sparks||0,-d),bonus=u.bonusSparks||0,fromBonus=Math.min(bonus,cost),fromPurchased=cost-fromBonus;return {...u,sparks:Math.max(0,(u.sparks||0)-cost),bonusSparks:bonus-fromBonus,purchasedSparks:Math.max(0,(u.purchasedSparks||0)-fromPurchased)}}
+  const gain=Number(d)||0;return {...u,sparks:(u.sparks||0)+gain,bonusSparks:(u.bonusSparks||0)+gain,bonusExpiry:"90 days after award",sparksEarned:(u.sparksEarned||0)+gain}
+};
 
 /* ═══ AGE VERIFY ═══ */
 function AgeV({onDone}){const [s,setS]=useState(0);
@@ -265,6 +286,91 @@ function AgeV({onDone}){const [s,setS]=useState(0);
 const CK=({onOk})=><div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:60,padding:"12px 18px",background:"var(--sf)",borderTop:"1px solid var(--bd)",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
   <p style={{flex:1,minWidth:180,fontSize:".76rem",lineHeight:1.5}}><I n="lock" s={12} c="var(--cy)" st={{marginRight:4}}/>We use cookies per our <a href="#" style={{color:"var(--cy)"}}>Cookie Policy</a>.</p>
   <div style={{display:"flex",gap:6}}><Btn small onClick={onOk}>Reject</Btn><Btn small primary onClick={onOk}>Accept All</Btn></div></div>;
+
+/* â•â•â• PUBLIC SITE â•â•â• */
+const Logo=({onClick})=><button type="button" onClick={onClick} style={{display:"inline-flex",alignItems:"center",gap:8,border:0,background:"none",color:"#fff",cursor:"pointer",font:"inherit",fontWeight:1000}}>
+  <span style={{width:34,height:34,borderRadius:10,display:"grid",placeItems:"center",background:"linear-gradient(135deg,var(--pk),var(--am),var(--lm))",color:"#03040a",fontSize:".68rem",boxShadow:"0 16px 45px rgba(255,45,120,.22)"}}>VB</span><span>VYBE</span>
+</button>;
+
+function PublicNav({go,onJoin,onLogin,onAdult}) {
+  const nav=[["Explore",onAdult],["How It Works",()=>go("/how-it-works")],["Games",()=>go("/games")],["Sparks",()=>go("/sparks")],["Become a Performer",()=>go("/performers/apply")]];
+  return <div style={{position:"sticky",top:0,zIndex:30,background:"rgba(6,8,15,.72)",borderBottom:"1px solid rgba(255,255,255,.07)",backdropFilter:"blur(18px)",WebkitBackdropFilter:"blur(18px)"}}>
+    <div style={{maxWidth:1180,margin:"0 auto",padding:"12px clamp(14px,4vw,28px)",display:"flex",alignItems:"center",justifyContent:"space-between",gap:14,flexWrap:"wrap"}}>
+      <Logo onClick={()=>go("/")}/>
+      <div style={{display:"flex",alignItems:"center",gap:4,flexWrap:"wrap",justifyContent:"center"}}>
+        {nav.map(([label,fn])=><button key={label} type="button" onClick={fn} style={{height:34,padding:"0 10px",border:0,borderRadius:9,background:"transparent",color:"rgba(255,255,255,.72)",font:"inherit",fontSize:".72rem",fontWeight:800,cursor:"pointer"}}>{label}</button>)}
+      </div>
+      <div style={{display:"flex",alignItems:"center",gap:8}}><Btn small onClick={onLogin}>Login</Btn><Btn small primary onClick={onJoin}>Join Free</Btn></div>
+    </div>
+  </div>;
+}
+
+function PublicFooter({go}) {
+  const col=(title,items)=><div><Kk>{title}</Kk>{items.map(([label,path])=><button key={label} type="button" onClick={()=>go(path)} style={{display:"block",border:0,background:"none",color:"rgba(255,255,255,.64)",font:"inherit",fontSize:".72rem",fontWeight:700,cursor:"pointer",padding:"4px 0",textAlign:"left"}}>{label}</button>)}</div>;
+  return <footer style={{borderTop:"1px solid var(--bd)",padding:"34px clamp(16px,5vw,54px)",background:"#070910"}}>
+    <div style={{maxWidth:1180,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:22}}>
+      <div><Logo onClick={()=>go("/")}/><p style={{fontSize:".72rem",lineHeight:1.55,color:"var(--mt)",marginTop:10}}>Premium interactive live entertainment where viewers build identity, performers own their audience, and games drive the room.</p></div>
+      {col("Platform",[["Explore","/explore"],["Game Modes","/games"],["Spark Packages","/sparks"],["Loyalty Program","/sparks"]])}
+      {col("Company",[["How It Works","/how-it-works"],["Performer Apply","/performers/apply"],["Contact","/performers/apply"]])}
+      {col("Legal",[["Terms of Service","/terms"],["Privacy Policy","/privacy"],["DMCA Policy","/dmca"],["2257 Statement","/2257"]])}
+    </div>
+    <div style={{maxWidth:1180,margin:"22px auto 0",paddingTop:14,borderTop:"1px solid var(--bd)",display:"flex",justifyContent:"space-between",gap:12,flexWrap:"wrap",fontSize:".62rem",color:"var(--mt)"}}><span>© 2026 VYBE. All rights reserved.</span><span>18+ only. Age verification required before adult content.</span></div>
+  </footer>;
+}
+
+function HeroScene() {
+  const cards=PERFS.slice(0,4);
+  return <div aria-hidden="true" style={{position:"absolute",inset:0,overflow:"hidden"}}>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at 54% 42%,rgba(255,45,120,.18),transparent 34%),radial-gradient(ellipse at 36% 72%,rgba(0,212,255,.13),transparent 30%),linear-gradient(180deg,#090d18,#080910 68%,#06080f)"}}/>
+    <div style={{position:"absolute",left:"50%",top:"50%",width:"min(820px,92vw)",height:"min(520px,70vh)",transform:"translate(-50%,-42%)",border:"1px solid rgba(255,255,255,.08)",borderRadius:22,background:"linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.015))",boxShadow:"0 50px 160px rgba(0,0,0,.5)",animation:"drift 7s ease-in-out infinite"}}>
+      <div style={{position:"absolute",inset:18,borderRadius:18,border:"1px solid rgba(255,255,255,.06)",background:"rgba(5,8,16,.38)"}}>
+        <div style={{position:"absolute",left:"8%",top:"10%",display:"grid",gridTemplateColumns:"repeat(2,minmax(110px,1fr))",gap:10,width:"42%"}}>{cards.map((p,i)=><div key={p.id} style={{height:118,borderRadius:16,border:"1px solid rgba(255,255,255,.08)",background:`linear-gradient(145deg,${p.accent}20,rgba(255,255,255,.03))`,position:"relative",overflow:"hidden",opacity:.82+i*.04}}><div style={{position:"absolute",left:"50%",top:22,transform:"translateX(-50%)",width:38,height:38,borderRadius:"50%",background:`linear-gradient(135deg,${p.accent},rgba(255,255,255,.45))`}}/><div style={{position:"absolute",left:10,bottom:10,right:10,height:10,borderRadius:10,background:"rgba(255,255,255,.16)"}}/></div>)}</div>
+        <div style={{position:"absolute",right:"8%",top:"14%",width:"34%",padding:14,borderRadius:16,border:"1px solid rgba(255,171,0,.18)",background:"rgba(10,14,24,.64)"}}><Kk>Room Heat</Kk><div style={{height:8,borderRadius:999,background:"linear-gradient(90deg,var(--cy),var(--lm),var(--pk))"}}/><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginTop:13}}>{["Games","Requests","Sparks"].map(x=><div key={x} style={{height:52,borderRadius:10,background:"rgba(255,255,255,.055)",display:"grid",placeItems:"center",fontSize:".58rem",fontWeight:900,color:"rgba(255,255,255,.72)"}}>{x}</div>)}</div></div>
+        <div style={{position:"absolute",left:"20%",right:"20%",bottom:"12%",height:64,borderRadius:18,border:"1px solid rgba(255,45,120,.22)",background:"linear-gradient(135deg,rgba(255,45,120,.22),rgba(255,171,0,.1))",display:"flex",alignItems:"center",justifyContent:"center",gap:10,fontWeight:1000}}><I n="gamepad" s={22} c="var(--am)"/> Interactive rooms, not passive feeds</div>
+      </div>
+    </div>
+  </div>;
+}
+
+function HomePage({go,onJoin,onLogin,onAdult}) {
+  const section={maxWidth:1180,margin:"0 auto",padding:"54px clamp(16px,5vw,54px)"};
+  const card={border:"1px solid var(--bd)",borderRadius:14,background:"rgba(255,255,255,.035)",boxShadow:"0 30px 90px rgba(0,0,0,.22)"};
+  return <div style={{minHeight:"100vh",background:"var(--bg)"}}>
+    <PublicNav go={go} onJoin={onJoin} onLogin={onLogin} onAdult={onAdult}/>
+    <section style={{position:"relative",minHeight:"min(760px,88vh)",display:"flex",alignItems:"center",overflow:"hidden"}}>
+      <HeroScene/>
+      <div style={{position:"relative",zIndex:2,maxWidth:1180,margin:"0 auto",padding:"80px clamp(16px,5vw,54px)",width:"100%"}}>
+        <div style={{maxWidth:660}}><Tag color="var(--lm)"><I n="shield" s={10} c="var(--lm)"/> 18+ verified platform</Tag>
+          <h1 style={{fontSize:"clamp(2.4rem,7vw,5.8rem)",lineHeight:.94,fontWeight:1000,letterSpacing:0,margin:"16px 0 14px"}}>Where Live Entertainment Meets Gaming.</h1>
+          <p style={{fontSize:"clamp(.94rem,1.6vw,1.15rem)",lineHeight:1.65,color:"rgba(255,255,255,.72)",maxWidth:560}}>VYBE turns live rooms into premium interactive experiences: real game modes, real performer control, real viewer identity.</p>
+          <div style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:22}}><Btn primary onClick={onJoin}>Start Watching</Btn><Btn onClick={()=>go("/how-it-works")}>Learn More</Btn></div>
+        </div>
+      </div>
+    </section>
+    <section style={{borderTop:"1px solid var(--bd)",borderBottom:"1px solid var(--bd)",background:"rgba(255,255,255,.025)"}}><div style={{...section,paddingTop:20,paddingBottom:20,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12}}>{HOME_STATS.map(([k,v])=><div key={k} style={{textAlign:"center"}}><div style={{fontSize:"1.35rem",fontWeight:1000,color:"var(--am)"}}>{v}</div><div style={{fontSize:".64rem",fontWeight:900,letterSpacing:".08em",textTransform:"uppercase",color:"var(--mt)"}}>{k}</div></div>)}</div></section>
+    <section id="how" style={section}><Kk>How VYBE Works</Kk><Tt s="clamp(1.5rem,3vw,2.4rem)">Choose the room. Play the moment. Build your reputation.</Tt>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:12,marginTop:18}}>{[["Choose a Room","Browse live performers by vibe, game mode, category, and schedule.","live","var(--pk)"],["Play Together","Eleven interactive game modes make the audience part of the room.","gamepad","var(--cy)"],["Earn & Connect","Sparks, loyalty tiers, badges, bookings, and requests build persistent identity.","badge","var(--am)"]].map(([t,d,i,c])=><div key={t} style={{...card,padding:18}}><I n={i} s={28} c={c}/><h3 style={{fontSize:"1rem",fontWeight:1000,marginTop:12}}>{t}</h3><p style={{fontSize:".76rem",lineHeight:1.55,color:"var(--mt)",marginTop:6}}>{d}</p></div>)}</div></section>
+    <section style={{...section,paddingTop:16}}><div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"end",flexWrap:"wrap"}}><div><Kk>Featured Performers</Kk><Tt s="clamp(1.5rem,3vw,2.2rem)">SFW previews. Verified rooms after entry.</Tt></div><Btn small onClick={onAdult}>Explore Rooms</Btn></div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12,marginTop:18}}>{PERFS.slice(0,6).map(p=><button key={p.id} type="button" onClick={onAdult} style={{...card,padding:0,overflow:"hidden",cursor:"pointer",textAlign:"left",color:"var(--tx)"}}><div style={{height:138,background:`linear-gradient(145deg,${p.accent}22,rgba(255,255,255,.035))`,position:"relative"}}><div style={{position:"absolute",left:"50%",top:28,transform:"translateX(-50%)",width:58,height:58,borderRadius:"50%",background:`linear-gradient(135deg,${p.accent},rgba(255,255,255,.38))`}}/><Lv/></div><div style={{padding:12}}><div style={{fontWeight:1000}}>{p.name}</div><div style={{fontSize:".68rem",color:"var(--mt)",lineHeight:1.4,marginTop:3}}>{p.game} · {p.rating} rating</div><div style={{display:"flex",gap:4,flexWrap:"wrap",marginTop:8}}>{p.caps.games.slice(0,3).map(id=><Tag key={id} color={p.accent}>{GAMES.find(g=>g.id===id)?.name||id}</Tag>)}</div></div></button>)}</div></section>
+    <section style={section}><Kk>Game Modes</Kk><Tt s="clamp(1.5rem,3vw,2.2rem)">The differentiator is participation.</Tt>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:10,marginTop:18}}>{GAMES.map(g=><div key={g.id} style={{...card,padding:14}}><div style={{display:"flex",alignItems:"center",gap:8}}><I n={g.icon} s={18} c={g.color}/><strong>{g.name}</strong><Tag color="var(--gn)">Always Free</Tag></div><p style={{fontSize:".68rem",lineHeight:1.45,color:"var(--mt)",marginTop:7}}>{g.desc}</p></div>)}</div></section>
+    <section style={section}><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14,alignItems:"stretch"}}><div style={{...card,padding:18}}><Kk>Spark Economy</Kk><Tt>Closed-loop Sparks with clearer math.</Tt><p style={{fontSize:".74rem",lineHeight:1.55,color:"var(--mt)",marginTop:7}}>Purchased and bonus Sparks are tracked separately. Bonus Sparks expire after 90 days and are spent first.</p><div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8,marginTop:14}}>{SPARK_PKGS.slice(0,4).map(p=><div key={p.id} style={{padding:10,borderRadius:10,border:"1px solid var(--bd)",background:p.pop?"rgba(255,45,120,.09)":"rgba(255,255,255,.035)"}}><div style={{fontWeight:1000}}>{p.label}</div><div style={{fontSize:"1rem",fontWeight:1000,color:"var(--am)"}}>{p.total.toLocaleString()}</div><div style={{fontSize:".58rem",color:"var(--mt)"}}>{p.price} · {p.per}</div></div>)}</div></div><div style={{...card,padding:18}}><Kk>Loyalty</Kk><Tt>Permanent status by lifetime spend.</Tt><div style={{display:"grid",gap:7,marginTop:12}}>{LOYALTY.map(t=><div key={t.name} style={{display:"grid",gridTemplateColumns:"90px minmax(0,1fr) auto",gap:8,alignItems:"center",padding:9,borderRadius:10,border:"1px solid var(--bd)",background:`${t.color}0d`}}><strong style={{color:t.color}}>{t.name}</strong><span style={{fontSize:".62rem",color:"var(--mt)"}}>{t.perk}</span><span style={{fontSize:".7rem",fontWeight:1000,color:"var(--gn)"}}>{t.back}% back</span></div>)}</div></div></div></section>
+    <section style={{...section,paddingTop:20}}><div style={{borderRadius:18,padding:"28px clamp(18px,4vw,34px)",border:"1px solid rgba(255,171,0,.2)",background:"linear-gradient(135deg,rgba(255,45,120,.16),rgba(255,171,0,.08))",display:"grid",gridTemplateColumns:"minmax(0,1fr) auto",gap:18,alignItems:"center"}}><div><Kk>For Performers</Kk><Tt>Earn more. Play more. Own your audience.</Tt><p style={{fontSize:".78rem",lineHeight:1.55,color:"rgba(255,255,255,.72)",marginTop:6}}>80/20 split, performer-priced requests, subscriber tools, built-in games, schedule controls, and compliance-gated onboarding.</p></div><Btn primary onClick={()=>go("/performers/apply")}>Apply as a Performer</Btn></div></section>
+    <section style={{...section,paddingTop:16,paddingBottom:42}}><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:10}}>{[["Age Verified","id"],["Encrypted Payments","shield"],["Performer Privacy","lock"],["Moderation Queue","eye"]].map(([t,i])=><div key={t} style={{display:"flex",alignItems:"center",gap:8,padding:12,borderRadius:12,border:"1px solid var(--bd)",background:"rgba(255,255,255,.025)"}}><I n={i} s={16} c="var(--cy)"/><span style={{fontSize:".72rem",fontWeight:900}}>{t}</span></div>)}</div></section>
+    <PublicFooter go={go}/>
+  </div>;
+}
+
+function PublicInfoPage({path,go,onJoin,onLogin,onAdult}) {
+  const isGames=path==="/games",isSparks=path==="/sparks",isApply=path==="/performers/apply";
+  const title=isGames?"Game Modes":isSparks?"Sparks & Loyalty":isApply?"Performer Application":"How VYBE Works";
+  return <div style={{minHeight:"100vh",background:"var(--bg)"}}><PublicNav go={go} onJoin={onJoin} onLogin={onLogin} onAdult={onAdult}/><main style={{maxWidth:1080,margin:"0 auto",padding:"54px clamp(16px,5vw,54px)"}}><Kk>{isApply?"Supply":"Platform"}</Kk><Tt s="clamp(2rem,5vw,4rem)">{title}</Tt><p style={{maxWidth:720,fontSize:".92rem",lineHeight:1.7,color:"var(--mt)",marginTop:12}}>{isGames?"Every VYBE room is built around interaction. These modes are free to enter, with risk and reward expressed through clear Spark rules.":isSparks?"Sparks are a closed-loop access currency. Purchased and bonus balances stay separate, bonus Sparks expire, and loyalty status is earned by lifetime spend.":isApply?"Performer onboarding will require age verification, 2257 records, contractor paperwork, model release, W-9, payout setup, and moderation review before going live.":"VYBE combines premium live rooms, consent-safe performer controls, room games, Spark economy, and persistent viewer reputation."}</p>{isGames?<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12,marginTop:26}}>{GAMES.map(g=><G key={g.id} style={{padding:16}}><I n={g.icon} s={22} c={g.color}/><h3 style={{marginTop:10,fontWeight:1000}}>{g.name}</h3><p style={{fontSize:".72rem",lineHeight:1.5,color:"var(--mt)",marginTop:6}}>{g.desc}</p><Tag color="var(--am)">{gameEconomyLine(g.type)}</Tag></G>)}</div>:isSparks?<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:12,marginTop:26}}>{SPARK_PKGS.map(p=><G key={p.id} style={{padding:16,borderColor:p.pop?"rgba(255,45,120,.55)":"var(--bd)"}}><Kk>{p.pop?"Most Popular":p.label}</Kk><div style={{fontSize:"1.8rem",fontWeight:1000,color:"var(--am)"}}>{p.total.toLocaleString()}</div><div style={{fontSize:".72rem",color:"var(--mt)"}}>{p.sparks.toLocaleString()} purchased + {p.bonusSparks.toLocaleString()} bonus</div><div style={{fontWeight:1000,marginTop:10}}>{p.price}</div></G>)}</div>:<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12,marginTop:26}}>{["Public SFW homepage","Age-gated adult content","Verified performer onboarding","Closed-loop Sparks","Loyalty and concierge lanes","Trust and safety queue"].map((x,i)=><G key={x} style={{padding:16}}><Tag color={["var(--pk)","var(--cy)","var(--am)"][i%3]}>Step {i+1}</Tag><h3 style={{fontSize:".95rem",fontWeight:1000,marginTop:10}}>{x}</h3></G>)}</div>}</main><PublicFooter go={go}/></div>;
+}
+
+function LegalPage({path,go,onJoin,onLogin,onAdult}) {
+  const page=LEGAL_COPY[path]||LEGAL_COPY["/terms"];
+  return <div style={{minHeight:"100vh",background:"var(--bg)"}}><PublicNav go={go} onJoin={onJoin} onLogin={onLogin} onAdult={onAdult}/><main style={{maxWidth:900,margin:"0 auto",padding:"60px clamp(16px,5vw,54px)"}}><Kk>{page.eyebrow}</Kk><Tt s="clamp(2rem,5vw,3.5rem)">{page.title}</Tt><G style={{padding:"22px clamp(16px,4vw,30px)",marginTop:20,background:"rgba(255,255,255,.035)"}}>{page.body.map((p,i)=><p key={i} style={{fontSize:".88rem",lineHeight:1.75,color:i===0?"rgba(255,255,255,.78)":"var(--mt)",marginTop:i?14:0}}>{p}</p>)}<div style={{marginTop:20,padding:14,borderRadius:12,border:"1px solid rgba(255,171,0,.22)",background:"rgba(255,171,0,.06)",fontSize:".72rem",lineHeight:1.55,color:"var(--mt)"}}>Placeholder content. Final production language must be reviewed by counsel before launch, payment processing, or public performer onboarding.</div></G></main><PublicFooter go={go}/></div>;
+}
 
 /* ═══ MENU ═══ */
 function HM({open,onClose,cat,setCat,onProfile}){if(!open)return null;
@@ -335,13 +441,18 @@ function ViewerProfile({user,onClose,onSave,onWallet}){const tier=gl(user.spent)
     </Pn></div>;}
 
 /* ═══ WALLET ═══ */
-function WL({user,onClose,onBuy,onManagePayments}){const tier=gl(user.spent);const pay=user.paymentMethods||[];
+function WL({user,onClose,onBuy,onManagePayments}){const tier=gl(user.spent);const pay=user.paymentMethods||[];const bonus=user.bonusSparks||0;const purchased=user.purchasedSparks??Math.max(0,(user.sparks||0)-bonus);
   return<div className="ai" style={{position:"fixed",inset:0,zIndex:40,background:"rgba(0,0,0,.6)",display:"flex",alignItems:"center",justifyContent:"center"}} onClick={e=>{if(e.target===e.currentTarget)onClose()}}>
     <Pn onClose={onClose} title="Wallet" icon="wallet" ic="var(--am)" style={{maxWidth:500,width:"92%",maxHeight:"82vh",background:"var(--sf)"}}>
       <div style={{padding:16,borderRadius:12,background:"linear-gradient(135deg,rgba(255,171,0,.06),rgba(255,45,120,.04))",border:"1px solid var(--bd)",marginBottom:12,textAlign:"center"}}>
         <div style={{fontSize:".62rem",color:"var(--mt)",fontWeight:600,textTransform:"uppercase",letterSpacing:".08em"}}>Balance</div>
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,marginTop:3}}><I n="spark" s={24} c="var(--am)"/><span style={{fontSize:"2rem",fontWeight:900,color:"var(--am)"}}>{user.sparks.toLocaleString()}</span></div>
         <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:5,marginTop:5}}><Tag color={tier.color}><I n="shield" s={9} c={tier.color}/> {tier.name}</Tag>{tier.back>0&&<Tag color="var(--gn)">{tier.back}% back</Tag>}</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginTop:10}}>
+          <div style={{padding:7,borderRadius:8,background:"rgba(255,255,255,.045)",border:"1px solid var(--bd)"}}><div style={{fontSize:".52rem",color:"var(--mt)",fontWeight:900,textTransform:"uppercase"}}>Purchased</div><div style={{fontWeight:1000}}>{purchased.toLocaleString()}</div></div>
+          <div style={{padding:7,borderRadius:8,background:"rgba(198,255,0,.055)",border:"1px solid rgba(198,255,0,.16)"}}><div style={{fontSize:".52rem",color:"var(--mt)",fontWeight:900,textTransform:"uppercase"}}>Bonus</div><div style={{fontWeight:1000,color:"var(--lm)"}}>{bonus.toLocaleString()}</div></div>
+        </div>
+        {bonus>0&&<div style={{fontSize:".58rem",color:"var(--mt)",marginTop:7}}>Bonus Sparks spend first and expire {user.bonusExpiry||"90 days after award"}.</div>}
       </div>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:8}}><Kk>Payment Options</Kk>{onManagePayments&&<button type="button" onClick={onManagePayments} style={{height:28,padding:"0 9px",borderRadius:999,border:"1px solid var(--bd)",background:"rgba(255,255,255,.05)",color:"var(--tx)",fontWeight:900,fontSize:".58rem",cursor:"pointer"}}>Manage</button>}</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:6,marginBottom:12}}>
@@ -350,10 +461,10 @@ function WL({user,onClose,onBuy,onManagePayments}){const tier=gl(user.spent);con
       <Kk>Buy Sparks</Kk>
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginBottom:10}}>
         {SPARK_PKGS.map((pk,i)=><button key={i} onClick={()=>onBuy(pk)} style={{padding:10,borderRadius:9,border:pk.pop?"1px solid var(--pk)":"1px solid var(--bd)",background:"var(--cd)",cursor:"pointer",textAlign:"center",position:"relative"}}>
-          {pk.pop&&<div style={{position:"absolute",top:-6,left:"50%",transform:"translateX(-50%)",padding:"1px 6px",borderRadius:999,background:"var(--pk)",color:"#fff",fontSize:".48rem",fontWeight:800}}>BEST VALUE</div>}
-          <I n="spark" s={16} c="var(--am)"/><div style={{fontWeight:900,fontSize:".95rem",marginTop:2}}>{pk.sparks.toLocaleString()}</div>
-          {pk.bonus>0&&<div style={{fontSize:".6rem",color:"var(--lm)",fontWeight:700}}>+{pk.bonus}%</div>}
-          <div style={{fontSize:".78rem",fontWeight:800,marginTop:2,paddingTop:2,borderTop:"1px solid var(--bd)"}}>{pk.price}</div></button>)}
+          {pk.pop&&<div style={{position:"absolute",top:-6,left:"50%",transform:"translateX(-50%)",padding:"1px 6px",borderRadius:999,background:"var(--pk)",color:"#fff",fontSize:".48rem",fontWeight:800}}>MOST POPULAR</div>}
+          <I n="spark" s={16} c="var(--am)"/><div style={{fontWeight:900,fontSize:".95rem",marginTop:2}}>{pk.total.toLocaleString()}</div>
+          {pk.bonusSparks>0&&<div style={{fontSize:".6rem",color:"var(--lm)",fontWeight:700}}>+{pk.bonusSparks.toLocaleString()} bonus</div>}
+          <div style={{fontSize:".78rem",fontWeight:800,marginTop:2,paddingTop:2,borderTop:"1px solid var(--bd)"}}>{pk.price}</div><div style={{fontSize:".5rem",color:"var(--mt)",marginTop:1}}>{pk.per}/spark</div></button>)}
       </div>
       <Kk>Loyalty Tiers (Earned)</Kk>
       <div style={{display:"flex",gap:3}}>{LOYALTY.map(t=><div key={t.name} style={{flex:1,textAlign:"center",padding:5,borderRadius:5,border:"1px solid var(--bd)",background:user.spent>=t.min?t.color+"10":"var(--cd)",opacity:user.spent>=t.min?1:.35}}>
@@ -1460,7 +1571,7 @@ export default function App(){
   const [pf,setPf]=useState((visualPreview||roomPreview)?PERFS[0]:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
   const [user,setUser]=useState({name:"VelvetKing",email:"preview@vybe.local",phone:"",twoFactor:false,primaryRail:"card",cryptoNetwork:"Universal router",cryptoWallet:"",passwordUpdated:false,
     paymentMethods:[{id:"card-demo",name:"Card",detail:"No card saved yet",status:"Add method",icon:"card",color:"var(--am)"},{id:"wallet-demo",name:"Digital wallet",detail:"Apple/Google/PayPal ready",status:"Available",icon:"wallet",color:"var(--cy)"},{id:"bank-demo",name:"Bank",detail:"ACH/debit connection",status:"Optional",icon:"shield",color:"var(--gn)"},{id:"crypto-demo",name:"Crypto wallet",detail:"Universal router not connected",status:"Connect wallet",icon:"crypto",color:"var(--vi)"}],
-    sparks:2500,spent:450,gamesPlayed:87,winRate:72,sparksEarned:1240,totalSessions:23,topStreak:8,perfCount:4,
+    sparks:2500,purchasedSparks:2300,bonusSparks:200,bonusExpiry:"Jun 15",spent:450,gamesPlayed:87,winRate:72,sparksEarned:1240,totalSessions:23,topStreak:8,perfCount:4,
     badges:["First Win","5-Game Streak","100 Games","Luna's Top 10","Crown Sender"],
     favPerfs:["luna","jade","raven"],
     perfHistory:{luna:{sessions:12,sparksSpent:3400,since:"Mar 2027"},jade:{sessions:6,sparksSpent:1200,since:"Apr 2027"},raven:{sessions:3,sparksSpent:800,since:"May 2027"}}});
@@ -1493,7 +1604,7 @@ export default function App(){
   const vp=p=>{setPf(p);setVw("profile")};const gl2=()=>{setMd(null);setVw("room")};
   const gb=()=>setMd("book");const gv=()=>setMd("vip");const bk=()=>{setVw("lobby");setPf(null)};const bp=()=>setVw("profile");
   const cs=pk=>{setUser(u=>({...u,sparks:u.sparks-pk.sparks,spent:u.spent+pk.sparks*0.1,totalSessions:u.totalSessions+1}));setMd(null);setVw("room")};
-  const by=pk=>{const b=Math.floor(pk.sparks*pk.bonus/100);setUser(u=>({...u,sparks:u.sparks+pk.sparks+b,spent:u.spent+parseFloat(pk.price.replace("$",""))}));setMd(null)};
+  const by=pk=>{const bonus=pk.bonusSparks||0,total=pk.total||(pk.sparks+bonus);setUser(u=>({...u,sparks:u.sparks+total,purchasedSparks:(u.purchasedSparks||0)+pk.sparks,bonusSparks:(u.bonusSparks||0)+bonus,bonusExpiry:"90 days after award",spent:u.spent+parseFloat(pk.price.replace("$",""))}));setMd(null)};
   const sc=d=>setUser(u=>({...u,sparks:u.sparks+d}));
   const updateViewer=patch=>{setUser(u=>({...u,...patch,paymentMethods:(u.paymentMethods||[]).map(m=>m.id==="crypto-demo"?{...m,detail:patch.cryptoWallet?`${patch.cryptoNetwork} wallet connected`:"Universal router not connected",status:patch.cryptoWallet?"Connected":"Connect wallet"}:m)}));setAuthUser(a=>a?{...a,name:patch.name||a.name,email:patch.email||a.email}:a)};
 

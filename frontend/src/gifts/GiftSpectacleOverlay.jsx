@@ -140,10 +140,11 @@ function LowTierToast({ effect, pal, typo, sender, phase, reducedMotion }) {
 /* -----------------------------------------------------------------------
    High-tier: full-screen cinematic takeover - dims room, centers gift
    ----------------------------------------------------------------------- */
-function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedMotion }) {
+function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedMotion, isBanner }) {
   const entering = !reducedMotion && (phase === "entry" || phase === "cinematic-open" || phase === "blackout");
   const exiting = !reducedMotion && phase === "exit";
   const isKey = effect.id === "private_key";
+  const isCinematic = effect.sparkCost >= 5000;
   const headline = typo.bannerHeadline
     ? typo.bannerHeadline.replace("{sender}", sender)
     : sender + " sent " + effect.displayName + " to " + recipient;
@@ -312,7 +313,37 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedM
         {!reducedMotion && <CanvasParticleRenderer pal={pal} budget={effect.particleBudget} phase={phase} />}
         <Gift3DObject effect={effect} pal={pal} reducedMotion={reducedMotion} />
         <div style={labelStyle}>
+          {isBanner && (
+            <div style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "7px",
+            }}>
+              <span style={{
+                padding: "2px 11px",
+                borderRadius: "10px",
+                background: pal.primary + "22",
+                border: "1px solid " + pal.primary + "55",
+                color: pal.primary,
+                fontSize: "10px",
+                fontWeight: 700,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+              }}>{isCinematic ? "CINEMATIC" : "PLATFORM"}</span>
+            </div>
+          )}
           <div>{headline}</div>
+          {typo.subline && (
+            <div style={{
+              marginTop: "5px",
+              color: pal.secondary || pal.primary,
+              fontSize: "11px",
+              fontWeight: 500,
+              letterSpacing: "0.1em",
+              opacity: 0.78,
+              textTransform: "uppercase",
+            }}>{typo.subline}</div>
+          )}
           <div style={metaStyle}>
             <span>{effect.audienceScope === "platform" ? "platform moment" : "room moment"}</span>
             {typo.showSparkCount && <span>{effect.sparkCost.toLocaleString()} sparks</span>}

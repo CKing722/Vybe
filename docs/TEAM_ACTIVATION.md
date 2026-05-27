@@ -30,6 +30,7 @@ Damon has approved moving from setup into active buildout. The team should opera
   - `28f1157 Add CI workflow`
   - `863bcfd Add frontend-ready demo API contracts`
   - `22deda5 Document backend API contracts`
+  - `e627f6f backend: add /api/me/profile to OpenAPI contract` (branch `backend/me-profile-contract-sync`)
 - Next scope: continue backend/frontend integration contracts, auth hardening, and no-cost local adapters.
 
 ### Hermes

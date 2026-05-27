@@ -16,3 +16,4 @@ These are machine-readable JSON Schemas for the Socket.io payloads used by the d
 - `server-to-client/spark_storm_update.schema.json`
 - `server-to-client/spark_storm_complete.schema.json`
 - `server-to-client/gift_error.schema.json`
+- `server-to-client/viewer_count.schema.json`

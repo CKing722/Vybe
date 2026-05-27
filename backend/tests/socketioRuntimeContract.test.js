@@ -127,6 +127,9 @@ test('Socket.io runtime emits contract-compliant payloads for gifts, banners, an
   const validateStormComplete = ajv.getSchema(
     'vybe://contracts/socketio/v1/server-to-client/spark_storm_complete.schema.json'
   );
+  const validateViewerCount = ajv.getSchema(
+    'vybe://contracts/socketio/v1/server-to-client/viewer_count.schema.json'
+  );
 
   assert.ok(validateJoin);
   assert.ok(validateSendGift);
@@ -135,6 +138,7 @@ test('Socket.io runtime emits contract-compliant payloads for gifts, banners, an
   assert.ok(validateStormStart);
   assert.ok(validateStormUpdate);
   assert.ok(validateStormComplete);
+  assert.ok(validateViewerCount);
 
   const { baseUrl, socketUrl, close } = await startTestServerWithSockets();
   const accessToken = await loginViewer(baseUrl);
@@ -155,8 +159,13 @@ test('Socket.io runtime emits contract-compliant payloads for gifts, banners, an
     const joinPayload = { room_id: MEMORY_IDS.room };
     validateOrThrow(validateJoin, joinPayload, 'join_room payload');
 
+    const viewerCountPromise = waitForEvent(socket, 'viewer_count');
     const joinAck = await emitWithAck(socket, 'join_room', joinPayload);
     assert.deepEqual(joinAck, { ok: true, roomId: MEMORY_IDS.room });
+
+    const viewerCount = await viewerCountPromise;
+    validateOrThrow(validateViewerCount, viewerCount, 'viewer_count event payload');
+    assert.equal(viewerCount.count, 1);
 
     const sendPayload = {
       performer_id: MEMORY_IDS.performer,

@@ -64,6 +64,11 @@ channels:
     publish:
       message:
         $ref: '#/components/messages/spark_storm_complete'
+  viewer_count:
+    description: Server announces a room viewer count update.
+    publish:
+      message:
+        $ref: '#/components/messages/viewer_count'
 
 components:
   messages:
@@ -113,3 +118,8 @@ components:
       title: spark_storm_complete
       payload:
         $ref: ./socketio/v1/server-to-client/spark_storm_complete.schema.json
+    viewer_count:
+      name: viewer_count
+      title: viewer_count
+      payload:
+        $ref: ./socketio/v1/server-to-client/viewer_count.schema.json

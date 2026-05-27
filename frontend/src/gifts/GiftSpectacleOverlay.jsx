@@ -3,6 +3,7 @@ import { GIFT_EFFECT_MAP, PLATFORM_BANNER_THRESHOLD_SPARKS } from "./giftEffectC
 import useReducedMotion from "./useReducedMotion.js";
 import CanvasParticleRenderer from "./CanvasParticleRenderer.jsx";
 import useGiftAudio from "./useGiftAudio.js";
+import useHapticFeedback from "./useHapticFeedback.js";
 
 const GIFT_STAGE_ANCHOR = {
   top: "22%",
@@ -23,12 +24,14 @@ export default function GiftSpectacleOverlay({ giftId, sender = "Someone", recip
   const timers = useRef([]);
   const reducedMotion = useReducedMotion();
   const { playGiftSound } = useGiftAudio({ muted });
+  const { fire: haptic } = useHapticFeedback();
 
   const effect = giftId ? GIFT_EFFECT_MAP[giftId] : null;
 
   useEffect(() => {
     if (!visible || !effect) return;
     playGiftSound(effect.tier);
+    haptic(effect.tier);
 
     timers.current.forEach(clearTimeout);
     timers.current = [];

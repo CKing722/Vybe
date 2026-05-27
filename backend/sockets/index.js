@@ -2,6 +2,7 @@ const { Server } = require('socket.io');
 const { env } = require('../config/env');
 const { verifyAccessToken } = require('../middleware/auth');
 const { registerGiftHandler } = require('./giftHandler');
+const { registerChatHandler } = require('./chatHandler');
 
 function configureSockets(httpServer, app) {
   const io = new Server(httpServer, {
@@ -55,6 +56,7 @@ function configureSockets(httpServer, app) {
     });
 
     registerGiftHandler(io, socket);
+    registerChatHandler(io, socket);
   });
 
   app.set('io', io);

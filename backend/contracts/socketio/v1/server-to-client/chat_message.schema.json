@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vybe://contracts/socketio/v1/server-to-client/chat_message.schema.json",
+  "title": "Socket.io chat_message event payload (server -> client) (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "messageId": { "type": "string", "minLength": 1 },
+    "roomId": { "type": "string", "minLength": 1 },
+    "sender": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "displayName": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "minLength": 1 }
+      },
+      "required": ["id", "displayName", "role"]
+    },
+    "message": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "required": ["messageId", "roomId", "sender", "message", "createdAt"]
+}
+

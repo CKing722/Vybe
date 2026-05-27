@@ -755,15 +755,18 @@ function ParticleBurst({ pal, budget, phase }) {
     height: 0,
   };
 
+  // Each particle gets a named keyframe so it flies to its unique (tx, ty) target.
+  const keyframeCSS = particles.map((p) =>
+    "@keyframes " + p.keyframeId + "{" +
+    "0%{transform:translate(0,0) scale(1);opacity:1}" +
+    "80%{opacity:0.6}" +
+    "100%{transform:translate(" + Math.round(p.tx) + "px," + Math.round(p.ty) + "px) scale(0.4);opacity:0}" +
+    "}"
+  ).join("\n");
+
   return (
     <div style={containerStyle}>
-      <style>{`
-        @keyframes vybe-particle {
-          0%   { transform: translate(0,0) scale(1); opacity: 1; }
-          80%  { opacity: 0.6; }
-          100% { opacity: 0; }
-        }
-      `}</style>
+      <style>{keyframeCSS}</style>
       <div style={centerStyle}>
         {particles.map((p, i) => (
           <div
@@ -777,9 +780,7 @@ function ParticleBurst({ pal, budget, phase }) {
               boxShadow: "0 0 " + (p.size * 2) + "px " + pal.primary,
               top: "-" + (p.size / 2) + "px",
               left: "-" + (p.size / 2) + "px",
-              animation: "vybe-particle " + p.duration + "s " + p.delay + "s ease-out forwards",
-              transform: "translate(" + p.tx + "px, " + p.ty + "px)",
-              animationFillMode: "both",
+              animation: p.keyframeId + " " + p.duration + "s " + p.delay + "s ease-out both",
             }}
           />
         ))}

@@ -157,6 +157,8 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedM
   const shakeMs = !reducedMotion && curPhaseData?.cameraShake
     ? curPhaseData.cameraShake.durationMs
     : 0;
+  // Cipher-reveal glitch: Private Key only, 1800ms phase per catalog
+  const isCipherReveal = isKey && !reducedMotion && phase === "cipher-reveal";
 
   const dimStyle = {
     position: "fixed",
@@ -185,7 +187,10 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedM
     transition: reducedMotion ? "opacity 0.15s ease" : "opacity 0.45s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1)",
     perspective: "980px",
     pointerEvents: "none",
-    animation: shakeMs ? "vybe-cam-shake " + shakeMs + "ms ease-in-out" : "none",
+    animation: [
+      shakeMs ? "vybe-cam-shake " + shakeMs + "ms ease-in-out" : "",
+      isCipherReveal ? "vybe-glitch-decode 1800ms ease-out both" : "",
+    ].filter(Boolean).join(", ") || "none",
   };
 
   const auraStyle = {
@@ -266,6 +271,27 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedM
             45% { opacity: 0.82; }
             52% { opacity: 0.28; }
             60% { opacity: 0.76; }
+          }
+          @keyframes vybe-glitch-decode {
+            0%   { clip-path: inset(0 0 98% 0); opacity: 0; }
+            4%   { clip-path: inset(0 0 0 0); opacity: 1; transform: translateX(6px); filter: hue-rotate(120deg) brightness(1.6); }
+            6%   { transform: translateX(-8px); filter: hue-rotate(240deg) brightness(2); }
+            8%   { clip-path: inset(22% 0 44% 0); transform: translateX(0); filter: hue-rotate(0deg) brightness(1); }
+            10%  { clip-path: inset(0 0 0 0); }
+            18%  { transform: translateX(5px); filter: brightness(1.5); }
+            20%  { transform: translateX(-4px); }
+            22%  { transform: translateX(0); filter: brightness(1); }
+            34%  { clip-path: inset(48% 0 18% 0); }
+            36%  { clip-path: inset(0 0 0 0); transform: translateX(4px); }
+            38%  { transform: translateX(0); }
+            52%  { transform: translateX(-3px) scaleX(1.01); filter: brightness(1.3); }
+            54%  { transform: translateX(3px) scaleX(0.99); }
+            56%  { transform: translateX(0) scaleX(1); filter: brightness(1); }
+            72%  { clip-path: inset(8% 0 62% 0); }
+            74%  { clip-path: inset(0 0 0 0); }
+            88%  { transform: translateX(2px); }
+            90%  { transform: translateX(0); }
+            100% { clip-path: inset(0 0 0 0); transform: translateX(0); filter: brightness(1); opacity: 1; }
           }
         `}</style>
         {showGrid && (

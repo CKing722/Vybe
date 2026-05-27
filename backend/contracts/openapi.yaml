@@ -16,6 +16,7 @@ tags:
   - name: gifts
   - name: banners
   - name: games
+  - name: chat
 paths:
   /health:
     get:
@@ -225,6 +226,24 @@ paths:
         "404":
           $ref: "#/components/responses/ApiError"
 
+  /api/me/achievements:
+    get:
+      tags: [viewer]
+      summary: List viewer achievements
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Viewer achievements
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ViewerAchievementsResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+        "404":
+          $ref: "#/components/responses/ApiError"
+
   /api/me/profile:
     put:
       tags: [viewer]
@@ -326,6 +345,48 @@ paths:
         "404":
           $ref: "#/components/responses/ApiError"
 
+  /api/performers/{id}/feed:
+    get:
+      tags: [performers]
+      summary: Get performer content feed
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 25 }
+      responses:
+        "200":
+          description: Performer feed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PerformerFeedResponse"
+        "404":
+          $ref: "#/components/responses/ApiError"
+
+  /api/performers/{id}/requests:
+    get:
+      tags: [performers]
+      summary: Get performer request menu
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Performer requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PerformerRequestsResponse"
+        "404":
+          $ref: "#/components/responses/ApiError"
+
   /api/sparks/balance:
     get:
       tags: [sparks]
@@ -422,6 +483,80 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActiveBannersResponse"
+
+  /api/chat/conversations:
+    get:
+      tags: [chat]
+      summary: List DM conversations for the current user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 25 }
+      responses:
+        "200":
+          description: Conversations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatConversationsResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+
+  /api/chat/{userId}:
+    get:
+      tags: [chat]
+      summary: Get DM messages with one user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 250, default: 50 }
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatMessagesResponse"
+        "401":
+          $ref: "#/components/responses/ApiError"
+        "404":
+          $ref: "#/components/responses/ApiError"
+
+  /api/chat/send:
+    post:
+      tags: [chat]
+      summary: Send a DM chat message
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatSendRequest"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatSendResponse"
+        "400":
+          $ref: "#/components/responses/ApiError"
+        "401":
+          $ref: "#/components/responses/ApiError"
+        "404":
+          $ref: "#/components/responses/ApiError"
 
   /api/games/leaderboard/{performerId}:
     get:
@@ -662,6 +797,27 @@ components:
         bio:
           type: ["string", "null"]
           maxLength: 2000
+
+    ViewerAchievement:
+      type: object
+      properties:
+        id: { type: string }
+        key: { type: string }
+        title: { type: string }
+        description: { type: string }
+        category: { type: string }
+        achievedAt: { type: ["string", "null"], format: date-time }
+      required: [id, key, title, description, category, achievedAt]
+
+    ViewerAchievementsResponse:
+      type: object
+      properties:
+        userId: { type: string }
+        achievements:
+          type: array
+          items:
+            $ref: "#/components/schemas/ViewerAchievement"
+      required: [userId, achievements]
 
     SparkBalance:
       type: object
@@ -942,6 +1098,69 @@ components:
           $ref: "#/components/schemas/Performer"
       required: [performer]
 
+    PerformerContentPost:
+      type: object
+      properties:
+        id: { type: string }
+        type: { type: string }
+        text: { type: ["string", "null"] }
+        mediaUrl: { type: ["string", "null"] }
+        mediaThumbnailUrl: { type: ["string", "null"] }
+        isSubscriberOnly: { type: boolean }
+        sparkPrice: { type: integer }
+        isEphemeral: { type: boolean }
+        expiresAt: { type: ["string", "null"], format: date-time }
+        likeCount: { type: integer }
+        commentCount: { type: integer }
+        viewCount: { type: integer }
+        createdAt: { type: ["string", "null"], format: date-time }
+      required:
+        - id
+        - type
+        - text
+        - mediaUrl
+        - mediaThumbnailUrl
+        - isSubscriberOnly
+        - sparkPrice
+        - isEphemeral
+        - expiresAt
+        - likeCount
+        - commentCount
+        - viewCount
+        - createdAt
+
+    PerformerFeedResponse:
+      type: object
+      properties:
+        performerId: { type: string }
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/PerformerContentPost"
+      required: [performerId, posts]
+
+    PerformerRequest:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        sparkCost: { type: integer }
+        sortOrder: { type: integer }
+        isActive: { type: boolean }
+        createdAt: { type: ["string", "null"], format: date-time }
+      required: [id, name, description, sparkCost, sortOrder, isActive, createdAt]
+
+    PerformerRequestsResponse:
+      type: object
+      properties:
+        performerId: { type: string }
+        requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/PerformerRequest"
+      required: [performerId, requests]
+
     ViewerHistoryPerformer:
       type: object
       properties:
@@ -1043,3 +1262,68 @@ components:
           items:
             $ref: "#/components/schemas/GameLeaderboardEntry"
       required: [performerId, updatedAt, entries]
+
+    PublicUser:
+      type: object
+      properties:
+        id: { type: string }
+        displayName: { type: string }
+        role: { type: string, enum: [viewer, performer] }
+        avatarUrl: { type: ["string", "null"] }
+      required: [id, displayName, role, avatarUrl]
+
+    ChatMessage:
+      type: object
+      properties:
+        id: { type: string }
+        senderId: { type: string }
+        recipientId: { type: string }
+        message: { type: string }
+        createdAt: { type: string, format: date-time }
+      required: [id, senderId, recipientId, message, createdAt]
+
+    ChatConversation:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/PublicUser"
+        lastMessage:
+          $ref: "#/components/schemas/ChatMessage"
+        lastMessageAt: { type: string, format: date-time }
+        unreadCount: { type: integer, minimum: 0 }
+      required: [user, lastMessage, lastMessageAt, unreadCount]
+
+    ChatConversationsResponse:
+      type: object
+      properties:
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatConversation"
+      required: [conversations]
+
+    ChatMessagesResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/PublicUser"
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+      required: [user, messages]
+
+    ChatSendRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        recipient_id: { type: string, minLength: 1 }
+        message: { type: string, minLength: 1, maxLength: 500 }
+      required: [recipient_id, message]
+
+    ChatSendResponse:
+      type: object
+      properties:
+        message:
+          $ref: "#/components/schemas/ChatMessage"
+      required: [message]

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { GIFT_EFFECT_CATALOG } from "./giftEffectCatalog.js";
+import useReducedMotion from "./useReducedMotion.js";
 
 // Map canonical catalog entries to the shape used by this preview component.
 const giftCatalog = GIFT_EFFECT_CATALOG.map((g) => ({
@@ -12,6 +13,7 @@ const giftCatalog = GIFT_EFFECT_CATALOG.map((g) => ({
 export default function VybeLuxuryPreview() {
   const [gift, setGift] = useState(giftCatalog[1]);
   const [pulse, setPulse] = useState(0);
+  const reducedMotion = useReducedMotion();
 
   function sendGift(nextGift) {
     setGift(nextGift);
@@ -56,7 +58,7 @@ export default function VybeLuxuryPreview() {
               <div style={styles.hairLight} />
               <div style={styles.portraitCore} />
             </div>
-            <GiftMoment gift={gift} pulse={pulse} />
+            <GiftMoment gift={gift} pulse={pulse} reducedMotion={reducedMotion} />
             <div style={styles.mediaHud}>
               <span>HD LIVE</span>
               <span>Low latency</span>
@@ -113,10 +115,10 @@ function TopBanner({ gift, pulse }) {
   );
 }
 
-function GiftMoment({ gift, pulse }) {
+function GiftMoment({ gift, pulse, reducedMotion }) {
   return (
-    <div className="luxury-gift-moment" key={gift.id + pulse} style={styles.giftMoment}>
-      <GiftCanvas gift={gift} />
+    <div className="luxury-gift-moment" key={gift.id + pulse} style={reducedMotion ? { ...styles.giftMoment, animation: "none" } : styles.giftMoment}>
+      <GiftCanvas gift={gift} reducedMotion={reducedMotion} />
       <div style={{ ...styles.giftCaption, borderColor: gift.tone + "66", boxShadow: "0 18px 44px rgba(0,0,0,0.36), 0 0 34px " + gift.tone + "24" }}>
         <strong>{gift.name}</strong>
         <span style={{ color: gift.tone }}>{gift.sparks.toLocaleString()} sparks</span>
@@ -125,7 +127,7 @@ function GiftMoment({ gift, pulse }) {
   );
 }
 
-function GiftCanvas({ gift }) {
+function GiftCanvas({ gift, reducedMotion }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -136,6 +138,7 @@ function GiftCanvas({ gift }) {
     canvas.width = Math.floor(rect.width * dpr);
     canvas.height = Math.floor(rect.height * dpr);
     const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     let frame = 0;
     let raf = 0;
@@ -147,13 +150,15 @@ function GiftCanvas({ gift }) {
       ctx.clearRect(0, 0, w, h);
       drawAura(ctx, w, h, gift.tone, t);
       drawObject(ctx, w, h, gift, t);
-      frame += 1;
-      raf = requestAnimationFrame(draw);
+      if (!reducedMotion) {
+        frame += 1;
+        raf = requestAnimationFrame(draw);
+      }
     }
 
     draw();
     return () => cancelAnimationFrame(raf);
-  }, [gift]);
+  }, [gift, reducedMotion]);
 
   return <canvas ref={canvasRef} style={styles.giftCanvas} aria-hidden="true" />;
 }

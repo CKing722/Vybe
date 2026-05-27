@@ -19,6 +19,7 @@ logs/
 tmp/
 temp/
 .wrangler/
+.vercel/
 
 # OS/editor noise
 .DS_Store

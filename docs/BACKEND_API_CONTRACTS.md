@@ -218,6 +218,58 @@ Accepts the demo slug `luna` or a performer UUID.
 
 Returns one performer with caps, requests, posts, schedule, stats, and room id.
 
+### `GET /api/performers/:id/feed`
+
+Query parameters:
+
+- `limit` (default 25, max 100)
+
+Returns the performer content feed (demo data is deterministic when the memory adapter is active):
+
+```json
+{
+  "performerId": "22222222-2222-4222-8222-222222222222",
+  "posts": [
+    {
+      "id": "7b0ac662-3ed0-3f19-d9a4-5d463aa4febb",
+      "type": "text",
+      "text": "Tonight's trivia: spicy confessions. Bring it.",
+      "mediaUrl": null,
+      "mediaThumbnailUrl": null,
+      "isSubscriberOnly": false,
+      "sparkPrice": 0,
+      "isEphemeral": false,
+      "expiresAt": null,
+      "likeCount": 0,
+      "commentCount": 0,
+      "viewCount": 0,
+      "createdAt": "2026-01-09T22:00:00.000Z"
+    }
+  ]
+}
+```
+
+### `GET /api/performers/:id/requests`
+
+Returns the performer request menu:
+
+```json
+{
+  "performerId": "22222222-2222-4222-8222-222222222222",
+  "requests": [
+    {
+      "id": "f4b88fbf-25af-9d22-71c0-0f0e50c11849",
+      "name": "Song & Vibe",
+      "description": "She plays your song",
+      "sparkCost": 150,
+      "sortOrder": 0,
+      "isActive": true,
+      "createdAt": "2026-01-10T00:00:00.000Z"
+    }
+  ]
+}
+```
+
 ## Sparks
 
 ### `GET /api/sparks/balance`

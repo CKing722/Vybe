@@ -136,6 +136,9 @@ test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banne
   const validateViewerCount = ajv.getSchema(
     'vybe://contracts/socketio/v1/server-to-client/viewer_count.schema.json'
   );
+  const validatePerformerStatus = ajv.getSchema(
+    'vybe://contracts/socketio/v1/server-to-client/performer_status.schema.json'
+  );
 
   assert.ok(validateJoin);
   assert.ok(validateChatSend);
@@ -147,6 +150,7 @@ test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banne
   assert.ok(validateStormUpdate);
   assert.ok(validateStormComplete);
   assert.ok(validateViewerCount);
+  assert.ok(validatePerformerStatus);
 
   const { baseUrl, socketUrl, close } = await startTestServerWithSockets();
   const accessToken = await loginViewer(baseUrl);
@@ -168,12 +172,18 @@ test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banne
     validateOrThrow(validateJoin, joinPayload, 'join_room payload');
 
     const viewerCountPromise = waitForEvent(socket, 'viewer_count');
+    const performerStatusPromise = waitForEvent(socket, 'performer_status');
     const joinAck = await emitWithAck(socket, 'join_room', joinPayload);
     assert.deepEqual(joinAck, { ok: true, roomId: MEMORY_IDS.room });
 
     const viewerCount = await viewerCountPromise;
     validateOrThrow(validateViewerCount, viewerCount, 'viewer_count event payload');
     assert.equal(viewerCount.count, 1);
+
+    const performerStatus = await performerStatusPromise;
+    validateOrThrow(validatePerformerStatus, performerStatus, 'performer_status event payload');
+    assert.equal(performerStatus.roomId, MEMORY_IDS.room);
+    assert.equal(performerStatus.performerId, MEMORY_IDS.performer);
 
     const chatSendPayload = { room_id: MEMORY_IDS.room, message: 'hello from contract test' };
     validateOrThrow(validateChatSend, chatSendPayload, 'chat_message payload');

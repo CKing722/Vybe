@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vybe://contracts/socketio/v1/server-to-client/performer_status.schema.json",
+  "title": "Socket.io performer_status event payload (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "performerId": { "type": "string", "minLength": 1 },
+    "roomId": { "type": "string", "minLength": 1 },
+    "isLive": { "type": "boolean" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "required": ["performerId", "roomId", "isLive", "updatedAt"]
+}
+

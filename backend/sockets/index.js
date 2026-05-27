@@ -3,6 +3,7 @@ const { env } = require('../config/env');
 const { verifyAccessToken } = require('../middleware/auth');
 const { registerGiftHandler } = require('./giftHandler');
 const { registerChatHandler } = require('./chatHandler');
+const { getPerformerStatusForRoom } = require('../services/performerStatusService');
 
 function configureSockets(httpServer, app) {
   const io = new Server(httpServer, {
@@ -43,6 +44,10 @@ function configureSockets(httpServer, app) {
       }
       await socket.join(room);
       await emitViewerCount(room);
+      const performerStatus = await getPerformerStatusForRoom(room);
+      if (performerStatus) {
+        socket.emit('performer_status', performerStatus);
+      }
       if (typeof ack === 'function') ack({ ok: true, roomId: room });
     });
 

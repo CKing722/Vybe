@@ -396,6 +396,33 @@ Response:
 }
 ```
 
+## Game Leaderboard
+
+### `GET /api/games/leaderboard/:performerId`
+
+Query parameters:
+
+- `limit` (default 25, max 50)
+
+Response:
+
+```json
+{
+  "performerId": "22222222-2222-4222-8222-222222222222",
+  "updatedAt": "2026-05-27T00:00:00.000Z",
+  "entries": [
+    {
+      "rank": 1,
+      "viewerId": "11111111-1111-4111-8111-111111111111",
+      "displayName": "VelvetKing",
+      "avatarUrl": null,
+      "sparksSpent": 8650,
+      "lastInteraction": "2026-05-26T04:20:00.000Z"
+    }
+  ]
+}
+```
+
 ## Chat (DM)
 
 ### `GET /api/chat/conversations`

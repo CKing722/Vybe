@@ -2,6 +2,8 @@ const { Server } = require('socket.io');
 const { env } = require('../config/env');
 const { verifyAccessToken } = require('../middleware/auth');
 const { registerGiftHandler } = require('./giftHandler');
+const { registerChatHandler } = require('./chatHandler');
+const { getPerformerStatusForRoom } = require('../services/performerStatusService');
 
 function configureSockets(httpServer, app) {
   const io = new Server(httpServer, {
@@ -10,6 +12,12 @@ function configureSockets(httpServer, app) {
       credentials: true,
     },
   });
+
+  async function emitViewerCount(roomId) {
+    if (!roomId) return;
+    const sockets = await io.in(roomId).allSockets();
+    io.to(roomId).emit('viewer_count', { count: sockets.size });
+  }
 
   io.use((socket, next) => {
     const token =
@@ -28,23 +36,32 @@ function configureSockets(httpServer, app) {
   });
 
   io.on('connection', (socket) => {
-    socket.on('join_room', ({ room_id: roomId, roomId: camelRoomId }, ack) => {
+    socket.on('join_room', async ({ room_id: roomId, roomId: camelRoomId }, ack) => {
       const room = roomId || camelRoomId;
       if (!room) {
         if (typeof ack === 'function') ack({ ok: false, error: 'room_id is required' });
         return;
       }
-      socket.join(room);
+      await socket.join(room);
+      await emitViewerCount(room);
+      const performerStatus = await getPerformerStatusForRoom(room);
+      if (performerStatus) {
+        socket.emit('performer_status', performerStatus);
+      }
       if (typeof ack === 'function') ack({ ok: true, roomId: room });
     });
 
-    socket.on('leave_room', ({ room_id: roomId, roomId: camelRoomId }, ack) => {
+    socket.on('leave_room', async ({ room_id: roomId, roomId: camelRoomId }, ack) => {
       const room = roomId || camelRoomId;
-      if (room) socket.leave(room);
+      if (room) {
+        await socket.leave(room);
+        await emitViewerCount(room);
+      }
       if (typeof ack === 'function') ack({ ok: true, roomId: room });
     });
 
     registerGiftHandler(io, socket);
+    registerChatHandler(io, socket);
   });
 
   app.set('io', io);

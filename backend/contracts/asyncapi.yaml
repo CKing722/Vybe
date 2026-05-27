@@ -28,6 +28,14 @@ channels:
     subscribe:
       message:
         $ref: '#/components/messages/leave_room'
+  chat_message:
+    description: Client sends a room chat message; server broadcasts it to the room.
+    subscribe:
+      message:
+        $ref: '#/components/messages/chat_message_send'
+    publish:
+      message:
+        $ref: '#/components/messages/chat_message'
   send_gift:
     description: Client sends a gift to a performer room.
     subscribe:
@@ -64,6 +72,16 @@ channels:
     publish:
       message:
         $ref: '#/components/messages/spark_storm_complete'
+  viewer_count:
+    description: Server announces a room viewer count update.
+    publish:
+      message:
+        $ref: '#/components/messages/viewer_count'
+  performer_status:
+    description: Server announces a performer live status update for a room.
+    publish:
+      message:
+        $ref: '#/components/messages/performer_status'
 
 components:
   messages:
@@ -77,6 +95,11 @@ components:
       title: leave_room
       payload:
         $ref: ./socketio/v1/client-to-server/leave_room.schema.json
+    chat_message_send:
+      name: chat_message
+      title: chat_message (client -> server)
+      payload:
+        $ref: ./socketio/v1/client-to-server/chat_message.schema.json
     send_gift:
       name: send_gift
       title: send_gift
@@ -88,6 +111,11 @@ components:
       title: gift_animation
       payload:
         $ref: ./socketio/v1/server-to-client/gift_animation.schema.json
+    chat_message:
+      name: chat_message
+      title: chat_message (server -> client)
+      payload:
+        $ref: ./socketio/v1/server-to-client/chat_message.schema.json
     gift_error:
       name: gift_error
       title: gift_error
@@ -113,3 +141,13 @@ components:
       title: spark_storm_complete
       payload:
         $ref: ./socketio/v1/server-to-client/spark_storm_complete.schema.json
+    viewer_count:
+      name: viewer_count
+      title: viewer_count
+      payload:
+        $ref: ./socketio/v1/server-to-client/viewer_count.schema.json
+    performer_status:
+      name: performer_status
+      title: performer_status
+      payload:
+        $ref: ./socketio/v1/server-to-client/performer_status.schema.json

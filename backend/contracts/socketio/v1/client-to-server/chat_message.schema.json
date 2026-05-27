@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vybe://contracts/socketio/v1/client-to-server/chat_message.schema.json",
+  "title": "Socket.io chat_message payload (client -> server) (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "room_id": { "type": "string", "minLength": 1 },
+    "roomId": { "type": "string", "minLength": 1 },
+    "message": { "type": "string", "minLength": 1, "maxLength": 500 }
+  },
+  "required": ["message"],
+  "anyOf": [{ "required": ["room_id"] }, { "required": ["roomId"] }]
+}
+

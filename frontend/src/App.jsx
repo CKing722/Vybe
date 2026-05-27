@@ -243,7 +243,18 @@ const LEGAL_COPY={
   "/dmca":{title:"DMCA Policy",eyebrow:"Trust & Safety",body:["This page will host the public DMCA policy and takedown intake form. The form should route notices into the moderation queue and preserve all submitted evidence for review.","Launch version needs fields for claimant identity, copyrighted work, allegedly infringing URL, sworn statements, signature, and counter-notice handling.","Do not launch paid content without this workflow and a designated agent process."]},
   "/2257":{title:"18 U.S.C. 2257 Compliance Statement",eyebrow:"Compliance",body:["Attorney-reviewed final language is required before launch. The final 2257 statement must identify the custodian of records and the required physical United States address.","No performer should be able to go live, upload content, receive bookings, or receive payouts until identity, age, stage names, model release, contractor agreement, and required tax documents are verified.","This page is infrastructure only until counsel supplies final custodian language."]}
 };
-const HOME_STATS=[["Live rooms previewed","128"],["Games played today","18,420"],["Viewer sparks in motion","2.4M"]];
+const HOME_STATS=[
+  {key:"livePerformersNow",label:"Live Performers Now",fallback:128},
+  {key:"gamesPlayedToday",label:"Games Played Today",fallback:18420},
+  {key:"viewersOnline",label:"Viewers Online",fallback:2400}
+];
+const fmtStat=n=>n>=1000000?`${(n/1000000).toFixed(n>=10000000?0:1)}M`:n>=1000?n.toLocaleString():String(n);
+function useCountUp(value){
+  const ref=useRef(null);const [seen,setSeen]=useState(false);const [num,setNum]=useState(0);
+  useEffect(()=>{const node=ref.current;if(!node||seen)return;const io=new IntersectionObserver(([entry])=>{if(entry.isIntersecting){setSeen(true);io.disconnect()}},{threshold:.35});io.observe(node);return()=>io.disconnect()},[seen]);
+  useEffect(()=>{if(!seen)return;let frame,start;const target=Number(value)||0;const step=t=>{if(!start)start=t;const p=Math.min(1,(t-start)/900);setNum(Math.round(target*(1-Math.pow(1-p,3))));if(p<1)frame=requestAnimationFrame(step)};frame=requestAnimationFrame(step);return()=>cancelAnimationFrame(frame)},[seen,value]);
+  return [ref,seen?num:0];
+}
 
 /* AI Questions */
 const QP='Generate 5 adult-themed trivia for a live interactive game show. Target senses: sensation, fantasy, desire, confession, attraction, intimacy. Return ONLY JSON: [{"q":"question","opts":["A","B","C","D"],"ans":0}]. Playful, suggestive, never explicit.';
@@ -326,17 +337,19 @@ const applySparkDelta=(u,d)=>{
 };
 
 /* ═══ AGE VERIFY ═══ */
-function AgeV({onDone}){const [s,setS]=useState(0);
-  const vfy=()=>{setS(2);setTimeout(()=>setS(3),2500);setTimeout(()=>onDone(),3500)};
+function AgeV({onDone,onLeave}){const [s,setS]=useState(0);const [err,setErr]=useState("");
+  const vfy=()=>{setS(2);setTimeout(async()=>{try{await onDone?.({provider:"demo_yoti",providerRef:`demo-age-${Date.now()}`});setS(3)}catch(error){setErr(error.message||"Age verification failed");setS(1)}},1200)};
+  const leave=()=>{if(onLeave)return onLeave();if(typeof window!=="undefined")window.location.href="https://www.google.com"};
   const bx={maxWidth:440,width:"90%",padding:"36px 28px",textAlign:"center",background:"var(--sf)",border:"1px solid var(--bh)",borderRadius:18,boxShadow:"0 40px 80px rgba(0,0,0,.5)"};
   const wp={position:"fixed",inset:0,zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",background:"radial-gradient(ellipse at 30% 20%,rgba(255,45,120,.06),transparent 55%),var(--bg)"};
   if(s===0)return<div style={wp}><div style={bx}><Tag color="var(--pk)"><I n="lock" s={10} c="var(--pk)"/> 18+ VERIFIED</Tag>
     <h1 style={{fontSize:"2.6rem",fontWeight:900,lineHeight:1,margin:"12px 0",background:"linear-gradient(135deg,var(--pk),var(--am),var(--lm))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>VYBE</h1>
-    <p style={{color:"var(--mt)",fontSize:".82rem",lineHeight:1.6,marginBottom:6}}>The platform where you and a performer create something together, live.</p>
+    <p style={{color:"var(--mt)",fontSize:".82rem",lineHeight:1.6,marginBottom:6}}>VYBE is an adult entertainment platform. You must be 18+ to enter.</p>
     <p style={{color:"var(--mt)",fontSize:".7rem",marginBottom:22}}>Age verification is required before adult content is available. This preview uses a simulated verification handoff until the provider integration is approved.</p>
-    <div style={{display:"flex",gap:10,justifyContent:"center"}}><Btn primary onClick={()=>setS(1)}>Verify My Age</Btn><Btn>Leave</Btn></div></div></div>;
+    <div style={{display:"flex",gap:10,justifyContent:"center"}}><Btn primary onClick={()=>setS(1)}>Verify My Age</Btn><Btn onClick={leave}>Leave</Btn></div></div></div>;
   if(s===1)return<div style={wp}><div style={bx}><I n="id" s={32} c="var(--cy)" st={{marginBottom:8}}/><Tt>Verification Method</Tt>
     <p style={{color:"var(--mt)",fontSize:".78rem",marginBottom:14}}>Production verification will use a third-party provider and store only the minimum approved reference data.</p>
+    {err&&<div style={{padding:8,borderRadius:8,background:"rgba(255,45,120,.08)",border:"1px solid rgba(255,45,120,.2)",fontSize:".72rem",color:"var(--pk)",marginBottom:10}}>{err}</div>}
     {[{l:"Government ID",d:"Provider-hosted document check",i:"id",c:"var(--cy)"},{l:"Age Estimate",d:"Provider-hosted age estimate",i:"user",c:"var(--lm)"},{l:"Verified Wallet",d:"Approved digital identity handoff",i:"shield",c:"var(--am)"}].map(v=>
       <button key={v.l} onClick={vfy} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:12,borderRadius:10,border:"1px solid var(--bd)",background:"var(--cd)",cursor:"pointer",textAlign:"left",marginBottom:6}}>
         <div style={{width:36,height:36,borderRadius:8,background:v.c+"15",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I n={v.i} s={18} c={v.c}/></div>
@@ -399,6 +412,9 @@ function HeroScene() {
 function HomePage({go,onJoin,onLogin,onAdult}) {
   const section={maxWidth:1180,margin:"0 auto",padding:"54px clamp(16px,5vw,54px)"};
   const card={border:"1px solid var(--bd)",borderRadius:14,background:"rgba(255,255,255,.035)",boxShadow:"0 30px 90px rgba(0,0,0,.22)"};
+  const [stats,setStats]=useState(()=>Object.fromEntries(HOME_STATS.map(s=>[s.key,s.fallback])));
+  useEffect(()=>{apiJson("/api/public/homepage-stats").then(d=>setStats(s=>({...s,...d}))).catch(()=>{})},[]);
+  const CountedStat=({label,value})=>{const [ref,num]=useCountUp(value);return <div ref={ref} style={{textAlign:"center"}}><div style={{fontSize:"1.35rem",fontWeight:1000,color:"var(--am)"}}>{fmtStat(num)}</div><div style={{fontSize:".64rem",fontWeight:900,letterSpacing:".08em",textTransform:"uppercase",color:"var(--mt)"}}>{label}</div></div>};
   return <div style={{minHeight:"100vh",background:"var(--bg)"}}>
     <PublicNav go={go} onJoin={onJoin} onLogin={onLogin} onAdult={onAdult}/>
     <section style={{position:"relative",minHeight:"min(760px,88vh)",display:"flex",alignItems:"center",overflow:"hidden"}}>
@@ -411,11 +427,11 @@ function HomePage({go,onJoin,onLogin,onAdult}) {
         </div>
       </div>
     </section>
-    <section style={{borderTop:"1px solid var(--bd)",borderBottom:"1px solid var(--bd)",background:"rgba(255,255,255,.025)"}}><div style={{...section,paddingTop:20,paddingBottom:20,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12}}>{HOME_STATS.map(([k,v])=><div key={k} style={{textAlign:"center"}}><div style={{fontSize:"1.35rem",fontWeight:1000,color:"var(--am)"}}>{v}</div><div style={{fontSize:".64rem",fontWeight:900,letterSpacing:".08em",textTransform:"uppercase",color:"var(--mt)"}}>{k}</div></div>)}</div></section>
+    <section style={{borderTop:"1px solid var(--bd)",borderBottom:"1px solid var(--bd)",background:"rgba(255,255,255,.025)"}}><div style={{...section,paddingTop:20,paddingBottom:20,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12}}>{HOME_STATS.map(s=><CountedStat key={s.key} label={s.label} value={stats[s.key]??s.fallback}/>)}</div></section>
     <section id="how" style={section}><Kk>How VYBE Works</Kk><Tt s="clamp(1.5rem,3vw,2.4rem)">Choose the room. Play the moment. Build your reputation.</Tt>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:12,marginTop:18}}>{[["Choose a Room","Browse live performers by vibe, game mode, category, and schedule.","live","var(--pk)"],["Play Together","Eleven interactive game modes make the audience part of the room.","gamepad","var(--cy)"],["Earn & Connect","Sparks, loyalty tiers, badges, bookings, and requests build persistent identity.","badge","var(--am)"]].map(([t,d,i,c])=><div key={t} style={{...card,padding:18}}><I n={i} s={28} c={c}/><h3 style={{fontSize:"1rem",fontWeight:1000,marginTop:12}}>{t}</h3><p style={{fontSize:".76rem",lineHeight:1.55,color:"var(--mt)",marginTop:6}}>{d}</p></div>)}</div></section>
     <section style={{...section,paddingTop:16}}><div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"end",flexWrap:"wrap"}}><div><Kk>Featured Performers</Kk><Tt s="clamp(1.5rem,3vw,2.2rem)">SFW previews. Verified rooms after entry.</Tt></div><Btn small onClick={onAdult}>Explore Rooms</Btn></div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12,marginTop:18}}>{PERFS.slice(0,6).map(p=><button key={p.id} type="button" onClick={onAdult} style={{...card,padding:0,overflow:"hidden",cursor:"pointer",textAlign:"left",color:"var(--tx)"}}><div style={{height:138,background:`linear-gradient(145deg,${p.accent}22,rgba(255,255,255,.035))`,position:"relative"}}><div style={{position:"absolute",left:"50%",top:28,transform:"translateX(-50%)",width:58,height:58,borderRadius:"50%",background:`linear-gradient(135deg,${p.accent},rgba(255,255,255,.38))`}}/><Lv/></div><div style={{padding:12}}><div style={{fontWeight:1000}}>{p.name}</div><div style={{fontSize:".68rem",color:"var(--mt)",lineHeight:1.4,marginTop:3}}>{p.game} · {p.rating} rating</div><div style={{display:"flex",gap:4,flexWrap:"wrap",marginTop:8}}>{p.caps.games.slice(0,3).map(id=><Tag key={id} color={p.accent}>{GAMES.find(g=>g.id===id)?.name||id}</Tag>)}</div></div></button>)}</div></section>
+      <div style={{display:"flex",gap:12,marginTop:18,overflowX:"auto",paddingBottom:8,scrollSnapType:"x proximity"}}>{PERFS.slice(0,6).map(p=><button key={p.id} type="button" onClick={onAdult} style={{...card,minWidth:220,padding:0,overflow:"hidden",cursor:"pointer",textAlign:"left",color:"var(--tx)",scrollSnapAlign:"start"}}><div style={{height:138,background:`linear-gradient(145deg,${p.accent}22,rgba(255,255,255,.035))`,position:"relative"}}><div style={{position:"absolute",left:"50%",top:28,transform:"translateX(-50%)",width:58,height:58,borderRadius:"50%",background:`linear-gradient(135deg,${p.accent},rgba(255,255,255,.38))`}}/><Lv/></div><div style={{padding:12}}><div style={{fontWeight:1000}}>{p.name}</div><div style={{fontSize:".68rem",color:"var(--mt)",lineHeight:1.4,marginTop:3}}>{p.game} · {p.rating} rating</div><div style={{display:"flex",gap:4,flexWrap:"wrap",marginTop:8}}>{p.caps.games.slice(0,3).map(id=><Tag key={id} color={p.accent}>{GAMES.find(g=>g.id===id)?.name||id}</Tag>)}</div></div></button>)}</div></section>
     <section style={section}><Kk>Game Modes</Kk><Tt s="clamp(1.5rem,3vw,2.2rem)">The differentiator is participation.</Tt>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:10,marginTop:18}}>{GAMES.map(g=><div key={g.id} style={{...card,padding:14}}><div style={{display:"flex",alignItems:"center",gap:8}}><I n={g.icon} s={18} c={g.color}/><strong>{g.name}</strong><Tag color="var(--gn)">Always Free</Tag></div><p style={{fontSize:".68rem",lineHeight:1.45,color:"var(--mt)",marginTop:7}}>{g.desc}</p></div>)}</div></section>
     <section style={section}><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14,alignItems:"stretch"}}><div style={{...card,padding:18}}><Kk>Spark Economy</Kk><Tt>Closed-loop Sparks with clearer math.</Tt><p style={{fontSize:".74rem",lineHeight:1.55,color:"var(--mt)",marginTop:7}}>Purchased and bonus Sparks are tracked separately. Bonus Sparks expire after 90 days and are spent first.</p><div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8,marginTop:14}}>{SPARK_PKGS.slice(0,4).map(p=><div key={p.id} style={{padding:10,borderRadius:10,border:"1px solid var(--bd)",background:p.pop?"rgba(255,45,120,.09)":"rgba(255,255,255,.035)"}}><div style={{fontWeight:1000}}>{p.label}</div><div style={{fontSize:"1rem",fontWeight:1000,color:"var(--am)"}}>{p.total.toLocaleString()}</div><div style={{fontSize:".58rem",color:"var(--mt)"}}>{p.price} · {p.per}</div></div>)}</div></div><div style={{...card,padding:18}}><Kk>Loyalty</Kk><Tt>Permanent status by lifetime spend.</Tt><div style={{display:"grid",gap:7,marginTop:12}}>{LOYALTY.map(t=><div key={t.name} style={{display:"grid",gridTemplateColumns:"90px minmax(0,1fr) auto",gap:8,alignItems:"center",padding:9,borderRadius:10,border:"1px solid var(--bd)",background:`${t.color}0d`}}><strong style={{color:t.color}}>{t.name}</strong><span style={{fontSize:".62rem",color:"var(--mt)"}}>{t.perk}</span><span style={{fontSize:".7rem",fontWeight:1000,color:"var(--gn)"}}>{t.back}% back</span></div>)}</div></div></div></section>

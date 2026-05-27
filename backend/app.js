@@ -5,6 +5,7 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const { securityMiddleware } = require('./middleware/security');
 const authRoutes = require('./routes/auth');
 const bannerRoutes = require('./routes/banners');
+const chatRoutes = require('./routes/chat');
 const gamesRoutes = require('./routes/games');
 const giftRoutes = require('./routes/gifts').router;
 const healthRoutes = require('./routes/health');
@@ -23,6 +24,7 @@ function createApp() {
   app.use('/health', healthRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/banners', bannerRoutes);
+  app.use('/api/chat', chatRoutes);
   app.use('/api', userRoutes);
   app.use('/api/games', gamesRoutes);
   app.use('/api/gifts', giftRoutes);

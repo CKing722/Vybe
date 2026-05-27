@@ -145,6 +145,25 @@ Requires auth.
 
 Returns the current viewer, spark balance, loyalty tier, and performer history.
 
+### `PUT /api/me/profile`
+
+Requires auth.
+
+Updates the viewer's public profile fields. Accepts camelCase or snake_case keys.
+
+Request (any subset):
+
+```json
+{
+  "displayName": "Velvet Emperor",
+  "avatarUrl": "https://example.com/avatar.png",
+  "bannerUrl": "https://example.com/banner.png",
+  "bio": "Late-night game royalty."
+}
+```
+
+Response: same shape as `GET /api/me` (updated `user`, plus `viewer` and `performerHistory`).
+
 ### `GET /api/me/history/:performerId`
 
 Requires auth.

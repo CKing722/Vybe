@@ -1,5 +1,5 @@
 const { hasDatabase, query } = require('../config/db');
-const { notFound } = require('../utils/errors');
+const { badRequest, notFound } = require('../utils/errors');
 const { getMemoryState, LOYALTY_TIERS } = require('./memoryStore');
 
 function loyaltyForSpend(totalSpent) {
@@ -98,8 +98,80 @@ async function getCurrentViewer(userId) {
   };
 }
 
+async function updateViewerProfile(userId, updates = {}) {
+  const { displayName, avatarUrl, bannerUrl, bio } = updates;
+  const hasUpdates =
+    displayName !== undefined || avatarUrl !== undefined || bannerUrl !== undefined || bio !== undefined;
+
+  if (!hasUpdates) {
+    throw badRequest('No profile updates provided');
+  }
+
+  if (!hasDatabase()) {
+    const state = getMemoryState();
+    const user = state.users.get(userId);
+    const profile = state.viewerProfiles.get(userId);
+    if (!user || !profile) {
+      throw notFound('Viewer profile not found');
+    }
+
+    if (displayName !== undefined) {
+      user.display_name = displayName;
+    }
+    if (avatarUrl !== undefined) {
+      user.avatar_url = avatarUrl;
+    }
+    if (bannerUrl !== undefined) {
+      user.banner_url = bannerUrl;
+    }
+    if (bio !== undefined) {
+      user.bio = bio;
+    }
+
+    return getCurrentViewer(userId);
+  }
+
+  const assignments = [];
+  const params = [];
+
+  if (displayName !== undefined) {
+    assignments.push(`display_name = $${params.length + 1}`);
+    params.push(displayName);
+  }
+  if (avatarUrl !== undefined) {
+    assignments.push(`avatar_url = $${params.length + 1}`);
+    params.push(avatarUrl);
+  }
+  if (bannerUrl !== undefined) {
+    assignments.push(`banner_url = $${params.length + 1}`);
+    params.push(bannerUrl);
+  }
+  if (bio !== undefined) {
+    assignments.push(`bio = $${params.length + 1}`);
+    params.push(bio);
+  }
+
+  params.push(userId);
+  const userIdParam = `$${params.length}`;
+
+  const result = await query(
+    `UPDATE users
+     SET ${assignments.join(', ')}, updated_at = NOW()
+     WHERE id = ${userIdParam} AND role = 'viewer' AND is_active = TRUE
+     RETURNING id`,
+    params
+  );
+
+  if (!result.rows[0]) {
+    throw notFound('Viewer profile not found');
+  }
+
+  return getCurrentViewer(userId);
+}
+
 module.exports = {
   getCurrentViewer,
   loyaltyForSpend,
   publicViewerProfile,
+  updateViewerProfile,
 };

@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 const isProduction = nodeEnv === 'production';
+const requiresSecureSecrets = isProduction || ['staging', 'preview'].includes(nodeEnv);
 const databaseUrl = process.env.DATABASE_URL || '';
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
@@ -24,7 +25,7 @@ const env = {
   enablePaidAi: false,
 };
 
-if (isProduction) {
+if (requiresSecureSecrets) {
   const missing = [];
   if (!databaseUrl) missing.push('DATABASE_URL');
   if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) missing.push('JWT_SECRET');
@@ -33,7 +34,7 @@ if (isProduction) {
   }
 
   if (missing.length > 0) {
-    throw new Error(`Missing production environment variables: ${missing.join(', ')}`);
+    throw new Error(`Missing secure environment variables for ${nodeEnv}: ${missing.join(', ')}`);
   }
 }
 

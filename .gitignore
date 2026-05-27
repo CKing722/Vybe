@@ -26,6 +26,3 @@ temp/
 Thumbs.db
 .idea/
 .vscode/
-
-# Accidental scaffold artifact from the original export
-/[{}]frontend/

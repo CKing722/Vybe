@@ -50,6 +50,37 @@ npm run db:migrate
 
 ## Auth
 
+### `GET /api/auth/csrf`
+
+Returns a CSRF token and sets the readable `vybe_csrf` cookie used by cookie-bound auth mutations such as refresh and logout.
+
+Response:
+
+```json
+{
+  "csrfToken": "...",
+  "headerName": "x-vybe-csrf"
+}
+```
+
+Send the token back in the returned header name when calling CSRF-protected cookie routes.
+
+### `POST /api/auth/register`
+
+Request:
+
+```json
+{
+  "email": "new.viewer@vybe.local",
+  "password": "Stronger1!",
+  "display_name": "KnownPatron",
+  "role": "viewer",
+  "phone_number": "555-0100"
+}
+```
+
+Passwords must be 8-72 characters and include at least one uppercase letter, one lowercase letter, one number, and one symbol. Registration returns the same auth envelope as login.
+
 ### `POST /api/auth/login`
 
 Request:
@@ -82,6 +113,26 @@ Use the access token as:
 Authorization: Bearer <accessToken>
 ```
 
+If 2FA is enabled, login returns `401` with `code: "TWO_FACTOR_REQUIRED"` until the request includes a valid `twoFactorToken`.
+
+### `POST /api/auth/refresh`
+
+Requires the `vybe_refresh` httpOnly cookie, the `vybe_csrf` cookie, and the `x-vybe-csrf` header from `/api/auth/csrf`.
+
+Refresh tokens rotate on every successful call. Reusing an older refresh token returns `401` and clears the cookie.
+
+### `POST /api/auth/logout`
+
+Requires CSRF in the same way as refresh. Revokes the active refresh token and clears auth cookies.
+
+### `POST /api/auth/2fa/setup`
+
+Requires auth. Returns a TOTP secret and `otpauth://` URL so the client can render a QR code.
+
+### `POST /api/auth/2fa/verify`
+
+Requires auth. Verifies the setup token and enables 2FA for the account.
+
 ## Viewer
 
 ### `GET /api/me`
@@ -89,6 +140,46 @@ Authorization: Bearer <accessToken>
 Requires auth.
 
 Returns the current viewer, spark balance, loyalty tier, and performer history.
+
+### `PATCH /api/me`
+
+Requires auth. Updates editable account fields and returns the same profile envelope as `GET /api/me`.
+
+Request:
+
+```json
+{
+  "displayName": "Known Patron",
+  "email": "known@vybe.local",
+  "phoneNumber": "555-0100",
+  "bio": "A short profile note."
+}
+```
+
+### `PUT /api/me/password`
+
+Requires auth. Validates the current password and applies the same password strength rules as registration.
+
+Request:
+
+```json
+{
+  "currentPassword": "vybe-demo",
+  "newPassword": "N3wStrong!Pass"
+}
+```
+
+Response:
+
+```json
+{
+  "passwordUpdated": true
+}
+```
+
+### `GET /api/me/history/:performerId`
+
+Requires auth. Accepts a performer UUID or slug and returns the viewer's relationship summary plus recent gifts/sessions for that performer.
 
 ## Performers
 
@@ -176,6 +267,8 @@ Request:
 ```
 
 Bonus Sparks expire after 90 days and are spent before purchased Sparks.
+
+Ledger rows include `isBonus` so bonus Spark purchases, sparkback, and FIFO spend/refund behavior can be reconciled separately from purchased Sparks.
 
 ## Performer Requests
 

@@ -8,6 +8,23 @@ import useGiftQueue from "./gifts/useGiftQueue.js";
 import useGiftSocket from "./gifts/useGiftSocket.js";
 import { getEffectForCost } from "./gifts/giftEffectCatalog.js";
 
+const API_BASE=(import.meta.env.VITE_API_URL||"http://localhost:4000").replace(/\/$/,"");
+async function apiJson(path,{method="GET",token,body,headers={}}={}){
+  const res=await fetch(`${API_BASE}${path}`,{
+    method,
+    credentials:"include",
+    headers:{
+      ...(body?{"Content-Type":"application/json"}:{}),
+      ...(token?{authorization:`Bearer ${token}`}:{}) ,
+      ...headers
+    },
+    body:body?JSON.stringify(body):undefined
+  });
+  const data=res.status===204?null:await res.json().catch(()=>null);
+  if(!res.ok)throw new Error(data?.error?.message||data?.message||`Request failed (${res.status})`);
+  return data;
+}
+
 /* ═══ ICONS — 40+ custom SVGs, zero emojis ═══ */
 function I({n,s=20,c="currentColor",st={}}){const p={width:s,height:s,flexShrink:0,display:"inline-block",verticalAlign:"middle",...st};const d={
 rose:<svg viewBox="0 0 24 24" style={p}><path d="M12 3c-1.5 2-4 4-4 7a4 4 0 008 0c0-3-2.5-5-4-7z" fill={c} opacity=".85"/><line x1="12" y1="10" x2="12" y2="22" stroke={c} strokeWidth="1.5"/></svg>,
@@ -230,7 +247,7 @@ const HOME_STATS=[["Live rooms previewed","128"],["Games played today","18,420"]
 
 /* AI Questions */
 const QP='Generate 5 adult-themed trivia for a live interactive game show. Target senses: sensation, fantasy, desire, confession, attraction, intimacy. Return ONLY JSON: [{"q":"question","opts":["A","B","C","D"],"ans":0}]. Playful, suggestive, never explicit.';
-async function genQs(){try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:QP}]})});const d=await r.json();return JSON.parse(d.content?.map(c=>c.text||"").join("").replace(/```json|```/g,"").trim())}catch(e){return FBQ.sort(()=>Math.random()-.5).slice(0,5)}}
+async function genQs(){try{const d=await apiJson("/api/games/questions",{method:"POST",body:{theme:"vybe-live-room",count:5}});return Array.isArray(d?.questions)?d.questions:FBQ.slice(0,5)}catch(e){return FBQ.sort(()=>Math.random()-.5).slice(0,5)}}
 
 /* CSS */
 const css=`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
@@ -260,6 +277,49 @@ const Kk=({children})=><div style={{fontSize:".62rem",fontWeight:700,letterSpaci
 const Tt=({children,s})=><h2 style={{fontSize:s||"1.3rem",fontWeight:800,marginBottom:3,lineHeight:1.15}}>{children}</h2>;
 const Pn=({children,onClose,title,icon,ic,style:s={}})=><G className="ai" style={{padding:14,overflowY:"auto",...s}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><span style={{fontWeight:800,fontSize:".82rem",display:"flex",alignItems:"center",gap:5}}>{icon&&<I n={icon} s={14} c={ic||"var(--pk)"}/>}{title}</span><button onClick={onClose} style={{background:"none",border:"none",color:"var(--mt)",cursor:"pointer",display:"flex"}}><I n="close" s={13}/></button></div>{children}</G>;
 const gl=s=>(LOYALTY.slice().reverse().find(t=>s>=t.min)||LOYALTY[0]);
+const normalizeFrontendPerformer=p=>({
+  id:p.slug||p.id,
+  backendId:p.id,
+  roomId:p.roomId||p.room_id||p.id,
+  name:p.name||p.stageName||p.stage_name||"VYBE Performer",
+  vibe:p.vibe||"",
+  viewers:Number(p.viewers||0),
+  game:p.game||"Live Room",
+  level:p.level||"warm",
+  tags:p.tags||[],
+  accent:p.accent||p.accentColor||"#ff2d78",
+  rating:Number(p.rating||0),
+  sessions:Number(p.sessions||0),
+  cats:p.cats||p.categories||[],
+  caps:p.caps||{duo:false,toys:false,replay:false,wardrobe:false,maxMins:60,games:["trivia"]},
+  bio:p.bio||"",
+  sub:p.sub||p.subscription||{price:null,trial:0},
+  schedule:p.schedule||[],
+  stats:p.stats||{hoursLive:0,followers:0},
+  requests:p.requests||[],
+  posts:p.posts||[],
+  isLive:p.isLive??p.is_live??true
+});
+const userFromProfile=(profile,current={})=>{
+  const u=profile?.user||{},v=profile?.viewer||{};
+  return {
+    ...current,
+    name:u.displayName||u.display_name||current.name||"",
+    email:u.email||current.email||"",
+    phone:u.phoneNumber||current.phone||"",
+    twoFactor:Boolean(u.two_factor_enabled||current.twoFactor),
+    sparks:Number(v.sparks??current.sparks??0),
+    purchasedSparks:Number(v.purchasedSparks??current.purchasedSparks??0),
+    bonusSparks:Number(v.bonusSparks??current.bonusSparks??0),
+    bonusExpiry:v.bonusSparksExpiresAt||current.bonusExpiry,
+    spent:Number(v.totalSpent??current.spent??0),
+    gamesPlayed:Number(v.gamesPlayed??current.gamesPlayed??0),
+    winRate:Number(v.winRate??current.winRate??0),
+    sparksEarned:Number(v.sparksEarned??current.sparksEarned??0),
+    totalSessions:Number(v.totalSessions??current.totalSessions??0),
+    topStreak:Number(v.topStreak??current.topStreak??0)
+  };
+};
 const applySparkDelta=(u,d)=>{
   if(d<0){const cost=Math.min(u.sparks||0,-d),bonus=u.bonusSparks||0,fromBonus=Math.min(bonus,cost),fromPurchased=cost-fromBonus;return {...u,sparks:Math.max(0,(u.sparks||0)-cost),bonusSparks:bonus-fromBonus,purchasedSparks:Math.max(0,(u.purchasedSparks||0)-fromPurchased)}}
   const gain=Number(d)||0;return {...u,sparks:(u.sparks||0)+gain,bonusSparks:(u.bonusSparks||0)+gain,bonusExpiry:"90 days after award",sparksEarned:(u.sparksEarned||0)+gain}
@@ -273,11 +333,11 @@ function AgeV({onDone}){const [s,setS]=useState(0);
   if(s===0)return<div style={wp}><div style={bx}><Tag color="var(--pk)"><I n="lock" s={10} c="var(--pk)"/> 18+ VERIFIED</Tag>
     <h1 style={{fontSize:"2.6rem",fontWeight:900,lineHeight:1,margin:"12px 0",background:"linear-gradient(135deg,var(--pk),var(--am),var(--lm))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>VYBE</h1>
     <p style={{color:"var(--mt)",fontSize:".82rem",lineHeight:1.6,marginBottom:6}}>The platform where you and a performer create something together, live.</p>
-    <p style={{color:"var(--mt)",fontSize:".7rem",marginBottom:22}}>Age verification required by federal and state law. Powered by Yoti — zero-knowledge, we never see your ID.</p>
+    <p style={{color:"var(--mt)",fontSize:".7rem",marginBottom:22}}>Age verification is required before adult content is available. This preview uses a simulated verification handoff until the provider integration is approved.</p>
     <div style={{display:"flex",gap:10,justifyContent:"center"}}><Btn primary onClick={()=>setS(1)}>Verify My Age</Btn><Btn>Leave</Btn></div></div></div>;
   if(s===1)return<div style={wp}><div style={bx}><I n="id" s={32} c="var(--cy)" st={{marginBottom:8}}/><Tt>Verification Method</Tt>
-    <p style={{color:"var(--mt)",fontSize:".78rem",marginBottom:14}}>VYBE never sees your personal information.</p>
-    {[{l:"Government ID",d:"Driver's license or passport",i:"id",c:"var(--cy)"},{l:"Facial Estimation",d:"AI age estimate from selfie",i:"user",c:"var(--lm)"},{l:"Digital Wallet",d:"Existing Yoti digital ID",i:"shield",c:"var(--am)"}].map(v=>
+    <p style={{color:"var(--mt)",fontSize:".78rem",marginBottom:14}}>Production verification will use a third-party provider and store only the minimum approved reference data.</p>
+    {[{l:"Government ID",d:"Provider-hosted document check",i:"id",c:"var(--cy)"},{l:"Age Estimate",d:"Provider-hosted age estimate",i:"user",c:"var(--lm)"},{l:"Verified Wallet",d:"Approved digital identity handoff",i:"shield",c:"var(--am)"}].map(v=>
       <button key={v.l} onClick={vfy} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:12,borderRadius:10,border:"1px solid var(--bd)",background:"var(--cd)",cursor:"pointer",textAlign:"left",marginBottom:6}}>
         <div style={{width:36,height:36,borderRadius:8,background:v.c+"15",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I n={v.i} s={18} c={v.c}/></div>
         <div><div style={{fontWeight:700,fontSize:".84rem"}}>{v.l}</div><div style={{fontSize:".68rem",color:"var(--mt)"}}>{v.d}</div></div></button>)}</div></div>;
@@ -286,7 +346,7 @@ function AgeV({onDone}){const [s,setS]=useState(0);
 
 /* ═══ COOKIE ═══ */
 const CK=({onOk})=><div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:60,padding:"12px 18px",background:"var(--sf)",borderTop:"1px solid var(--bd)",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
-  <p style={{flex:1,minWidth:180,fontSize:".76rem",lineHeight:1.5}}><I n="lock" s={12} c="var(--cy)" st={{marginRight:4}}/>We use cookies per our <a href="#" style={{color:"var(--cy)"}}>Cookie Policy</a>.</p>
+  <p style={{flex:1,minWidth:180,fontSize:".76rem",lineHeight:1.5}}><I n="lock" s={12} c="var(--cy)" st={{marginRight:4}}/>We use cookies per our <a href="/privacy" style={{color:"var(--cy)"}}>Cookie Policy</a>.</p>
   <div style={{display:"flex",gap:6}}><Btn small onClick={onOk}>Reject</Btn><Btn small primary onClick={onOk}>Accept All</Btn></div></div>;
 
 /* â•â•â• PUBLIC SITE â•â•â• */
@@ -388,8 +448,8 @@ function HM({open,onClose,cat,setCat,onProfile}){if(!open)return null;
       <button onClick={onProfile} style={{display:"flex",alignItems:"center",gap:7,width:"100%",padding:"8px 10px",borderRadius:7,border:"none",background:"none",color:"var(--tx)",cursor:"pointer",fontWeight:600,fontSize:".8rem",textAlign:"left"}}><I n="user" s={14} c="var(--cy)"/>My Profile</button>
     </div>
     <div style={{marginTop:12,padding:10,borderTop:"1px solid var(--bd)",fontSize:".58rem",color:"var(--mt)",lineHeight:1.6}}>
-      <strong>80/20</strong> — Performers keep 80%<br/>18 USC §2257 Compliant<br/>
-      <a href="#" style={{color:"var(--cy)"}}>Terms</a> · <a href="#" style={{color:"var(--cy)"}}>Privacy</a> · <a href="#" style={{color:"var(--cy)"}}>2257</a> · <a href="#" style={{color:"var(--cy)"}}>DMCA</a>
+      <strong>80/20</strong> — Performers keep 80%<br/>18 USC §2257 workflow staged<br/>
+      <a href="/terms" style={{color:"var(--cy)"}}>Terms</a> · <a href="/privacy" style={{color:"var(--cy)"}}>Privacy</a> · <a href="/2257" style={{color:"var(--cy)"}}>2257</a> · <a href="/dmca" style={{color:"var(--cy)"}}>DMCA</a>
     </div></div>;}
 
 /* ═══ VIEWER PROFILE — "You Are Known" ═══ */
@@ -573,7 +633,7 @@ function PF({perf,user,onBack,onLive,onBook,onVip,onWallet}){
         <Btn full primary onClick={onLive}><I n="eye" s={13} c="#fff" st={{marginRight:3}}/>Watch Live Now</Btn>
       </div>
     </div>
-    <div style={{padding:10,borderTop:"1px solid var(--bd)",fontSize:".56rem",color:"var(--mt)",textAlign:"center",marginTop:10}}>VYBE Inc. · 18 USC §2257 Compliant · 80/20 Performer Split · <a href="#" style={{color:"var(--cy)"}}>Terms</a> · <a href="#" style={{color:"var(--cy)"}}>Privacy</a></div>
+    <div style={{padding:10,borderTop:"1px solid var(--bd)",fontSize:".56rem",color:"var(--mt)",textAlign:"center",marginTop:10}}>VYBE Inc. · 18 USC §2257 workflow · 80/20 Performer Split · <a href="/terms" style={{color:"var(--cy)"}}>Terms</a> · <a href="/privacy" style={{color:"var(--cy)"}}>Privacy</a></div>
   </div>;}
 
 /* ═══ GAME ENGINE — 11 Unique Modes ═══ */
@@ -877,8 +937,8 @@ function RequestChatMessage({item}){
   </div>;
 }
 
-function LB({user,onPerf,onWallet,cat,setCat,onMenu}){
-  const f=cat==="All"?PERFS:PERFS.filter(p=>p.cats.includes(cat));const tier=gl(user.spent);
+function LB({user,onPerf,onWallet,cat,setCat,onMenu,performers=PERFS}){
+  const f=cat==="All"?performers:performers.filter(p=>(p.cats||[]).includes(cat));const tier=gl(user.spent);
   return<div style={{minHeight:"100vh",background:"var(--bg)",padding:"12px clamp(10px,3vw,30px)"}}>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
       <div style={{display:"flex",alignItems:"center",gap:7}}>
@@ -926,7 +986,7 @@ function LB({user,onPerf,onWallet,cat,setCat,onMenu}){
           <p style={{fontSize:".62rem",color:"var(--mt)",lineHeight:1.3,marginTop:1}}>{g.desc}</p>
           <div style={{marginTop:4,fontSize:".56rem",fontWeight:900,color:"var(--am)",display:"flex",alignItems:"center",gap:2}}><I n="spark" s={8} c="var(--am)"/>{gameEconomyLine(g.type)}</div></div>)}</div>
     </div>
-    <div style={{padding:10,borderTop:"1px solid var(--bd)",fontSize:".56rem",color:"var(--mt)",textAlign:"center"}}>VYBE Inc. · 18 USC §2257 · 80/20 · CCBill/Segpay · <a href="#" style={{color:"var(--cy)"}}>Terms</a> · <a href="#" style={{color:"var(--cy)"}}>Privacy</a> · <a href="#" style={{color:"var(--cy)"}}>2257</a> · <a href="#" style={{color:"var(--cy)"}}>DMCA</a></div>
+    <div style={{padding:10,borderTop:"1px solid var(--bd)",fontSize:".56rem",color:"var(--mt)",textAlign:"center"}}>VYBE Inc. · 18 USC §2257 workflow · 80/20 · CCBill/Segpay · <a href="/terms" style={{color:"var(--cy)"}}>Terms</a> · <a href="/privacy" style={{color:"var(--cy)"}}>Privacy</a> · <a href="/2257" style={{color:"var(--cy)"}}>2257</a> · <a href="/dmca" style={{color:"var(--cy)"}}>DMCA</a></div>
   </div>;}
 
 /* ═══ LIVE ROOM ═══ */
@@ -944,9 +1004,10 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const [reqFx,setReqFx]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
   const [pendingReq,setPendingReq]=useState([]);
   const [requestPins,setRequestPins]=useState([]);
+  const demoChat=roomParams.get("demoChat")==="1"||roomParams.get("vybePreview")==="room";
   const roomRef=useRef(null);const CP=[{user:"NightOwl",msg:"Let's go"},{user:"VelvetKing",msg:"Crown incoming",vip:true},{user:"AceHigh",msg:"All in",vip:true},{user:"DiamondJay",msg:"Here we go",vip:true}];
   useEffect(()=>{const t=setInterval(()=>setTm(p=>Math.max(0,p-1)),1000);return()=>clearInterval(t)},[]);
-  useEffect(()=>{const t=setInterval(()=>{setCh(p=>[...p.slice(-39),{...CP[Math.floor(Math.random()*4)],id:Date.now()}])},5000);return()=>clearInterval(t)},[]);
+  useEffect(()=>{if(!demoChat)return undefined;const t=setInterval(()=>{setCh(p=>[...p.slice(-39),{...CP[Math.floor(Math.random()*4)],id:Date.now()}])},5000);return()=>clearInterval(t)},[demoChat]);
   useEffect(()=>{const level=media.muted?0:Math.max(0,Math.min(100,media.volume))/100;document.querySelectorAll("video,audio").forEach(el=>{el.volume=level;el.muted=media.muted||media.volume===0})},[media.volume,media.muted]);
   useEffect(()=>{document.querySelectorAll("video,audio").forEach(el=>{if(media.paused)el.pause&&el.pause();else{const p=el.play&&el.play();if(p&&p.catch)p.catch(()=>{})}})},[media.paused]);
   useEffect(()=>{if(!media.replay||media.paused)return;const t=setInterval(()=>setMedia(p=>{if(!p.replay||p.paused)return p;if(p.replayLeft<=1)return {...p,replay:false,replayLeft:0};return {...p,replayLeft:p.replayLeft-1}}),1000);return()=>clearInterval(t)},[media.replay,media.paused]);
@@ -1163,12 +1224,12 @@ function MediaSettings({media,setMedia,setTheaterMode,switchLayout}) {
 function Auth({onAuth,onClose,initialMode="login"}){
   const [mode,setMode]=useState(initialMode);const [role,setRole]=useState("viewer");
   const [form,setForm]=useState({email:"",pass:"",name:"",confirm:"",agree:false});
-  const [err,setErr]=useState("");const [show,setShow]=useState(false);
+  const [err,setErr]=useState("");const [show,setShow]=useState(false);const [loading,setLoading]=useState(false);
   const f=form;const uf=(k,v)=>setForm(p=>({...p,[k]:v}));
   const passStrength=(p)=>{let s=0;if(p.length>=8)s++;if(p.length>=12)s++;if(/[A-Z]/.test(p))s++;if(/[0-9]/.test(p))s++;if(/[^A-Za-z0-9]/.test(p))s++;return s};
   const ps=passStrength(f.pass);const pColors=["var(--pk)","var(--pk)","var(--am)","var(--lm)","var(--gn)"];
 
-  const submit=()=>{
+  const submit=async()=>{
     setErr("");
     if(!f.email||!f.email.includes("@"))return setErr("Valid email required");
     if(f.pass.length<8)return setErr("Password must be 8+ characters");
@@ -1178,7 +1239,18 @@ function Auth({onAuth,onClose,initialMode="login"}){
       if(ps<3)return setErr("Password too weak — add uppercase, numbers, or symbols");
       if(!f.agree)return setErr("You must agree to Terms and confirm you are 18+");
     }
-    onAuth({email:f.email,name:f.name||f.email.split("@")[0],role});
+    setLoading(true);
+    try{
+      const payload=mode==="login"
+        ? await apiJson("/api/auth/login",{method:"POST",body:{email:f.email,password:f.pass}})
+        : await apiJson("/api/auth/register",{method:"POST",body:{email:f.email,password:f.pass,display_name:f.name,role}});
+      const u=payload.user||{};
+      onAuth({id:u.id,email:u.email||f.email,name:u.display_name||f.name||f.email.split("@")[0],role:u.role||role,accessToken:payload.accessToken,twoFactorEnabled:u.two_factor_enabled});
+    }catch(error){
+      setErr(error.message||"Authentication failed");
+    }finally{
+      setLoading(false);
+    }
   };
 
   const inp=(label,key,type="text")=><div style={{marginBottom:10}}>
@@ -1210,16 +1282,16 @@ function Auth({onAuth,onClose,initialMode="login"}){
       {mode==="register"&&inp("Confirm Password","confirm","password")}
       {mode==="register"&&<label style={{display:"flex",alignItems:"flex-start",gap:8,marginBottom:12,cursor:"pointer"}}>
         <input type="checkbox" checked={f.agree} onChange={e=>uf("agree",e.target.checked)} style={{marginTop:3,accentColor:"var(--pk)"}}/>
-        <span style={{fontSize:".72rem",color:"var(--mt)",lineHeight:1.4}}>I am 18+ years of age, agree to the <a href="#" style={{color:"var(--cy)"}}>Terms of Service</a>, <a href="#" style={{color:"var(--cy)"}}>Privacy Policy</a>, and acknowledge the <a href="#" style={{color:"var(--cy)"}}>18 USC §2257</a> compliance requirements.</span>
+        <span style={{fontSize:".72rem",color:"var(--mt)",lineHeight:1.4}}>I am 18+ years of age, agree to the <a href="/terms" style={{color:"var(--cy)"}}>Terms of Service</a>, <a href="/privacy" style={{color:"var(--cy)"}}>Privacy Policy</a>, and acknowledge the <a href="/2257" style={{color:"var(--cy)"}}>18 USC §2257</a> compliance requirements.</span>
       </label>}
       {err&&<div style={{padding:8,borderRadius:6,background:"rgba(255,45,120,.08)",border:"1px solid rgba(255,45,120,.2)",fontSize:".76rem",color:"var(--pk)",marginBottom:10}}><I n="lock" s={12} c="var(--pk)" st={{marginRight:4}}/>{err}</div>}
-      <Btn full primary onClick={submit}>{mode==="login"?"Sign In":"Create Account"}</Btn>
+      <Btn full primary onClick={submit} disabled={loading}>{loading?"Connecting...":mode==="login"?"Sign In":"Create Account"}</Btn>
       <div style={{textAlign:"center",marginTop:12}}>
         <button onClick={()=>{setMode(mode==="login"?"register":"login");setErr("")}} style={{background:"none",border:"none",color:"var(--cy)",fontSize:".78rem",cursor:"pointer",fontWeight:600}}>
           {mode==="login"?"Don't have an account? Sign up":"Already have an account? Sign in"}</button>
       </div>
       <div style={{marginTop:16,padding:10,borderTop:"1px solid var(--bd)",fontSize:".6rem",color:"var(--mt)",lineHeight:1.5,textAlign:"center"}}>
-        <I n="shield" s={10} c="var(--gn)" st={{marginRight:3}}/>Passwords are hashed with bcrypt. Sessions use httpOnly secure cookies. All connections are TLS 1.3 encrypted. We never store raw credentials.
+        <I n="shield" s={10} c="var(--gn)" st={{marginRight:3}}/>Authentication uses the VYBE backend, bcrypt password hashing, short-lived access tokens, and httpOnly refresh cookies.
       </div>
     </div></div>;
 }
@@ -1227,7 +1299,7 @@ function Auth({onAuth,onClose,initialMode="login"}){
 /* ═══ PERFORMER STUDIO ═══ */
 function PerfDash({perfData,onGoLive,onLogout}){
   const [tab,setTab]=useState("home");const [newPost,setNewPost]=useState("");const [msgTo,setMsgTo]=useState(null);const [msgText,setMsgText]=useState("");
-  const p=perfData;const earn={today:Math.floor(Math.random()*800+400),pending:2847};
+  const p=perfData;const earn={today:Math.max(400,Math.round((p.viewers||0)*1.7+(p.rating||0)*100)),pending:2847};
   const fans=[{name:"VelvetKing",lv:34,sparks:8400,sessions:42,msg:"Can't wait for tonight",time:"2m",online:true},
     {name:"DiamondJay",lv:28,sparks:5200,sessions:28,msg:"That last session was incredible",time:"18m",online:true},
     {name:"AceHigh",lv:22,sparks:3100,sessions:19,msg:"When's the next King of the Hill?",time:"1h",online:false},
@@ -1427,7 +1499,7 @@ function PerfDash({perfData,onGoLive,onLogout}){
           <div style={{padding:16,borderRadius:12,border:"1px solid var(--bd)",background:"var(--cd)"}}>
             <Kk>Payout</Kk>
             <div style={{fontSize:".82rem",fontWeight:700,marginBottom:4}}>Every 2 weeks via CCBill</div>
-            <div style={{fontSize:".72rem",color:"var(--mt)"}}>Minimum: $50 · Next payout: June 1</div>
+            <div style={{fontSize:".72rem",color:"var(--mt)"}}>Minimum: $50 · Next payout: processor schedule pending</div>
             <Btn small style={{marginTop:8,border:"1px solid var(--bd)",color:"var(--mt)"}}>Manage</Btn>
           </div>
           <div style={{padding:16,borderRadius:12,border:"1px solid var(--bd)",background:"var(--cd)"}}>
@@ -1572,28 +1644,28 @@ export default function App(){
   const previewMode=visualPreview||roomPreview||studioPreview;
   const previewView=visualPreview||roomPreview?"room":"lobby";
   const giftDebug=searchParams.get("giftDebug")==="1";
-  const [authed,setAuthed]=useState(previewMode);const [authUser,setAuthUser]=useState(previewMode?{email:"preview@vybe.local",name:"VelvetKing",role:studioPreview?"performer":"viewer"}:null);
+  const [authed,setAuthed]=useState(previewMode);const [authUser,setAuthUser]=useState(previewMode?{email:"preview@vybe.local",name:"VelvetKing",role:studioPreview?"performer":"viewer"}:null);const [apiToken,setApiToken]=useState(null);
   const [ok,setOk]=useState(previewMode);const [ck,setCk]=useState(previewMode);const [vw,setVw]=useState(previewMode?previewView:"lobby");
   const [path,setPath]=useState(initialPath);const [authOpen,setAuthOpen]=useState(false);const [authMode,setAuthMode]=useState(initialPath==="/signup"?"register":"login");const [publicGate,setPublicGate]=useState(false);
-  const [pf,setPf]=useState((visualPreview||roomPreview)?PERFS[0]:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
+  const [performers,setPerformers]=useState(PERFS);const [pf,setPf]=useState((visualPreview||roomPreview)?PERFS[0]:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
   const [user,setUser]=useState({name:"VelvetKing",email:"preview@vybe.local",phone:"",twoFactor:false,primaryRail:"card",cryptoNetwork:"Universal router",cryptoWallet:"",passwordUpdated:false,
     paymentMethods:[{id:"card-demo",name:"Card",detail:"No card saved yet",status:"Add method",icon:"card",color:"var(--am)"},{id:"wallet-demo",name:"Digital wallet",detail:"Apple/Google/PayPal ready",status:"Available",icon:"wallet",color:"var(--cy)"},{id:"bank-demo",name:"Bank",detail:"ACH/debit connection",status:"Optional",icon:"shield",color:"var(--gn)"},{id:"crypto-demo",name:"Crypto wallet",detail:"Universal router not connected",status:"Connect wallet",icon:"crypto",color:"var(--vi)"}],
     sparks:2500,purchasedSparks:2300,bonusSparks:200,bonusExpiry:"Jun 15",spent:450,gamesPlayed:87,winRate:72,sparksEarned:1240,totalSessions:23,topStreak:8,perfCount:4,
     badges:["First Win","5-Game Streak","100 Games","Luna's Top 10","Crown Sender"],
     favPerfs:["luna","jade","raven"],
-    perfHistory:{luna:{sessions:12,sparksSpent:3400,since:"Mar 2027"},jade:{sessions:6,sparksSpent:1200,since:"Apr 2027"},raven:{sessions:3,sparksSpent:800,since:"May 2027"}}});
+    perfHistory:{luna:{sessions:12,sparksSpent:3400,since:"Mar 2026"},jade:{sessions:6,sparksSpent:1200,since:"Apr 2026"},raven:{sessions:3,sparksSpent:800,since:"May 2026"}}});
 
   const {current:demoGift,enqueue:enqueueDemoGift,advance:advanceDemoGift}=useGiftQueue();
   const [giftEvents,setGiftEvents]=useState([]);
   const DEMO_GIFTS=["neon_rose","fire_shot","velvet_kiss","diamond_rain","crown_drop","champagne_pour","private_key"];
   let _demoIdx=useRef(0);
   const triggerDemoGift=useCallback((giftId)=>{
-    const recipient=pf?.name||PERFS[0].name;
+    const recipient=pf?.name||(performers[0]||PERFS[0]).name;
     const sender=user.name||"VelvetKing";
     const ev={id:Date.now(),giftId,sender,recipient,timestamp:Date.now()};
     setGiftEvents(p=>[ev,...p].slice(0,20));
     enqueueDemoGift({giftId,sender,recipient});
-  },[pf,user.name]);
+  },[pf,performers,user.name]);
   const fireDemoGift=useCallback(()=>{
     const giftId=DEMO_GIFTS[_demoIdx.current%DEMO_GIFTS.length];
     _demoIdx.current++;
@@ -1603,17 +1675,19 @@ export default function App(){
   const handleSocketGift=useCallback((ev)=>{setGiftEvents(p=>[ev,...p].slice(0,20));enqueueDemoGift(ev);},[enqueueDemoGift]);
   useGiftSocket({roomId:vw==="room"&&pf?pf.id:null,onGiftAnimation:handleSocketGift});
 
-  const handleAuth=(u)=>{setAuthUser(u);setUser(p=>({...p,name:u.name,email:u.email||p.email}));setAuthed(true);if(u.role==="performer")setOk(true)};/*performers skip age verify*/
-  const logout=()=>{setAuthed(false);setAuthUser(null);setOk(false);setVw("lobby")};
+  useEffect(()=>{apiJson("/api/performers?live=true").then(d=>{if(Array.isArray(d?.performers)&&d.performers.length)setPerformers(d.performers.map(normalizeFrontendPerformer))}).catch(()=>{})},[]);
+  useEffect(()=>{if(!apiToken||authUser?.role!=="viewer")return;apiJson("/api/me",{token:apiToken}).then(profile=>setUser(u=>userFromProfile(profile,u))).catch(()=>{})},[apiToken,authUser?.role]);
+  const handleAuth=(u)=>{setApiToken(u.accessToken||null);setAuthUser(u);setUser(p=>({...p,name:u.name,email:u.email||p.email,twoFactor:!!u.twoFactorEnabled}));setAuthed(true);if(u.role==="performer")setOk(true)};/*performers skip age verify*/
+  const logout=()=>{setAuthed(false);setAuthUser(null);setApiToken(null);setOk(false);setVw("lobby")};
   const isPerf=authed&&authUser?.role==="performer";
-  const perfSelf=isPerf?PERFS[0]:null;
+  const perfSelf=isPerf?(performers[0]||PERFS[0]):null;
 
   const vp=p=>{setPf(p);setVw("profile")};const gl2=()=>{setMd(null);setVw("room")};
   const gb=()=>setMd("book");const gv=()=>setMd("vip");const bk=()=>{setVw("lobby");setPf(null)};const bp=()=>setVw("profile");
   const cs=pk=>{setUser(u=>({...applySparkDelta(u,-pk.sparks),totalSessions:u.totalSessions+1}));setMd(null);setVw("room")};
-  const by=pk=>{const bonus=pk.bonusSparks||0,total=pk.total||(pk.sparks+bonus);setUser(u=>({...u,sparks:u.sparks+total,purchasedSparks:(u.purchasedSparks||0)+pk.sparks,bonusSparks:(u.bonusSparks||0)+bonus,bonusExpiry:"90 days after award",spent:u.spent+parseFloat(pk.price.replace("$",""))}));setMd(null)};
+  const by=async pk=>{try{if(apiToken){const r=await apiJson("/api/sparks/purchase",{method:"POST",token:apiToken,body:{package_id:pk.id.replace("-","_"),processor:"demo"}});setUser(u=>userFromProfile({viewer:r.balance,user:{displayName:u.name,email:u.email}},u));}else{const bonus=pk.bonusSparks||0,total=pk.total||(pk.sparks+bonus);setUser(u=>({...u,sparks:u.sparks+total,purchasedSparks:(u.purchasedSparks||0)+pk.sparks,bonusSparks:(u.bonusSparks||0)+bonus,bonusExpiry:"90 days after award",spent:u.spent+parseFloat(pk.price.replace("$",""))}));}setMd(null)}catch(error){window.alert?.(error.message||"Spark purchase failed")}};
   const sc=d=>setUser(u=>applySparkDelta(u,d));
-  const updateViewer=patch=>{setUser(u=>({...u,...patch,paymentMethods:(u.paymentMethods||[]).map(m=>m.id==="crypto-demo"?{...m,detail:patch.cryptoWallet?`${patch.cryptoNetwork} wallet connected`:"Universal router not connected",status:patch.cryptoWallet?"Connected":"Connect wallet"}:m)}));setAuthUser(a=>a?{...a,name:patch.name||a.name,email:patch.email||a.email}:a)};
+  const updateViewer=patch=>{setUser(u=>({...u,...patch,paymentMethods:(u.paymentMethods||[]).map(m=>m.id==="crypto-demo"?{...m,detail:patch.cryptoWallet?`${patch.cryptoNetwork} wallet connected`:"Universal router not connected",status:patch.cryptoWallet?"Connected":"Connect wallet"}:m)}));setAuthUser(a=>a?{...a,name:patch.name||a.name,email:patch.email||a.email}:a);if(apiToken)apiJson("/api/me",{method:"PATCH",token:apiToken,body:{display_name:patch.name,email:patch.email,phone_number:patch.phone}}).catch(()=>{})};
   const go=to=>{if(typeof window!=="undefined"){window.history.pushState({}, "", to)}setPath(to);setAuthOpen(false);setPublicGate(false)};
   useEffect(()=>{if(typeof window==="undefined")return;const onPop=()=>setPath(window.location.pathname);window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[]);
   const openAuth=mode=>{setAuthMode(mode);setAuthOpen(true)};
@@ -1636,7 +1710,7 @@ export default function App(){
     {!authed&&<Auth onAuth={handleAuth} initialMode={authMode}/>}
     {authed&&!ok&&!isPerf&&<AgeV onDone={()=>setOk(true)}/>}
     {authed&&ok&&isPerf&&vw!=="room"&&<PerfDash perfData={perfSelf} onGoLive={()=>{setPf(perfSelf);setVw("room")}} onLogout={logout}/>}
-    {authed&&ok&&!isPerf&&vw==="lobby"&&<LB user={user} onPerf={vp} onWallet={()=>setMd("wallet")} cat={cat} setCat={setCat} onMenu={()=>setMn(true)}/>}
+    {authed&&ok&&!isPerf&&vw==="lobby"&&<LB user={user} performers={performers} onPerf={vp} onWallet={()=>setMd("wallet")} cat={cat} setCat={setCat} onMenu={()=>setMn(true)}/>}
     {authed&&ok&&!isPerf&&vw==="profile"&&pf&&<PF perf={pf} user={user} onBack={bk} onLive={gl2} onBook={gb} onVip={gv} onWallet={()=>setMd("wallet")}/>}
     {authed&&ok&&vw==="room"&&pf&&<RM perf={pf} user={user} onBack={isPerf?()=>setVw("lobby"):bp} onSC={sc} onWallet={()=>setMd("wallet")} onBook={gb} onVip={gv} onGiftSent={triggerDemoGift}/>}
     <HM open={mn} onClose={()=>setMn(false)} cat={cat} setCat={setCat} onProfile={()=>{setMn(false);setMd("viewer")}}/>

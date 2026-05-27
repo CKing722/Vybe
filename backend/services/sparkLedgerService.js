@@ -100,7 +100,7 @@ function normalizeSparkTransaction(row) {
     amount: Number(row.amount),
     balanceAfter: Number(row.balance_after),
     source: row.source || null,
-    bonusSpark: Boolean(row.bonus_spark),
+    bonusSpark: Boolean(row.is_bonus || row.bonus_spark),
     expiresAt: row.expires_at || null,
     expiredAt: row.expired_at || null,
     softDeletedAt: row.soft_deleted_at || null,
@@ -280,7 +280,7 @@ async function listSparkTransactions(userId, { limit = 25 } = {}) {
   }
 
   const { rows } = await query(
-    `SELECT id, user_id, type, amount, balance_after, source, bonus_spark,
+    `SELECT id, user_id, type, amount, balance_after, source, is_bonus, bonus_spark,
       expires_at, expired_at, soft_deleted_at, reference_id, performer_id, metadata, created_at
      FROM spark_transactions
      WHERE user_id = $1
@@ -412,12 +412,12 @@ async function purchaseSparkPackage({ userId, packageId, paymentMethodId = null,
 
     await client.query(
       `INSERT INTO spark_transactions (
-        user_id, type, amount, balance_after, source, bonus_spark,
+        user_id, type, amount, balance_after, source, is_bonus, bonus_spark,
         expires_at, reference_id, metadata
       )
       VALUES
-        ($1, 'purchase', $2, $3, 'purchase', FALSE, NULL, $4, $5),
-        ($1, 'sparkback', $6, $7, 'purchase_bonus', TRUE, $8, $4, $9)`,
+        ($1, 'purchase', $2, $3, 'purchase', FALSE, FALSE, NULL, $4, $5),
+        ($1, 'sparkback', $6, $7, 'purchase_bonus', TRUE, TRUE, $8, $4, $9)`,
       [
         userId,
         sparkPackage.purchasedSparks,

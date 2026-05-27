@@ -96,6 +96,30 @@ async function listPerformers(filters = {}) {
     conditions.push('pp.is_live = TRUE');
     conditions.push("pp.verification_status = 'verified'");
   }
+  if (filters.category && filters.category !== 'All') {
+    params.push(String(filters.category).toLowerCase());
+    conditions.push(
+      `EXISTS (
+        SELECT 1 FROM performer_categories pcat
+        WHERE pcat.performer_id = u.id AND lower(pcat.category) = $${params.length}
+      )`
+    );
+  }
+  if (filters.query) {
+    params.push(`%${String(filters.query).toLowerCase()}%`);
+    conditions.push(
+      `(lower(u.display_name) LIKE $${params.length}
+        OR lower(COALESCE(pp.stage_name, '')) LIKE $${params.length}
+        OR lower(COALESCE(pp.vibe, '')) LIKE $${params.length})`
+    );
+  }
+
+  const orderBy =
+    filters.sort === 'rating'
+      ? 'pp.rating DESC NULLS LAST, pp.follower_count DESC'
+      : filters.sort === 'viewers'
+        ? 'pp.follower_count DESC, pp.rating DESC NULLS LAST'
+        : 'pp.is_live DESC, pp.follower_count DESC';
 
   const { rows } = await query(
     `SELECT u.id, u.display_name, u.bio, u.avatar_url, u.banner_url,
@@ -104,12 +128,17 @@ async function listPerformers(filters = {}) {
       pp.is_live, pp.max_session_minutes, pp.verification_status, pp.id_verified,
       pp.can_receive_bookings,
       pc.duo_available, pc.toys_enabled, pc.replay_allowed, pc.wardrobe_available,
-      pc.game_modes
+      pc.game_modes,
+      COALESCE((
+        SELECT jsonb_agg(pcat.category ORDER BY pcat.category)
+        FROM performer_categories pcat
+        WHERE pcat.performer_id = u.id
+      ), '[]'::jsonb) AS categories
      FROM users u
      JOIN performer_profiles pp ON pp.user_id = u.id
      LEFT JOIN performer_capabilities pc ON pc.performer_id = u.id
      WHERE ${conditions.join(' AND ')}
-     ORDER BY pp.is_live DESC, pp.follower_count DESC
+     ORDER BY ${orderBy}
      LIMIT 50`,
     params
   );
@@ -135,11 +164,17 @@ async function getPerformer(identifier) {
       pp.is_live, pp.max_session_minutes, pp.verification_status, pp.id_verified,
       pp.can_receive_bookings,
       pc.duo_available, pc.toys_enabled, pc.replay_allowed, pc.wardrobe_available,
-      pc.game_modes
+      pc.game_modes,
+      COALESCE((
+        SELECT jsonb_agg(pcat.category ORDER BY pcat.category)
+        FROM performer_categories pcat
+        WHERE pcat.performer_id = u.id
+      ), '[]'::jsonb) AS categories
      FROM users u
      JOIN performer_profiles pp ON pp.user_id = u.id
      LEFT JOIN performer_capabilities pc ON pc.performer_id = u.id
-     WHERE u.id::text = $1 AND u.role = 'performer' AND u.is_active = TRUE`,
+     WHERE (u.id::text = $1 OR lower(COALESCE(pp.stage_name, u.display_name)) = lower($1))
+       AND u.role = 'performer' AND u.is_active = TRUE`,
     [identifier]
   );
 

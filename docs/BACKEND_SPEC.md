@@ -102,12 +102,13 @@ Server → Client:
 
 ## Key API Endpoints
 ```
-POST   /api/auth/register        { email, password, name, role }
-POST   /api/auth/login            { email, password }
-POST   /api/auth/refresh          (cookie-based)
-POST   /api/auth/logout
-POST   /api/auth/2fa/setup
-POST   /api/auth/2fa/verify
+GET    /api/auth/csrf            (sets vybe_csrf, returns x-vybe-csrf token)
+POST   /api/auth/register        { email, password, display_name, role, phone_number }
+POST   /api/auth/login           { email, password, twoFactorToken? }
+POST   /api/auth/refresh         (cookie + CSRF, rotates refresh token)
+POST   /api/auth/logout          (cookie + CSRF, revokes refresh token)
+POST   /api/auth/2fa/setup       (Bearer auth)
+POST   /api/auth/2fa/verify      (Bearer auth)
 
 GET    /api/performers            ?category=&sort=&live=true
 GET    /api/performers/:id        (full profile + capabilities + schedule)
@@ -117,9 +118,11 @@ GET    /api/performers/:id/requests (request menu)
 GET    /api/me                    (current user profile + viewer identity)
 GET    /api/me/achievements
 GET    /api/me/history/:performerId
-PUT    /api/me/profile            { display_name, avatar, bio }
+PATCH  /api/me                    { display_name, email, phone_number, bio }
+PUT    /api/me/password           { currentPassword, newPassword }
 
-POST   /api/sparks/purchase       { package_id, payment_token }
+GET    /api/sparks/packages       (closed-loop Spark package contracts)
+POST   /api/sparks/purchase       { package_id, payment_method_id, processor }
 GET    /api/sparks/balance
 GET    /api/sparks/transactions   ?page=&limit=
 

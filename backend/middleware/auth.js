@@ -14,7 +14,9 @@ function signAccessToken(user) {
   );
 }
 
-function signRefreshToken(user) {
+function signRefreshToken(user, { tokenId } = {}) {
+  const options = { expiresIn: '7d' };
+  if (tokenId) options.jwtid = tokenId;
   return jwt.sign(
     {
       sub: user.id,
@@ -23,7 +25,7 @@ function signRefreshToken(user) {
       token_use: 'refresh',
     },
     env.jwtRefreshSecret,
-    { expiresIn: '7d' }
+    options
   );
 }
 

@@ -1,9 +1,23 @@
+const crypto = require('node:crypto');
 const express = require('express');
+const { body, cookie } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const { env } = require('../config/env');
+const { CSRF_HEADER_NAME, issueCsrfToken, requireCsrf } = require('../middleware/csrf');
 const { loginLimiter } = require('../middleware/rateLimiter');
-const { signAccessToken, signRefreshToken } = require('../middleware/auth');
-const { loginUser, registerUser } = require('../services/authService');
+const { requireAuth, signAccessToken, signRefreshToken } = require('../middleware/auth');
+const { validate } = require('../middleware/validator');
+const {
+  loginUser,
+  registerUser,
+  startTwoFactorSetup,
+  verifyTwoFactorSetup,
+} = require('../services/authService');
+const {
+  getActiveRefreshTokenId,
+  revokeRefreshTokens,
+  setActiveRefreshTokenId,
+} = require('../services/refreshTokenStore');
 const { unauthorized } = require('../utils/errors');
 
 const router = express.Router();
@@ -19,17 +33,55 @@ function setRefreshCookie(res, token) {
 
 function authResponse(res, user) {
   const accessToken = signAccessToken(user);
-  const refreshToken = signRefreshToken(user);
+  const refreshTokenId = crypto.randomUUID();
+  setActiveRefreshTokenId(user.id, refreshTokenId);
+  const refreshToken = signRefreshToken(user, { tokenId: refreshTokenId });
   setRefreshCookie(res, refreshToken);
   return res.status(200).json({ user, accessToken, expiresInSeconds: 15 * 60 });
 }
 
-router.post('/register', async (req, res, next) => {
+const registerValidation = validate([
+  body('email').isEmail().withMessage('email must be a valid email').normalizeEmail(),
+  body('password')
+    .isString()
+    .withMessage('password must be a string')
+    .isLength({ min: 8, max: 72 })
+    .withMessage('password must be 8-72 characters'),
+  body('display_name')
+    .customSanitizer((value, { req }) => value ?? req.body.displayName ?? req.body.name)
+    .isString()
+    .withMessage('display_name must be a string')
+    .trim()
+    .isLength({ min: 2, max: 32 })
+    .withMessage('display_name must be 2-32 characters'),
+  body('role').optional().isIn(['viewer', 'performer']).withMessage('role must be viewer or performer'),
+  body('phone_number')
+    .optional({ nullable: true, checkFalsy: true })
+    .customSanitizer((value, { req }) => value ?? req.body.phoneNumber)
+    .isLength({ min: 7, max: 30 })
+    .withMessage('phone_number must be 7-30 characters'),
+]);
+
+const loginValidation = validate([
+  body('email').isEmail().withMessage('email must be a valid email').normalizeEmail(),
+  body('password').isString().withMessage('password must be a string'),
+]);
+
+const refreshValidation = validate([
+  cookie('vybe_refresh').exists().withMessage('Refresh token cookie missing'),
+]);
+
+router.get('/csrf', (req, res) => {
+  const csrfToken = issueCsrfToken(res);
+  res.status(200).json({ csrfToken, headerName: CSRF_HEADER_NAME });
+});
+
+router.post('/register', registerValidation, async (req, res, next) => {
   try {
     const user = await registerUser({
       email: req.body.email,
       password: req.body.password,
-      displayName: req.body.display_name || req.body.displayName || req.body.name,
+      displayName: req.body.display_name,
       role: req.body.role || 'viewer',
       phoneNumber: req.body.phone_number || req.body.phoneNumber || null,
     });
@@ -39,7 +91,7 @@ router.post('/register', async (req, res, next) => {
   }
 });
 
-router.post('/login', loginLimiter, async (req, res, next) => {
+router.post('/login', loginLimiter, loginValidation, async (req, res, next) => {
   try {
     const user = await loginUser(req.body);
     return authResponse(res, user);
@@ -48,14 +100,37 @@ router.post('/login', loginLimiter, async (req, res, next) => {
   }
 });
 
-router.post('/refresh', (req, res, next) => {
+router.post('/2fa/setup', requireAuth, async (req, res, next) => {
+  try {
+    const result = await startTwoFactorSetup({ userId: req.user.sub, issuer: 'VYBE' });
+    return res.status(200).json(result);
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.post('/2fa/verify', requireAuth, async (req, res, next) => {
+  try {
+    const result = await verifyTwoFactorSetup({ userId: req.user.sub, token: req.body.token });
+    return res.status(200).json(result);
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.post('/refresh', refreshValidation, requireCsrf, (req, res, next) => {
   try {
     const token = req.cookies.vybe_refresh;
     if (!token) throw unauthorized('Refresh token missing');
 
     const payload = jwt.verify(token, env.jwtRefreshSecret);
-    if (payload.token_use !== 'refresh') {
+    if (payload.token_use !== 'refresh' || !payload.jti) {
       throw unauthorized('Invalid refresh token');
+    }
+
+    const expectedTokenId = getActiveRefreshTokenId(payload.sub);
+    if (!expectedTokenId || expectedTokenId !== payload.jti) {
+      throw unauthorized('Invalid or rotated refresh token');
     }
 
     const user = {
@@ -63,17 +138,32 @@ router.post('/refresh', (req, res, next) => {
       role: payload.role,
       display_name: payload.display_name || '',
     };
+    const rotatedTokenId = crypto.randomUUID();
+    setActiveRefreshTokenId(user.id, rotatedTokenId);
+    setRefreshCookie(res, signRefreshToken(user, { tokenId: rotatedTokenId }));
+
     return res.status(200).json({
       accessToken: signAccessToken(user),
       expiresInSeconds: 15 * 60,
     });
   } catch (error) {
+    res.clearCookie('vybe_refresh');
     return next(unauthorized('Invalid or expired refresh token'));
   }
 });
 
-router.post('/logout', (req, res) => {
+router.post('/logout', requireCsrf, (req, res) => {
+  const token = req.cookies.vybe_refresh;
+  if (token) {
+    try {
+      const payload = jwt.verify(token, env.jwtRefreshSecret);
+      revokeRefreshTokens(payload.sub);
+    } catch (error) {
+      // Ignore invalid logout cookies; clearing them is enough.
+    }
+  }
   res.clearCookie('vybe_refresh');
+  res.clearCookie('vybe_csrf');
   res.status(204).end();
 });
 

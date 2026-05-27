@@ -24,8 +24,9 @@ CREATE TABLE users (
   age_verification_token TEXT,
   birth_month SMALLINT CHECK (birth_month BETWEEN 1 AND 12),
   birth_day SMALLINT CHECK (birth_day BETWEEN 1 AND 31),
+  priority_weight INTEGER DEFAULT 1,
   geo_blocked BOOLEAN DEFAULT FALSE,
-  is_verified BOOLEAN DEFAULT FALSE, -- age verified (Yoti for viewers, 2257 for performers)
+  is_verified BOOLEAN DEFAULT FALSE, -- age verified (third-party provider for viewers, 2257 for performers)
   is_active BOOLEAN DEFAULT TRUE,
   two_factor_enabled BOOLEAN DEFAULT FALSE,
   two_factor_secret VARCHAR(255),
@@ -69,6 +70,27 @@ CREATE TABLE viewer_achievements (
   achievement_key VARCHAR(50) NOT NULL, -- 'first_win', '5_streak', 'centurion', etc.
   achieved_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, achievement_key)
+);
+
+CREATE TABLE daily_login_rewards (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  reward_date DATE NOT NULL,
+  streak_count INTEGER NOT NULL DEFAULT 1,
+  sparks_awarded INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, reward_date)
+);
+
+CREATE TABLE concierge_assignments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  viewer_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  concierge_user_id UUID REFERENCES users(id),
+  tier_name VARCHAR(30) NOT NULL,
+  status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'paused', 'ended')),
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE viewer_performer_history (
@@ -138,6 +160,13 @@ CREATE TABLE performer_capabilities (
   game_modes JSONB DEFAULT '[]'::jsonb -- array of enabled game mode IDs
 );
 
+CREATE TABLE performer_categories (
+  performer_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  category VARCHAR(50) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (performer_id, category)
+);
+
 CREATE TABLE performer_schedule (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   performer_id UUID REFERENCES users(id) ON DELETE CASCADE,
@@ -165,6 +194,7 @@ CREATE TABLE spark_transactions (
   amount INTEGER NOT NULL, -- positive = credit, negative = debit
   balance_after INTEGER NOT NULL,
   source VARCHAR(40), -- closed-loop source or sink, no user-to-user transfers
+  is_bonus BOOLEAN DEFAULT FALSE,
   bonus_spark BOOLEAN DEFAULT FALSE,
   expires_at TIMESTAMPTZ,
   expired_at TIMESTAMPTZ,
@@ -521,6 +551,9 @@ CREATE INDEX idx_chat_room ON chat_messages(room_id, created_at DESC);
 CREATE INDEX idx_dm_recipient ON direct_messages(recipient_id, is_read, created_at DESC);
 CREATE INDEX idx_subs_performer ON subscriptions(performer_id, status);
 CREATE INDEX idx_viewer_history ON viewer_performer_history(viewer_id);
+CREATE INDEX idx_daily_login_rewards_user_date ON daily_login_rewards(user_id, reward_date DESC);
+CREATE INDEX idx_concierge_assignments_viewer ON concierge_assignments(viewer_id, status);
+CREATE INDEX idx_performer_categories_category ON performer_categories(category, performer_id);
 CREATE INDEX idx_banners_expires_at ON platform_banners(expires_at);
 CREATE INDEX idx_banners_type_created ON platform_banners(type, created_at DESC);
 CREATE INDEX idx_perf_live ON performer_profiles(is_live) WHERE is_live = TRUE;

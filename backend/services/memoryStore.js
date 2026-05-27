@@ -156,6 +156,21 @@ const LOYALTY_TIERS = [
   { name: 'Diamond', min: 25000, sparkBack: 20, color: '#67e8f9' },
 ];
 
+const DEMO_ACHIEVEMENTS = [
+  {
+    achievement_key: 'first_win',
+    achieved_at: '2026-01-09T18:00:00.000Z',
+  },
+  {
+    achievement_key: 'crown_drop',
+    achieved_at: '2026-01-08T21:00:00.000Z',
+  },
+  {
+    achievement_key: 'centurion',
+    achieved_at: '2026-01-07T22:00:00.000Z',
+  },
+];
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -209,6 +224,7 @@ function createInitialState() {
         },
       ],
     ]),
+    viewerAchievements: new Map([[MEMORY_IDS.viewer, DEMO_ACHIEVEMENTS.map((item) => ({ ...item }))]]),
     performerProfiles: new Map([
       ...DEMO_PERFORMERS.map((performer) => [
         performer.id,
@@ -262,6 +278,10 @@ function snapshotMemoryStore() {
   return {
     users: Array.from(state.users.values()),
     viewerProfiles: Array.from(state.viewerProfiles.values()),
+    viewerAchievements: Array.from(state.viewerAchievements.entries()).map(([userId, achievements]) => ({
+      userId,
+      achievements: achievements.map((item) => ({ ...item })),
+    })),
     performerDirectory: [...state.performerDirectory],
     giftsSent: [...state.giftsSent],
     sparkTransactions: [...state.sparkTransactions],

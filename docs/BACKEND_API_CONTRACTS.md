@@ -158,6 +158,30 @@ Requires auth.
 
 Returns the current viewer, spark balance, loyalty tier, and performer history.
 
+### `GET /api/me/achievements`
+
+Requires auth.
+
+Returns the viewer's earned achievements (demo data is deterministic when the memory adapter is active).
+
+Returns:
+
+```json
+{
+  "userId": "11111111-1111-4111-8111-111111111111",
+  "achievements": [
+    {
+      "id": "96aaedcb-361f-9690-c485-1b9d41e991da",
+      "key": "first_win",
+      "title": "First Win",
+      "description": "Win your first game.",
+      "category": "games",
+      "achievedAt": "2026-01-09T18:00:00.000Z"
+    }
+  ]
+}
+```
+
 ### `GET /api/me/history/:performerId`
 
 Requires auth.

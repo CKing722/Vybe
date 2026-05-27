@@ -3,6 +3,7 @@ const { body } = require('express-validator');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { validate } = require('../middleware/validator');
 const { getCurrentViewer, updateViewerProfile } = require('../services/profileService');
+const { getViewerAchievements } = require('../services/achievementService');
 const { getViewerPerformerHistory } = require('../services/viewerHistoryService');
 
 const router = express.Router();
@@ -11,6 +12,15 @@ router.get('/me', requireAuth, async (req, res, next) => {
   try {
     const profile = await getCurrentViewer(req.user.sub);
     res.status(200).json(profile);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/me/achievements', requireAuth, async (req, res, next) => {
+  try {
+    const achievements = await getViewerAchievements(req.user.sub);
+    res.status(200).json(achievements);
   } catch (error) {
     next(error);
   }

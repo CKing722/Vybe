@@ -144,6 +144,14 @@ test('HTTP endpoints return OpenAPI-compliant JSON payloads (vertical slice)', a
         expectedStatus: 200,
       },
       {
+        name: 'GET /api/games/leaderboard/{performerId}',
+        openapiPath: '/api/games/leaderboard/{performerId}',
+        method: 'get',
+        url: `${baseUrl}/api/games/leaderboard/${MEMORY_IDS.performer}?limit=5`,
+        headers: {},
+        expectedStatus: 200,
+      },
+      {
         name: 'POST /api/games/questions',
         openapiPath: '/api/games/questions',
         method: 'post',

@@ -423,6 +423,29 @@ paths:
               schema:
                 $ref: "#/components/schemas/ActiveBannersResponse"
 
+  /api/games/leaderboard/{performerId}:
+    get:
+      tags: [games]
+      summary: Get performer leaderboard
+      parameters:
+        - name: performerId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 25 }
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameLeaderboardResponse"
+        "404":
+          $ref: "#/components/responses/ApiError"
+
   /api/games/questions:
     post:
       tags: [games]
@@ -998,3 +1021,25 @@ components:
           items:
             $ref: "#/components/schemas/GameQuestion"
       required: [provider, paidProviderUsed, rawProviderApisEnabled, questions]
+
+    GameLeaderboardEntry:
+      type: object
+      properties:
+        rank: { type: integer, minimum: 1 }
+        viewerId: { type: string, format: uuid }
+        displayName: { type: string }
+        avatarUrl: { type: ["string", "null"] }
+        sparksSpent: { type: integer }
+        lastInteraction: { type: ["string", "null"] }
+      required: [rank, viewerId, displayName, avatarUrl, sparksSpent, lastInteraction]
+
+    GameLeaderboardResponse:
+      type: object
+      properties:
+        performerId: { type: string }
+        updatedAt: { type: string }
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/GameLeaderboardEntry"
+      required: [performerId, updatedAt, entries]

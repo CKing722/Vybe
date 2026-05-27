@@ -3,6 +3,7 @@ const { badRequest, conflict, notFound } = require('../utils/errors');
 const { createPlatformBanner } = require('./bannerService');
 const { getGiftType } = require('./giftCatalog');
 const { getMemoryState, randomId } = require('./memoryStore');
+const { spendSparksFromProfile, spendSparksWithDatabase } = require('./sparkLedgerService');
 
 function giftAnimationPayload({ gift, senderName, giftId }) {
   return {
@@ -54,16 +55,9 @@ async function sendGiftInMemory({ senderId, performerId, giftTypeId, roomId }) {
   if (!viewerProfile) {
     throw notFound('Viewer profile not found');
   }
-  if (viewerProfile.sparks < gift.cost) {
-    throw conflict('Insufficient sparks', {
-      balance: viewerProfile.sparks,
-      required: gift.cost,
-    });
-  }
-
   const performerEarnings = Math.floor(gift.cost * 0.8);
   const platformFee = gift.cost - performerEarnings;
-  viewerProfile.sparks -= gift.cost;
+  const spend = spendSparksFromProfile(viewerProfile, gift.cost);
 
   const giftSent = {
     id: randomId(),
@@ -83,10 +77,18 @@ async function sendGiftInMemory({ senderId, performerId, giftTypeId, roomId }) {
     user_id: senderId,
     type: 'gift_sent',
     amount: -gift.cost,
-    balance_after: viewerProfile.sparks,
+    balance_after: spend.balanceAfter,
+    source: 'gift',
+    bonus_spark: false,
     reference_id: giftSent.id,
     performer_id: performerId,
-    metadata: { gift_type_id: gift.id, room_id: roomId },
+    metadata: {
+      gift_type_id: gift.id,
+      room_id: roomId,
+      purchased_sparks_spent: spend.purchasedSpent,
+      bonus_sparks_spent: spend.bonusSpent,
+      closed_loop: true,
+    },
     created_at: giftSent.created_at,
   });
 
@@ -96,6 +98,8 @@ async function sendGiftInMemory({ senderId, performerId, giftTypeId, roomId }) {
     type: 'gift_received',
     amount: performerEarnings,
     balance_after: 0,
+    source: 'performer_earnings',
+    bonus_spark: false,
     reference_id: giftSent.id,
     performer_id: performerId,
     metadata: { gross_sparks: gift.cost, platform_fee: platformFee, room_id: roomId },
@@ -137,7 +141,13 @@ async function sendGiftInMemory({ senderId, performerId, giftTypeId, roomId }) {
       platformFee,
       createdAt: giftSent.created_at,
     },
-    balance: viewerProfile.sparks,
+    balance: spend.balanceAfter,
+    balanceDetails: {
+      purchasedSparks: spend.purchasedSparks,
+      bonusSparks: spend.bonusSparks,
+      purchasedSparksSpent: spend.purchasedSpent,
+      bonusSparksSpent: spend.bonusSpent,
+    },
     animation: giftAnimationPayload({
       gift,
       senderName: sender.display_name,
@@ -162,13 +172,6 @@ async function sendGiftWithDatabase(client, { senderId, performerId, giftTypeId,
   if (!viewer) {
     throw notFound('Viewer not found');
   }
-  if (Number(viewer.sparks) < gift.cost) {
-    throw conflict('Insufficient sparks', {
-      balance: Number(viewer.sparks),
-      required: gift.cost,
-    });
-  }
-
   const performerResult = await client.query(
     `SELECT u.id, u.display_name
      FROM users u
@@ -183,7 +186,8 @@ async function sendGiftWithDatabase(client, { senderId, performerId, giftTypeId,
 
   const performerEarnings = Math.floor(gift.cost * 0.8);
   const platformFee = gift.cost - performerEarnings;
-  const balanceAfter = Number(viewer.sparks) - gift.cost;
+  const spend = await spendSparksWithDatabase(client, senderId, gift.cost);
+  const balanceAfter = spend.balanceAfter;
 
   const giftResult = await client.query(
     `INSERT INTO gifts_sent (
@@ -196,25 +200,26 @@ async function sendGiftWithDatabase(client, { senderId, performerId, giftTypeId,
   );
   const giftSent = giftResult.rows[0];
 
-  await client.query('UPDATE viewer_profiles SET sparks = $1 WHERE user_id = $2', [
-    balanceAfter,
-    senderId,
-  ]);
-
   await client.query(
     `INSERT INTO spark_transactions (
-      user_id, type, amount, balance_after, reference_id, performer_id, metadata
+      user_id, type, amount, balance_after, source, bonus_spark, reference_id, performer_id, metadata
     )
     VALUES
-      ($1, 'gift_sent', $2, $3, $4, $5, $6),
-      ($5, 'gift_received', $7, 0, $4, $5, $8)`,
+      ($1, 'gift_sent', $2, $3, 'gift', FALSE, $4, $5, $6),
+      ($5, 'gift_received', $7, 0, 'performer_earnings', FALSE, $4, $5, $8)`,
     [
       senderId,
       -gift.cost,
       balanceAfter,
       giftSent.id,
       performerId,
-      { gift_type_id: gift.id, room_id: roomId },
+      {
+        gift_type_id: gift.id,
+        room_id: roomId,
+        purchased_sparks_spent: spend.purchasedSpent,
+        bonus_sparks_spent: spend.bonusSpent,
+        closed_loop: true,
+      },
       performerEarnings,
       { gross_sparks: gift.cost, platform_fee: platformFee, room_id: roomId },
     ]
@@ -255,6 +260,12 @@ async function sendGiftWithDatabase(client, { senderId, performerId, giftTypeId,
       createdAt: giftSent.created_at,
     },
     balance: balanceAfter,
+    balanceDetails: {
+      purchasedSparks: spend.purchasedSparks,
+      bonusSparks: spend.bonusSparks,
+      purchasedSparksSpent: spend.purchasedSpent,
+      bonusSparksSpent: spend.bonusSpent,
+    },
     animation: giftAnimationPayload({
       gift,
       senderName: viewer.display_name,

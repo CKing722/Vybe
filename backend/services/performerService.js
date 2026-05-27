@@ -36,6 +36,13 @@ function normalizePerformer(row) {
       hoursLive: Number(row.total_hours_live || 0),
       followers: Number(row.follower_count || 0),
     },
+    compliance: {
+      verificationStatus: row.verification_status || (row.is_live ? 'verified' : 'pending'),
+      idVerified: Boolean(row.id_verified || row.verification_status === 'verified' || row.is_live),
+      canReceiveBookings: Boolean(
+        row.can_receive_bookings || row.verification_status === 'verified' || row.is_live
+      ),
+    },
     requests: row.requests || [],
     posts: row.posts || [],
     isLive: Boolean(row.is_live),
@@ -87,13 +94,15 @@ async function listPerformers(filters = {}) {
 
   if (filters.live === 'true') {
     conditions.push('pp.is_live = TRUE');
+    conditions.push("pp.verification_status = 'verified'");
   }
 
   const { rows } = await query(
     `SELECT u.id, u.display_name, u.bio, u.avatar_url, u.banner_url,
       pp.stage_name, pp.vibe, pp.accent_color, pp.subscription_price, pp.trial_days,
       pp.rating, pp.total_sessions, pp.total_hours_live, pp.follower_count,
-      pp.is_live, pp.max_session_minutes,
+      pp.is_live, pp.max_session_minutes, pp.verification_status, pp.id_verified,
+      pp.can_receive_bookings,
       pc.duo_available, pc.toys_enabled, pc.replay_allowed, pc.wardrobe_available,
       pc.game_modes
      FROM users u
@@ -123,7 +132,8 @@ async function getPerformer(identifier) {
     `SELECT u.id, u.display_name, u.bio, u.avatar_url, u.banner_url,
       pp.stage_name, pp.vibe, pp.accent_color, pp.subscription_price, pp.trial_days,
       pp.rating, pp.total_sessions, pp.total_hours_live, pp.follower_count,
-      pp.is_live, pp.max_session_minutes,
+      pp.is_live, pp.max_session_minutes, pp.verification_status, pp.id_verified,
+      pp.can_receive_bookings,
       pc.duo_available, pc.toys_enabled, pc.replay_allowed, pc.wardrobe_available,
       pc.game_modes
      FROM users u

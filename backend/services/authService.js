@@ -5,7 +5,7 @@ const { badRequest, conflict, unauthorized } = require('../utils/errors');
 const { getMemoryState, randomId } = require('./memoryStore');
 
 const PUBLIC_USER_COLUMNS =
-  'id, email, display_name, role, avatar_url, banner_url, bio, is_verified, is_active, created_at';
+  'id, email, display_name, role, avatar_url, banner_url, bio, phone_number, country_code, region_code, age_verified, is_verified, is_active, created_at';
 
 function publicUser(user) {
   return {
@@ -16,6 +16,10 @@ function publicUser(user) {
     avatar_url: user.avatar_url || null,
     banner_url: user.banner_url || null,
     bio: user.bio || null,
+    phone_number: user.phone_number || null,
+    country_code: user.country_code || null,
+    region_code: user.region_code || null,
+    age_verified: Boolean(user.age_verified),
     is_verified: Boolean(user.is_verified),
     is_active: Boolean(user.is_active),
     created_at: user.created_at,
@@ -28,7 +32,7 @@ function validateRole(role) {
   }
 }
 
-async function registerUser({ email, password, displayName, role = 'viewer' }) {
+async function registerUser({ email, password, displayName, role = 'viewer', phoneNumber = null }) {
   if (!email || !password || !displayName) {
     throw badRequest('email, password, and displayName are required');
   }
@@ -37,7 +41,7 @@ async function registerUser({ email, password, displayName, role = 'viewer' }) {
   const passwordHash = await bcrypt.hash(password, env.bcryptRounds);
 
   if (!hasDatabase()) {
-    return registerMemoryUser({ email, passwordHash, displayName, role });
+    return registerMemoryUser({ email, passwordHash, displayName, role, phoneNumber });
   }
 
   return withTransaction(async (client) => {
@@ -47,10 +51,10 @@ async function registerUser({ email, password, displayName, role = 'viewer' }) {
     }
 
     const result = await client.query(
-      `INSERT INTO users (email, password_hash, display_name, role)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO users (email, password_hash, display_name, role, phone_number)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING ${PUBLIC_USER_COLUMNS}`,
-      [email, passwordHash, displayName, role]
+      [email, passwordHash, displayName, role, phoneNumber]
     );
     const user = result.rows[0];
 
@@ -68,7 +72,7 @@ async function registerUser({ email, password, displayName, role = 'viewer' }) {
   });
 }
 
-function registerMemoryUser({ email, passwordHash, displayName, role }) {
+function registerMemoryUser({ email, passwordHash, displayName, role, phoneNumber }) {
   const state = getMemoryState();
   const normalizedEmail = email.toLowerCase();
   const exists = Array.from(state.users.values()).some(
@@ -86,6 +90,8 @@ function registerMemoryUser({ email, passwordHash, displayName, role }) {
     password_hash: passwordHash,
     display_name: displayName,
     role,
+    phone_number: phoneNumber,
+    age_verified: false,
     is_verified: false,
     is_active: true,
     created_at: now,
@@ -96,11 +102,16 @@ function registerMemoryUser({ email, passwordHash, displayName, role }) {
     state.viewerProfiles.set(id, {
       user_id: id,
       sparks: 0,
+      purchased_sparks: 0,
+      bonus_sparks: 0,
       total_spent: 0,
       games_played: 0,
       games_won: 0,
       sparks_earned: 0,
       total_sessions: 0,
+      daily_login_streak: 0,
+      priority_weight: 1,
+      vip_membership_status: 'none',
     });
   } else {
     state.performerProfiles.set(id, {

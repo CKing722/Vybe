@@ -150,11 +150,17 @@ const DEMO_PERFORMERS = [
 
 const LOYALTY_TIERS = [
   { name: 'Bronze', min: 0, sparkBack: 0, color: '#cd7f32' },
-  { name: 'Silver', min: 200, sparkBack: 5, color: '#c0c0c0' },
-  { name: 'Gold', min: 1000, sparkBack: 10, color: '#fbbf24' },
-  { name: 'Platinum', min: 5000, sparkBack: 15, color: '#a78bfa' },
-  { name: 'Diamond', min: 25000, sparkBack: 20, color: '#67e8f9' },
+  { name: 'Silver', min: 200, sparkBack: 3, color: '#c0c0c0' },
+  { name: 'Gold', min: 1000, sparkBack: 5, color: '#ffd700' },
+  { name: 'Platinum', min: 5000, sparkBack: 8, color: '#e5e4e2' },
+  { name: 'Diamond', min: 25000, sparkBack: 10, color: '#67e8f9' },
 ];
+
+function bonusExpiryIso(days = 90) {
+  const expires = new Date();
+  expires.setUTCDate(expires.getUTCDate() + days);
+  return expires.toISOString();
+}
 
 function nowIso() {
   return new Date().toISOString();
@@ -173,6 +179,9 @@ function createInitialState() {
           password_hash: demoPasswordHash,
           display_name: 'VelvetKing',
           role: 'viewer',
+          age_verified: true,
+          age_verification_provider: 'demo',
+          age_verification_date: nowIso(),
           is_active: true,
           created_at: nowIso(),
         },
@@ -185,6 +194,7 @@ function createInitialState() {
           password_hash: demoPasswordHash,
           display_name: 'Luna Voss',
           role: 'performer',
+          age_verified: true,
           is_active: true,
           created_at: nowIso(),
         },
@@ -196,11 +206,17 @@ function createInitialState() {
         {
           user_id: MEMORY_IDS.viewer,
           sparks: 10000,
+          purchased_sparks: 9000,
+          bonus_sparks: 1000,
+          bonus_sparks_expires_at: bonusExpiryIso(),
           total_spent: 0,
           games_played: 0,
           games_won: 0,
           sparks_earned: 0,
           total_sessions: 0,
+          daily_login_streak: 0,
+          priority_weight: 1,
+          vip_membership_status: 'none',
         },
       ],
     ]),
@@ -220,15 +236,27 @@ function createInitialState() {
           follower_count: performer.stats.followers,
           is_live: performer.is_live,
           max_session_minutes: performer.caps.maxMins,
+          legal_name: performer.stage_name,
+          stage_names: [performer.stage_name],
+          verification_status: 'verified',
+          verification_date: nowIso(),
+          verification_ref: 'demo-2257-ref',
+          contractor_agreement_signed: true,
+          model_release_signed: true,
+          w9_submitted: true,
+          custodian_record_id: `demo-${performer.slug}`,
         },
       ]),
     ]),
     performerDirectory: DEMO_PERFORMERS.map((performer) => ({ ...performer })),
     giftTypes: GIFT_TYPES.map((gift) => ({ ...gift })),
     giftsSent: [],
+    sparkPurchases: [],
     sparkTransactions: [],
     banners: [],
     viewerPerformerHistory: new Map(),
+    complianceEvents: [],
+    paymentMethods: new Map(),
   };
 }
 
@@ -249,8 +277,10 @@ function snapshotMemoryStore() {
     viewerProfiles: Array.from(state.viewerProfiles.values()),
     performerDirectory: [...state.performerDirectory],
     giftsSent: [...state.giftsSent],
+    sparkPurchases: [...state.sparkPurchases],
     sparkTransactions: [...state.sparkTransactions],
     banners: [...state.banners],
+    complianceEvents: [...state.complianceEvents],
   };
 }
 

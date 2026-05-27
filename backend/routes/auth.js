@@ -31,6 +31,7 @@ router.post('/register', async (req, res, next) => {
       password: req.body.password,
       displayName: req.body.display_name || req.body.displayName || req.body.name,
       role: req.body.role || 'viewer',
+      phoneNumber: req.body.phone_number || req.body.phoneNumber || null,
     });
     return authResponse(res, user);
   } catch (error) {

@@ -224,7 +224,7 @@ const LEGAL_COPY={
   "/terms":{title:"Terms of Service",eyebrow:"Legal",body:["Attorney-drafted Terms of Service will live here before launch. This route is wired so payment processors, reviewers, and compliance partners can inspect the full policy surface.","Sparks are designed as closed-loop, non-transferable digital tokens redeemable only inside VYBE. They have no cash value and cannot be exchanged for currency by viewers.","Production launch requires finalized refund, cancellation, performer, user conduct, arbitration, and acceptable-use language."]},
   "/privacy":{title:"Privacy Policy",eyebrow:"Privacy",body:["Attorney-drafted privacy policy will live here before launch, including CCPA/CPRA disclosures, cookie categories, data retention, and user rights workflows.","The product direction is to minimize sensitive retention: raw identity documents should be handled by the verification provider whenever legally permissible, while VYBE stores reference tokens and compliance status.","Payment, age verification, analytics, and moderation vendors must be listed before production."]},
   "/dmca":{title:"DMCA Policy",eyebrow:"Trust & Safety",body:["This page will host the public DMCA policy and takedown intake form. The form should route notices into the moderation queue and preserve all submitted evidence for review.","Launch version needs fields for claimant identity, copyrighted work, allegedly infringing URL, sworn statements, signature, and counter-notice handling.","Do not launch paid content without this workflow and a designated agent process."]},
-  "/2257":{title:"18 U.S.C. 2257 Compliance Statement",eyebrow:"Compliance",body:["The final 2257 statement must identify the custodian of records and the required physical United States address before launch.","No performer should be able to go live, upload content, receive bookings, or receive payouts until identity, age, stage names, model release, contractor agreement, and required tax documents are verified.","This page is infrastructure only until counsel supplies final custodian language."]}
+  "/2257":{title:"18 U.S.C. 2257 Compliance Statement",eyebrow:"Compliance",body:["Attorney-reviewed final language is required before launch. The final 2257 statement must identify the custodian of records and the required physical United States address.","No performer should be able to go live, upload content, receive bookings, or receive payouts until identity, age, stage names, model release, contractor agreement, and required tax documents are verified.","This page is infrastructure only until counsel supplies final custodian language."]}
 };
 const HOME_STATS=[["Live rooms previewed","128"],["Games played today","18,420"],["Viewer sparks in motion","2.4M"]];
 
@@ -247,6 +247,8 @@ body,#root{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:va
 .ai{animation:fi .3s ease both}
 input[type=text],input[type=email],input[type=tel],input[type=password],select{background:var(--cd);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:8px 12px;font:inherit;outline:none;width:100%}input[type=text]:focus,input[type=email]:focus,input[type=tel]:focus,input[type=password]:focus,select:focus{border-color:var(--cy)}
 html{scroll-behavior:smooth}a{color:inherit;text-decoration:none}
+.pub-menu,.pub-actions{display:flex}.pub-hamb{display:none}
+@media(max-width:720px){.pub-menu,.pub-actions{display:none}.pub-hamb{display:grid}.pub-menu.open{display:grid;grid-template-columns:1fr;width:100%;gap:4px;order:3}.pub-actions.open{display:flex;width:100%;order:4}.pub-actions.open button{flex:1}.pub-nav-inner{display:grid!important;grid-template-columns:1fr auto!important}.hero-scene{opacity:.42;transform:translateX(24%) scale(.94);transform-origin:center right}}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}`;
 
 /* ═══ SHARED ═══ */
@@ -293,14 +295,16 @@ const Logo=({onClick})=><button type="button" onClick={onClick} style={{display:
 </button>;
 
 function PublicNav({go,onJoin,onLogin,onAdult}) {
+  const [open,setOpen]=useState(false);
   const nav=[["Explore",onAdult],["How It Works",()=>go("/how-it-works")],["Games",()=>go("/games")],["Sparks",()=>go("/sparks")],["Become a Performer",()=>go("/performers/apply")]];
   return <div style={{position:"sticky",top:0,zIndex:30,background:"rgba(6,8,15,.72)",borderBottom:"1px solid rgba(255,255,255,.07)",backdropFilter:"blur(18px)",WebkitBackdropFilter:"blur(18px)"}}>
-    <div style={{maxWidth:1180,margin:"0 auto",padding:"12px clamp(14px,4vw,28px)",display:"flex",alignItems:"center",justifyContent:"space-between",gap:14,flexWrap:"wrap"}}>
+    <div className="pub-nav-inner" style={{maxWidth:1180,margin:"0 auto",padding:"12px clamp(14px,4vw,28px)",display:"flex",alignItems:"center",justifyContent:"space-between",gap:14,flexWrap:"wrap"}}>
       <Logo onClick={()=>go("/")}/>
-      <div style={{display:"flex",alignItems:"center",gap:4,flexWrap:"wrap",justifyContent:"center"}}>
-        {nav.map(([label,fn])=><button key={label} type="button" onClick={fn} style={{height:34,padding:"0 10px",border:0,borderRadius:9,background:"transparent",color:"rgba(255,255,255,.72)",font:"inherit",fontSize:".72rem",fontWeight:800,cursor:"pointer"}}>{label}</button>)}
+      <button className="pub-hamb" type="button" aria-label="Menu" onClick={()=>setOpen(p=>!p)} style={{width:38,height:38,borderRadius:10,border:"1px solid var(--bd)",background:"rgba(255,255,255,.045)",color:"#fff",placeItems:"center",cursor:"pointer"}}><I n={open?"close":"menu"} s={16}/></button>
+      <div className={`pub-menu ${open?"open":""}`} style={{alignItems:"center",gap:4,flexWrap:"wrap",justifyContent:"center"}}>
+        {nav.map(([label,fn])=><button key={label} type="button" onClick={()=>{setOpen(false);fn()}} style={{height:34,padding:"0 10px",border:0,borderRadius:9,background:"transparent",color:"rgba(255,255,255,.72)",font:"inherit",fontSize:".72rem",fontWeight:800,cursor:"pointer",textAlign:"left"}}>{label}</button>)}
       </div>
-      <div style={{display:"flex",alignItems:"center",gap:8}}><Btn small onClick={onLogin}>Login</Btn><Btn small primary onClick={onJoin}>Join Free</Btn></div>
+      <div className={`pub-actions ${open?"open":""}`} style={{alignItems:"center",gap:8}}><Btn small onClick={()=>{setOpen(false);onLogin()}}>Login</Btn><Btn small primary onClick={()=>{setOpen(false);onJoin()}}>Join Free</Btn></div>
     </div>
   </div>;
 }
@@ -320,7 +324,7 @@ function PublicFooter({go}) {
 
 function HeroScene() {
   const cards=PERFS.slice(0,4);
-  return <div aria-hidden="true" style={{position:"absolute",inset:0,overflow:"hidden"}}>
+  return <div className="hero-scene" aria-hidden="true" style={{position:"absolute",inset:0,overflow:"hidden"}}>
     <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at 54% 42%,rgba(255,45,120,.18),transparent 34%),radial-gradient(ellipse at 36% 72%,rgba(0,212,255,.13),transparent 30%),linear-gradient(180deg,#090d18,#080910 68%,#06080f)"}}/>
     <div style={{position:"absolute",left:"50%",top:"50%",width:"min(820px,92vw)",height:"min(520px,70vh)",transform:"translate(-50%,-42%)",border:"1px solid rgba(255,255,255,.08)",borderRadius:22,background:"linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.015))",boxShadow:"0 50px 160px rgba(0,0,0,.5)",animation:"drift 7s ease-in-out infinite"}}>
       <div style={{position:"absolute",inset:18,borderRadius:18,border:"1px solid rgba(255,255,255,.06)",background:"rgba(5,8,16,.38)"}}>
@@ -364,7 +368,7 @@ function HomePage({go,onJoin,onLogin,onAdult}) {
 function PublicInfoPage({path,go,onJoin,onLogin,onAdult}) {
   const isGames=path==="/games",isSparks=path==="/sparks",isApply=path==="/performers/apply";
   const title=isGames?"Game Modes":isSparks?"Sparks & Loyalty":isApply?"Performer Application":"How VYBE Works";
-  return <div style={{minHeight:"100vh",background:"var(--bg)"}}><PublicNav go={go} onJoin={onJoin} onLogin={onLogin} onAdult={onAdult}/><main style={{maxWidth:1080,margin:"0 auto",padding:"54px clamp(16px,5vw,54px)"}}><Kk>{isApply?"Supply":"Platform"}</Kk><Tt s="clamp(2rem,5vw,4rem)">{title}</Tt><p style={{maxWidth:720,fontSize:".92rem",lineHeight:1.7,color:"var(--mt)",marginTop:12}}>{isGames?"Every VYBE room is built around interaction. These modes are free to enter, with risk and reward expressed through clear Spark rules.":isSparks?"Sparks are a closed-loop access currency. Purchased and bonus balances stay separate, bonus Sparks expire, and loyalty status is earned by lifetime spend.":isApply?"Performer onboarding will require age verification, 2257 records, contractor paperwork, model release, W-9, payout setup, and moderation review before going live.":"VYBE combines premium live rooms, consent-safe performer controls, room games, Spark economy, and persistent viewer reputation."}</p>{isGames?<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12,marginTop:26}}>{GAMES.map(g=><G key={g.id} style={{padding:16}}><I n={g.icon} s={22} c={g.color}/><h3 style={{marginTop:10,fontWeight:1000}}>{g.name}</h3><p style={{fontSize:".72rem",lineHeight:1.5,color:"var(--mt)",marginTop:6}}>{g.desc}</p><Tag color="var(--am)">{gameEconomyLine(g.type)}</Tag></G>)}</div>:isSparks?<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:12,marginTop:26}}>{SPARK_PKGS.map(p=><G key={p.id} style={{padding:16,borderColor:p.pop?"rgba(255,45,120,.55)":"var(--bd)"}}><Kk>{p.pop?"Most Popular":p.label}</Kk><div style={{fontSize:"1.8rem",fontWeight:1000,color:"var(--am)"}}>{p.total.toLocaleString()}</div><div style={{fontSize:".72rem",color:"var(--mt)"}}>{p.sparks.toLocaleString()} purchased + {p.bonusSparks.toLocaleString()} bonus</div><div style={{fontWeight:1000,marginTop:10}}>{p.price}</div></G>)}</div>:<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12,marginTop:26}}>{["Public SFW homepage","Age-gated adult content","Verified performer onboarding","Closed-loop Sparks","Loyalty and concierge lanes","Trust and safety queue"].map((x,i)=><G key={x} style={{padding:16}}><Tag color={["var(--pk)","var(--cy)","var(--am)"][i%3]}>Step {i+1}</Tag><h3 style={{fontSize:".95rem",fontWeight:1000,marginTop:10}}>{x}</h3></G>)}</div>}</main><PublicFooter go={go}/></div>;
+  return <div style={{minHeight:"100vh",background:"var(--bg)"}}><PublicNav go={go} onJoin={onJoin} onLogin={onLogin} onAdult={onAdult}/><main style={{maxWidth:1080,margin:"0 auto",padding:"54px clamp(16px,5vw,54px)"}}><Kk>{isApply?"Supply":"Platform"}</Kk><Tt s="clamp(2rem,5vw,4rem)">{title}</Tt><p style={{maxWidth:720,fontSize:".92rem",lineHeight:1.7,color:"var(--mt)",marginTop:12}}>{isGames?"Every VYBE room is built around interaction. These modes are free to enter, with risk and reward expressed through clear Spark rules.":isSparks?"Sparks are a closed-loop access currency. Purchased and bonus balances stay separate, bonus Sparks expire, spend first, have no cash value, and cannot be transferred or cashed out.":isApply?"Performer onboarding will require age verification, 2257 records, contractor paperwork, model release, W-9, payout setup, and moderation review before going live.":"VYBE combines premium live rooms, consent-safe performer controls, room games, Spark economy, and persistent viewer reputation."}</p>{isGames?<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12,marginTop:26}}>{GAMES.map(g=><G key={g.id} style={{padding:16}}><I n={g.icon} s={22} c={g.color}/><h3 style={{marginTop:10,fontWeight:1000}}>{g.name}</h3><p style={{fontSize:".72rem",lineHeight:1.5,color:"var(--mt)",marginTop:6}}>{g.desc}</p><Tag color="var(--am)">{gameEconomyLine(g.type)}</Tag></G>)}</div>:isSparks?<><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:12,marginTop:26}}>{SPARK_PKGS.map(p=><G key={p.id} style={{padding:16,borderColor:p.pop?"rgba(255,45,120,.55)":"var(--bd)"}}><Kk>{p.pop?"Most Popular":p.label}</Kk><div style={{fontSize:"1.8rem",fontWeight:1000,color:"var(--am)"}}>{p.total.toLocaleString()}</div><div style={{fontSize:".72rem",color:"var(--mt)"}}>{p.sparks.toLocaleString()} purchased + {p.bonusSparks.toLocaleString()} bonus</div><div style={{fontWeight:1000,marginTop:10}}>{p.price}</div></G>)}</div><section style={{marginTop:28}}><Kk>Loyalty Program</Kk><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:12,marginTop:12}}>{LOYALTY.map(t=><G key={t.name} style={{padding:16,background:`linear-gradient(135deg,${t.color}16,rgba(255,255,255,.035))`}}><strong style={{display:"block",fontSize:"1.1rem",color:t.color}}>{t.name}</strong><div style={{fontSize:".7rem",color:"var(--mt)",marginTop:4}}>Lifetime spend threshold: {t.min===0?"Free":`$${t.min.toLocaleString()}`}</div><div style={{fontSize:"1.25rem",fontWeight:1000,color:"var(--gn)",marginTop:10}}>{t.back}% spark-back</div><p style={{fontSize:".7rem",lineHeight:1.45,color:"var(--mt)",marginTop:8}}>{t.perk}</p></G>)}</div></section></>:<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12,marginTop:26}}>{["Public SFW homepage","Age-gated adult content","Verified performer onboarding","Closed-loop Sparks","Loyalty and concierge lanes","Trust and safety queue"].map((x,i)=><G key={x} style={{padding:16}}><Tag color={["var(--pk)","var(--cy)","var(--am)"][i%3]}>Step {i+1}</Tag><h3 style={{fontSize:".95rem",fontWeight:1000,marginTop:10}}>{x}</h3></G>)}</div>}</main><PublicFooter go={go}/></div>;
 }
 
 function LegalPage({path,go,onJoin,onLogin,onAdult}) {
@@ -1156,8 +1160,8 @@ function MediaSettings({media,setMedia,setTheaterMode,switchLayout}) {
   </G>;
 }
 
-function Auth({onAuth}){
-  const [mode,setMode]=useState("login");const [role,setRole]=useState("viewer");
+function Auth({onAuth,onClose,initialMode="login"}){
+  const [mode,setMode]=useState(initialMode);const [role,setRole]=useState("viewer");
   const [form,setForm]=useState({email:"",pass:"",name:"",confirm:"",agree:false});
   const [err,setErr]=useState("");const [show,setShow]=useState(false);
   const f=form;const uf=(k,v)=>setForm(p=>({...p,[k]:v}));
@@ -1189,7 +1193,8 @@ function Auth({onAuth}){
   </div>;
 
   return<div style={{position:"fixed",inset:0,zIndex:998,display:"flex",alignItems:"center",justifyContent:"center",background:"radial-gradient(ellipse at 30% 20%,rgba(255,45,120,.06),transparent 55%),var(--bg)"}}>
-    <div style={{maxWidth:420,width:"92%",padding:"32px 28px",background:"var(--sf)",border:"1px solid var(--bh)",borderRadius:16,boxShadow:"0 40px 80px rgba(0,0,0,.5)"}}>
+    <div style={{maxWidth:420,width:"92%",padding:"32px 28px",background:"var(--sf)",border:"1px solid var(--bh)",borderRadius:16,boxShadow:"0 40px 80px rgba(0,0,0,.5)",position:"relative"}}>
+      {onClose&&<button type="button" aria-label="Close" onClick={onClose} style={{position:"absolute",right:12,top:12,width:28,height:28,borderRadius:14,border:"1px solid var(--bd)",background:"rgba(255,255,255,.05)",color:"var(--mt)",display:"grid",placeItems:"center",cursor:"pointer"}}><I n="close" s={12}/></button>}
       <div style={{textAlign:"center",marginBottom:20}}>
         <div style={{width:40,height:40,borderRadius:10,background:"linear-gradient(135deg,var(--pk),var(--am),var(--lm))",display:"inline-flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:".8rem",color:"#000",marginBottom:8}}>VB</div>
         <h1 style={{fontSize:"1.5rem",fontWeight:900}}>{mode==="login"?"Welcome Back":"Create Account"}</h1>
@@ -1560,6 +1565,7 @@ function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
 
 export default function App(){
   const searchParams=typeof window!=="undefined"?new URLSearchParams(window.location.search):new URLSearchParams();
+  const initialPath=typeof window!=="undefined"?window.location.pathname:"/";
   const visualPreview=searchParams.get("vybePreview")==="gift";
   const roomPreview=searchParams.get("vybePreview")==="room";
   const studioPreview=searchParams.get("vybePreview")==="studio";
@@ -1568,6 +1574,7 @@ export default function App(){
   const giftDebug=searchParams.get("giftDebug")==="1";
   const [authed,setAuthed]=useState(previewMode);const [authUser,setAuthUser]=useState(previewMode?{email:"preview@vybe.local",name:"VelvetKing",role:studioPreview?"performer":"viewer"}:null);
   const [ok,setOk]=useState(previewMode);const [ck,setCk]=useState(previewMode);const [vw,setVw]=useState(previewMode?previewView:"lobby");
+  const [path,setPath]=useState(initialPath);const [authOpen,setAuthOpen]=useState(false);const [authMode,setAuthMode]=useState(initialPath==="/signup"?"register":"login");const [publicGate,setPublicGate]=useState(false);
   const [pf,setPf]=useState((visualPreview||roomPreview)?PERFS[0]:null);const [md,setMd]=useState(null);const [mn,setMn]=useState(false);const [cat,setCat]=useState("All");
   const [user,setUser]=useState({name:"VelvetKing",email:"preview@vybe.local",phone:"",twoFactor:false,primaryRail:"card",cryptoNetwork:"Universal router",cryptoWallet:"",passwordUpdated:false,
     paymentMethods:[{id:"card-demo",name:"Card",detail:"No card saved yet",status:"Add method",icon:"card",color:"var(--am)"},{id:"wallet-demo",name:"Digital wallet",detail:"Apple/Google/PayPal ready",status:"Available",icon:"wallet",color:"var(--cy)"},{id:"bank-demo",name:"Bank",detail:"ACH/debit connection",status:"Optional",icon:"shield",color:"var(--gn)"},{id:"crypto-demo",name:"Crypto wallet",detail:"Universal router not connected",status:"Connect wallet",icon:"crypto",color:"var(--vi)"}],
@@ -1603,16 +1610,30 @@ export default function App(){
 
   const vp=p=>{setPf(p);setVw("profile")};const gl2=()=>{setMd(null);setVw("room")};
   const gb=()=>setMd("book");const gv=()=>setMd("vip");const bk=()=>{setVw("lobby");setPf(null)};const bp=()=>setVw("profile");
-  const cs=pk=>{setUser(u=>({...u,sparks:u.sparks-pk.sparks,spent:u.spent+pk.sparks*0.1,totalSessions:u.totalSessions+1}));setMd(null);setVw("room")};
+  const cs=pk=>{setUser(u=>({...applySparkDelta(u,-pk.sparks),totalSessions:u.totalSessions+1}));setMd(null);setVw("room")};
   const by=pk=>{const bonus=pk.bonusSparks||0,total=pk.total||(pk.sparks+bonus);setUser(u=>({...u,sparks:u.sparks+total,purchasedSparks:(u.purchasedSparks||0)+pk.sparks,bonusSparks:(u.bonusSparks||0)+bonus,bonusExpiry:"90 days after award",spent:u.spent+parseFloat(pk.price.replace("$",""))}));setMd(null)};
-  const sc=d=>setUser(u=>({...u,sparks:u.sparks+d}));
+  const sc=d=>setUser(u=>applySparkDelta(u,d));
   const updateViewer=patch=>{setUser(u=>({...u,...patch,paymentMethods:(u.paymentMethods||[]).map(m=>m.id==="crypto-demo"?{...m,detail:patch.cryptoWallet?`${patch.cryptoNetwork} wallet connected`:"Universal router not connected",status:patch.cryptoWallet?"Connected":"Connect wallet"}:m)}));setAuthUser(a=>a?{...a,name:patch.name||a.name,email:patch.email||a.email}:a)};
+  const go=to=>{if(typeof window!=="undefined"){window.history.pushState({}, "", to)}setPath(to);setAuthOpen(false);setPublicGate(false)};
+  useEffect(()=>{if(typeof window==="undefined")return;const onPop=()=>setPath(window.location.pathname);window.addEventListener("popstate",onPop);return()=>window.removeEventListener("popstate",onPop)},[]);
+  const openAuth=mode=>{setAuthMode(mode);setAuthOpen(true)};
+  const requestAdultAccess=()=>{if(authed){setVw("lobby");return}setPublicGate(true)};
 
   if(visualPreview)return <VybeLuxuryPreview/>;
 
+  if(!previewMode&&!authed){
+    const isLegal=!!LEGAL_COPY[path],isPublicInfo=["/how-it-works","/games","/sparks","/performers/apply"].includes(path);
+    const page=isLegal?<LegalPage path={path} go={go} onJoin={()=>openAuth("register")} onLogin={()=>openAuth("login")} onAdult={requestAdultAccess}/>:
+      isPublicInfo?<PublicInfoPage path={path} go={go} onJoin={()=>openAuth("register")} onLogin={()=>openAuth("login")} onAdult={requestAdultAccess}/>:
+      <HomePage go={go} onJoin={()=>openAuth("register")} onLogin={()=>openAuth("login")} onAdult={requestAdultAccess}/>;
+    const showAuth=authOpen||path==="/login"||path==="/signup";
+    const showAge=(publicGate||path==="/explore")&&!ok;
+    return<><style>{css}</style>{page}{showAge&&<AgeV onDone={()=>{setOk(true);setPublicGate(false);openAuth("register")}}/>}{showAuth&&<Auth onAuth={handleAuth} onClose={()=>{setAuthOpen(false);if(path==="/login"||path==="/signup")go("/")}} initialMode={path==="/signup"?"register":authMode}/>} {!ck&&<CK onOk={()=>setCk(true)}/>}</>;
+  }
+
   return<>
     <style>{css}</style>
-    {!authed&&<Auth onAuth={handleAuth}/>}
+    {!authed&&<Auth onAuth={handleAuth} initialMode={authMode}/>}
     {authed&&!ok&&!isPerf&&<AgeV onDone={()=>setOk(true)}/>}
     {authed&&ok&&isPerf&&vw!=="room"&&<PerfDash perfData={perfSelf} onGoLive={()=>{setPf(perfSelf);setVw("room")}} onLogout={logout}/>}
     {authed&&ok&&!isPerf&&vw==="lobby"&&<LB user={user} onPerf={vp} onWallet={()=>setMd("wallet")} cat={cat} setCat={setCat} onMenu={()=>setMn(true)}/>}

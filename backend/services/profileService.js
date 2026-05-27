@@ -20,9 +20,16 @@ function publicViewerProfile(user, profile) {
       bannerUrl: user.banner_url || null,
       bio: user.bio || null,
       isVerified: Boolean(user.is_verified),
+      ageVerified: Boolean(user.age_verified || user.is_verified),
+      phoneNumber: user.phone_number || null,
+      countryCode: user.country_code || null,
+      regionCode: user.region_code || null,
     },
     viewer: {
       sparks: Number(profile.sparks || 0),
+      purchasedSparks: Number(profile.purchased_sparks || profile.sparks || 0),
+      bonusSparks: Number(profile.bonus_sparks || 0),
+      bonusSparksExpiresAt: profile.bonus_sparks_expires_at || null,
       totalSpent,
       gamesPlayed: Number(profile.games_played || 0),
       gamesWon: Number(profile.games_won || 0),
@@ -34,6 +41,10 @@ function publicViewerProfile(user, profile) {
       sparksEarned: Number(profile.sparks_earned || 0),
       totalSessions: Number(profile.total_sessions || 0),
       reputationScore: Number(profile.reputation_score || 0),
+      dailyLoginStreak: Number(profile.daily_login_streak || 0),
+      priorityWeight: Number(profile.priority_weight || 1),
+      vipMembershipStatus: profile.vip_membership_status || 'none',
+      monthlySessionCreditType: profile.monthly_session_credit_type || null,
       loyalty: loyaltyForSpend(totalSpent),
     },
   };
@@ -64,8 +75,12 @@ async function getCurrentViewer(userId) {
 
   const { rows } = await query(
     `SELECT u.id, u.email, u.display_name, u.role, u.avatar_url, u.banner_url, u.bio,
-      u.is_verified, vp.sparks, vp.total_spent, vp.games_played, vp.games_won,
-      vp.top_streak, vp.sparks_earned, vp.total_sessions, vp.reputation_score
+      u.phone_number, u.country_code, u.region_code, u.is_verified, u.age_verified,
+      vp.sparks, vp.purchased_sparks, vp.bonus_sparks, vp.bonus_sparks_expires_at,
+      vp.total_spent, vp.games_played, vp.games_won,
+      vp.top_streak, vp.sparks_earned, vp.total_sessions, vp.reputation_score,
+      vp.daily_login_streak, vp.priority_weight, vp.vip_membership_status,
+      vp.monthly_session_credit_type
      FROM users u
      JOIN viewer_profiles vp ON vp.user_id = u.id
      WHERE u.id = $1 AND u.role = 'viewer' AND u.is_active = TRUE`,

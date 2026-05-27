@@ -15,6 +15,16 @@ CREATE TABLE users (
   avatar_url TEXT,
   banner_url TEXT,
   bio TEXT,
+  phone_number VARCHAR(30),
+  country_code CHAR(2),
+  region_code VARCHAR(10),
+  age_verified BOOLEAN DEFAULT FALSE,
+  age_verification_date TIMESTAMPTZ,
+  age_verification_provider VARCHAR(50),
+  age_verification_token TEXT,
+  birth_month SMALLINT CHECK (birth_month BETWEEN 1 AND 12),
+  birth_day SMALLINT CHECK (birth_day BETWEEN 1 AND 31),
+  geo_blocked BOOLEAN DEFAULT FALSE,
   is_verified BOOLEAN DEFAULT FALSE, -- age verified (Yoti for viewers, 2257 for performers)
   is_active BOOLEAN DEFAULT TRUE,
   two_factor_enabled BOOLEAN DEFAULT FALSE,
@@ -28,6 +38,9 @@ CREATE TABLE users (
 CREATE TABLE viewer_profiles (
   user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
   sparks INTEGER DEFAULT 0 CHECK (sparks >= 0),
+  purchased_sparks INTEGER DEFAULT 0 CHECK (purchased_sparks >= 0),
+  bonus_sparks INTEGER DEFAULT 0 CHECK (bonus_sparks >= 0),
+  bonus_sparks_expires_at TIMESTAMPTZ,
   total_spent DECIMAL(12,2) DEFAULT 0, -- lifetime USD spend (determines loyalty tier)
   games_played INTEGER DEFAULT 0,
   games_won INTEGER DEFAULT 0,
@@ -35,6 +48,18 @@ CREATE TABLE viewer_profiles (
   sparks_earned INTEGER DEFAULT 0, -- from games/sparkback
   total_sessions INTEGER DEFAULT 0,
   reputation_score INTEGER DEFAULT 0, -- community standing
+  daily_login_streak INTEGER DEFAULT 0,
+  last_login_bonus_at TIMESTAMPTZ,
+  monthly_session_credit_type VARCHAR(20) CHECK (
+    monthly_session_credit_type IS NULL OR monthly_session_credit_type IN ('standard', 'vip')
+  ),
+  monthly_session_credit_expires_at TIMESTAMPTZ,
+  priority_weight INTEGER DEFAULT 1,
+  vip_membership_status VARCHAR(20) DEFAULT 'none' CHECK (
+    vip_membership_status IN ('none', 'trial', 'active', 'past_due', 'cancelled')
+  ),
+  vip_membership_renews_at TIMESTAMPTZ,
+  custom_chat_color VARCHAR(7),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -76,6 +101,26 @@ CREATE TABLE performer_profiles (
   max_session_minutes INTEGER DEFAULT 60,
   payout_method VARCHAR(50), -- ccbill, segpay
   payout_account_id VARCHAR(255),
+  payout_status VARCHAR(20) DEFAULT 'not_configured' CHECK (
+    payout_status IN ('not_configured', 'pending', 'verified', 'blocked')
+  ),
+  legal_name VARCHAR(120),
+  stage_names JSONB DEFAULT '[]'::jsonb,
+  date_of_birth DATE,
+  verification_status VARCHAR(20) DEFAULT 'pending' CHECK (
+    verification_status IN ('pending', 'verified', 'rejected', 'expired')
+  ),
+  verification_date TIMESTAMPTZ,
+  verification_ref TEXT,
+  verification_provider VARCHAR(50),
+  verification_rejected_reason TEXT,
+  custodian_notified BOOLEAN DEFAULT FALSE,
+  contractor_agreement_signed BOOLEAN DEFAULT FALSE,
+  contractor_agreement_signed_at TIMESTAMPTZ,
+  model_release_signed_at TIMESTAMPTZ,
+  w9_submitted BOOLEAN DEFAULT FALSE,
+  w9_submitted_at TIMESTAMPTZ,
+  can_receive_bookings BOOLEAN DEFAULT FALSE,
   -- 2257 compliance
   id_verified BOOLEAN DEFAULT FALSE,
   model_release_signed BOOLEAN DEFAULT FALSE,
@@ -111,10 +156,19 @@ CREATE TABLE spark_transactions (
     'session_earned', 'request_payment', 'request_earned',
     'sparkback', 'game_reward', 'subscription_payment',
     'subscription_earned', 'content_purchase', 'content_earned',
-    'presence_points', 'spark_storm_reward', 'refund'
+    'presence_points', 'spark_storm_reward', 'refund',
+    'daily_login_bonus', 'birthday_bonus', 'anniversary_bonus',
+    'streak_bonus', 'promo_drop', 'concierge_credit',
+    'monthly_session_credit', 'game_stake', 'game_loss',
+    'adjustment', 'expired_bonus'
   )),
   amount INTEGER NOT NULL, -- positive = credit, negative = debit
   balance_after INTEGER NOT NULL,
+  source VARCHAR(40), -- closed-loop source or sink, no user-to-user transfers
+  bonus_spark BOOLEAN DEFAULT FALSE,
+  expires_at TIMESTAMPTZ,
+  expired_at TIMESTAMPTZ,
+  soft_deleted_at TIMESTAMPTZ,
   reference_id UUID, -- links to gift/session/request/etc
   performer_id UUID REFERENCES users(id), -- who received (for gifts/sessions)
   metadata JSONB,
@@ -124,13 +178,37 @@ CREATE TABLE spark_transactions (
 CREATE TABLE spark_purchases (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES users(id),
+  package_id VARCHAR(40),
+  purchased_sparks INTEGER NOT NULL DEFAULT 0,
   sparks_amount INTEGER NOT NULL,
   bonus_sparks INTEGER DEFAULT 0,
+  total_sparks INTEGER GENERATED ALWAYS AS (sparks_amount + bonus_sparks) STORED,
   usd_amount DECIMAL(8,2) NOT NULL,
+  currency CHAR(3) DEFAULT 'USD',
+  payment_method_id UUID,
   payment_processor VARCHAR(20), -- ccbill, segpay, epoch
   processor_txn_id VARCHAR(255),
   status VARCHAR(20) DEFAULT 'completed',
+  metadata JSONB,
   created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE payment_methods (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  type VARCHAR(30) NOT NULL CHECK (
+    type IN ('card', 'bank', 'apple_pay', 'google_pay', 'crypto_wallet', 'voucher')
+  ),
+  provider VARCHAR(50) NOT NULL,
+  provider_ref VARCHAR(255) NOT NULL,
+  label VARCHAR(80),
+  last_four VARCHAR(8),
+  chain VARCHAR(40),
+  wallet_address_hash TEXT,
+  is_default BOOLEAN DEFAULT FALSE,
+  status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'expired', 'blocked')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- ═══ GIFTS ═══
@@ -317,9 +395,103 @@ CREATE TABLE presence_points (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Legal / compliance controls
+CREATE TABLE age_verifications (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  provider VARCHAR(50) NOT NULL,
+  provider_ref TEXT NOT NULL,
+  status VARCHAR(20) NOT NULL CHECK (status IN ('pending', 'verified', 'failed', 'expired')),
+  checked_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ,
+  metadata JSONB
+);
+
+CREATE TABLE performer_verifications (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  performer_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  provider VARCHAR(50) NOT NULL,
+  provider_ref TEXT NOT NULL,
+  status VARCHAR(20) NOT NULL CHECK (status IN ('pending', 'verified', 'rejected', 'expired')),
+  legal_name VARCHAR(120),
+  stage_names JSONB DEFAULT '[]'::jsonb,
+  date_of_birth DATE,
+  checked_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ,
+  metadata JSONB
+);
+
+CREATE TABLE geo_blocks (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  country_code CHAR(2) NOT NULL,
+  region_code VARCHAR(10),
+  reason TEXT NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  starts_at TIMESTAMPTZ DEFAULT NOW(),
+  ends_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE moderation_queue (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  target_type VARCHAR(30) NOT NULL CHECK (
+    target_type IN ('chat_message', 'content_post', 'performer_profile', 'payment', 'stream')
+  ),
+  target_id UUID,
+  severity VARCHAR(20) DEFAULT 'medium' CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+  reason TEXT NOT NULL,
+  status VARCHAR(20) DEFAULT 'open' CHECK (status IN ('open', 'reviewing', 'resolved', 'dismissed')),
+  assigned_to UUID REFERENCES users(id),
+  metadata JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  resolved_at TIMESTAMPTZ
+);
+
+CREATE TABLE dmca_requests (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  claimant_name VARCHAR(120) NOT NULL,
+  claimant_email VARCHAR(255) NOT NULL,
+  content_url TEXT NOT NULL,
+  content_id UUID REFERENCES content_posts(id),
+  status VARCHAR(20) DEFAULT 'received' CHECK (
+    status IN ('received', 'reviewing', 'removed', 'rejected', 'counter_notice', 'restored')
+  ),
+  received_at TIMESTAMPTZ DEFAULT NOW(),
+  resolved_at TIMESTAMPTZ,
+  metadata JSONB
+);
+
+CREATE TABLE compliance_audit_events (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  actor_id UUID REFERENCES users(id),
+  event_type VARCHAR(60) NOT NULL,
+  subject_type VARCHAR(40) NOT NULL,
+  subject_id UUID,
+  metadata JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE compliance_settings (
+  key VARCHAR(80) PRIMARY KEY,
+  value JSONB NOT NULL,
+  updated_by UUID REFERENCES users(id),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE concierge_assignments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  concierge_user_id UUID REFERENCES users(id),
+  status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'paused', 'ended')),
+  next_check_in_at TIMESTAMPTZ,
+  last_check_in_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ═══ INDEXES ═══
 CREATE INDEX idx_spark_txn_user ON spark_transactions(user_id, created_at DESC);
 CREATE INDEX idx_spark_txn_performer ON spark_transactions(performer_id, created_at DESC);
+CREATE INDEX idx_spark_txn_bonus_expiry ON spark_transactions(user_id, expires_at) WHERE bonus_spark = TRUE AND soft_deleted_at IS NULL;
 CREATE INDEX idx_gifts_performer ON gifts_sent(performer_id, created_at DESC);
 CREATE INDEX idx_sessions_viewer ON sessions(viewer_id, created_at DESC);
 CREATE INDEX idx_sessions_performer ON sessions(performer_id, created_at DESC);
@@ -331,6 +503,13 @@ CREATE INDEX idx_viewer_history ON viewer_performer_history(viewer_id);
 CREATE INDEX idx_banners_expires_at ON platform_banners(expires_at);
 CREATE INDEX idx_banners_type_created ON platform_banners(type, created_at DESC);
 CREATE INDEX idx_perf_live ON performer_profiles(is_live) WHERE is_live = TRUE;
+CREATE INDEX idx_payment_methods_user ON payment_methods(user_id, status);
+CREATE INDEX idx_age_verifications_user ON age_verifications(user_id, checked_at DESC);
+CREATE INDEX idx_performer_verifications_status ON performer_verifications(status, checked_at DESC);
+CREATE INDEX idx_geo_blocks_active ON geo_blocks(country_code, region_code) WHERE is_active = TRUE;
+CREATE INDEX idx_moderation_queue_status ON moderation_queue(status, severity, created_at DESC);
+CREATE INDEX idx_dmca_status ON dmca_requests(status, received_at DESC);
+CREATE INDEX idx_compliance_events_subject ON compliance_audit_events(subject_type, subject_id, created_at DESC);
 
 -- ═══ SEED: Gift Types ═══
 INSERT INTO gift_types (id, name, cost, icon, color, animation_type, animation_duration_ms, is_platform_banner, sort_order) VALUES

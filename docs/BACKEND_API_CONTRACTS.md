@@ -1,6 +1,6 @@
 # VYBE Backend API Contracts
 
-This is the current local contract for frontend integration. It is intentionally no-spend: if `DATABASE_URL` is empty in development, the backend serves deterministic demo data from the memory adapter.
+This is the current backend contract for frontend integration. It is no-spend in local development: if `DATABASE_URL` is empty, the backend serves deterministic development data from the memory adapter. With `DATABASE_URL` set, the same routes use PostgreSQL.
 
 ## Local Backend
 
@@ -29,6 +29,23 @@ Demo performer:
 
 ```text
 luna / Luna Voss
+luna@vybe.local / vybe-demo
+```
+
+## Database
+
+Fresh local database:
+
+```bash
+cd backend
+npm run db:schema
+```
+
+Existing database migrations:
+
+```bash
+cd backend
+npm run db:migrate
 ```
 
 ## Auth
@@ -118,7 +135,13 @@ Returns:
 ```json
 {
   "sparks": 10000,
+  "purchasedSparks": 9000,
+  "bonusSparks": 1000,
+  "bonusSparksExpiresAt": "2026-08-25T00:00:00.000Z",
   "totalSpent": 0,
+  "closedLoop": true,
+  "cashOutAllowed": false,
+  "transferAllowed": false,
   "loyalty": {
     "name": "Bronze",
     "min": 0,
@@ -133,6 +156,107 @@ Returns:
 Requires auth.
 
 Returns the current viewer's spark ledger entries.
+
+### `GET /api/sparks/packages`
+
+Returns real purchase package contracts and closed-loop rules.
+
+### `POST /api/sparks/purchase`
+
+Requires auth. Records a package purchase against a processor-hosted payment method reference and credits purchased and bonus Sparks separately.
+
+Request:
+
+```json
+{
+  "package_id": "popular",
+  "payment_method_id": "processor-token-id",
+  "processor": "ccbill"
+}
+```
+
+Bonus Sparks expire after 90 days and are spent before purchased Sparks.
+
+## Performer Requests
+
+Requests are not public when first submitted. They are held in Spark escrow and sent only to the performer approval lane. If declined, the viewer is refunded with the original purchased/bonus Spark split.
+
+### `GET /api/requests/performers/:performerId/menu`
+
+Returns a performer's active request menu.
+
+### `POST /api/requests/purchase`
+
+Requires viewer auth.
+
+```json
+{
+  "performer_id": "22222222-2222-4222-8222-222222222222",
+  "request_id": "22222222-2222-4222-8222-222222222222:ultimate-fantasy",
+  "prompt": "A consent-safe custom moment"
+}
+```
+
+Response status is `pending` and `publicVisible` is `false`.
+
+### `GET /api/requests/mine`
+
+Requires viewer auth. Lists the viewer's request history.
+
+### `GET /api/requests/performer?status=pending`
+
+Requires performer or admin auth. Lists the private performer approval queue.
+
+### `POST /api/requests/:id/accept`
+
+Requires performer or admin auth. Marks the request accepted, makes it public, records performer earnings, and emits `request_accepted`.
+
+### `POST /api/requests/:id/decline`
+
+Requires performer or admin auth. Marks the request declined, refunds the viewer, and emits `request_declined_refunded`.
+
+## Payments
+
+### `GET /api/payments/options`
+
+Returns supported payment rails and safety policy. VYBE stores provider references only, not raw card or raw wallet custody data.
+
+### `GET /api/payments/methods`
+
+Requires auth. Lists saved provider-backed payment references.
+
+### `POST /api/payments/methods`
+
+Requires auth. Adds a provider-backed payment reference.
+
+```json
+{
+  "type": "crypto_wallet",
+  "provider": "coinbase_commerce",
+  "provider_ref": "processor-token",
+  "chain": "base",
+  "wallet_address": "0x...",
+  "is_default": true
+}
+```
+
+## Compliance
+
+### `GET /api/compliance/adult-access`
+
+Requires auth. Returns age-verification and geo-block status before adult content is exposed.
+
+### `POST /api/compliance/age-verification`
+
+Requires auth. Records a third-party age verification reference token.
+
+### `POST /api/compliance/performer-verification`
+
+Requires performer/admin auth. Records performer identity and 2257 verification state. Performers should not go live, upload content, receive bookings, or receive payouts until verified.
+
+### `GET /api/compliance/overview`
+
+Requires admin auth. Returns compliance dashboard counts for age verification, performer 2257 state, moderation, and DMCA queue.
 
 ## Gifts
 

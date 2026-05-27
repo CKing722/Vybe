@@ -119,6 +119,7 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
 
     let { cssW: w, cssH: h, dpr } = sizeCanvas(canvas);
     const ctx = canvas.getContext("2d");
+    if (!ctx) return; // canvas 2D unavailable (headless, locked-down browser)
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const spread = budget.spread || "radial-tight";
 

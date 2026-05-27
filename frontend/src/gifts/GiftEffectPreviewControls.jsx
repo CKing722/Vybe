@@ -10,7 +10,7 @@ const TIER_DOT = { low: "#ff2d78", mid: "#ffab00", high: "#ffd700" };
   Renders a floating debug panel for quickly firing any catalog gift.
   Dev/designer tool - not part of the live room production UI path.
 */
-export default function GiftEffectPreviewControls({ onPreview }) {
+export default function GiftEffectPreviewControls({ onPreview, activeGiftId = null }) {
   const [open, setOpen] = useState(false);
 
   const panelStyle = {
@@ -92,25 +92,32 @@ export default function GiftEffectPreviewControls({ onPreview }) {
           <div style={labelStyle}>Gift Effect Preview</div>
           {GIFT_EFFECT_CATALOG.map(g => {
             const dot = TIER_DOT[g.tier] || "#aaa";
+            const isActive = g.id === activeGiftId;
             return (
               <button
                 key={g.id}
                 onClick={() => handlePick(g.id)}
                 onMouseEnter={handleRowEnter}
                 onMouseLeave={handleRowLeave}
-                style={{ ...rowBase, borderColor: dot + "28" }}
-                aria-label={"Preview " + g.displayName}
+                style={{
+                  ...rowBase,
+                  borderColor: isActive ? dot + "cc" : dot + "28",
+                  background: isActive ? dot + "18" : "rgba(255,255,255,0.04)",
+                  boxShadow: isActive ? "0 0 12px " + dot + "44" : "none",
+                }}
+                aria-label={"Preview " + g.displayName + (isActive ? " (playing)" : "")}
               >
                 <span style={{
                   width: "8px",
                   height: "8px",
                   borderRadius: "50%",
                   background: dot,
-                  boxShadow: "0 0 6px " + dot,
+                  boxShadow: isActive ? "0 0 10px " + dot + ", 0 0 4px " + dot : "0 0 6px " + dot,
                   flexShrink: 0,
+                  opacity: isActive ? 1 : 0.75,
                 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ color: "#fff", fontSize: "13px", fontWeight: 600, whiteSpace: "nowrap" }}>{g.displayName}</div>
+                  <div style={{ color: isActive ? "#fff" : "rgba(255,255,255,0.85)", fontSize: "13px", fontWeight: isActive ? 700 : 600, whiteSpace: "nowrap" }}>{g.displayName}</div>
                   <div style={{ color: dot, fontSize: "11px", opacity: 0.82 }}>
                     {g.sparkCost.toLocaleString()} sparks
                     {g.platformWideBanner && (
@@ -118,8 +125,8 @@ export default function GiftEffectPreviewControls({ onPreview }) {
                     )}
                   </div>
                 </div>
-                <span style={{ fontSize: "10px", color: "#555", textTransform: "uppercase", letterSpacing: "0.08em", flexShrink: 0 }}>
-                  {g.tier}
+                <span style={{ fontSize: "10px", color: isActive ? dot : "#555", fontWeight: isActive ? 700 : 400, textTransform: "uppercase", letterSpacing: "0.08em", flexShrink: 0 }}>
+                  {isActive ? "live" : g.tier}
                 </span>
               </button>
             );

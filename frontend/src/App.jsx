@@ -484,6 +484,7 @@ body,#root{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:va
 @keyframes crownRise{0%,100%{transform:translateY(8px) scale(.96)}50%{transform:translateY(-8px) scale(1.04)}}
 .ai{animation:fi .3s ease both}
 input[type=text],input[type=email],input[type=tel],input[type=password],select{background:var(--cd);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:8px 12px;font:inherit;outline:none;width:100%}input[type=text]:focus,input[type=email]:focus,input[type=tel]:focus,input[type=password]:focus,select:focus{border-color:var(--cy)}
+select option{background:#0d1118;color:#f6efe5}
 html{scroll-behavior:smooth}a{color:inherit;text-decoration:none}
 .pub-menu,.pub-actions{display:flex}.pub-hamb{display:none}
 .battle-card{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,background .22s ease}
@@ -2246,7 +2247,10 @@ function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
   const [postAccess,setPostAccess]=useState("free");
   const [postDraft,setPostDraft]=useState({text:"",price:"120",scheduled:"Now"});
   const [postCanvas,setPostCanvas]=useState({surface:"reel",mood:"Champagne Heat",cover:"Spotlight",cta:"Unlock full drop"});
+  const [postFiles,setPostFiles]=useState([]);
+  const [reactedPosts,setReactedPosts]=useState({});
   const [studioPosts,setStudioPosts]=useState(()=>content.map((item,i)=>({
+    id:`seed-${i}`,
     ...item,
     dislikes:item.dislikes??Math.max(0,Math.round((item.likes||80)*.04)),
     shares:item.shares??18+i*7,
@@ -2255,7 +2259,8 @@ function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
     media:item.type==="post"?"status":item.type,
     surface:item.type==="video"?"reel":item.type==="photo"?"carousel":"story",
     mood:["Champagne Heat","Afterdark Game","Velvet Preview","Subscriber First"][i%4],
-    saves:36+i*11
+    saves:36+i*11,
+    createdAt:Date.now()-[2*60*60*1000,24*60*60*1000,3*24*60*60*1000,5*24*60*60*1000][i]
   })));
   const [prefTab,setPrefTab]=useState("pricing");
   const [pricing,setPricing]=useState(()=>({subscription:p.sub?.price||24.99,privateSession:65,vipSession:250,photo:120,video:240,gameEntry:25,requestBase:150}));
@@ -2282,14 +2287,29 @@ function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
   const subtitle={home:"One clean cockpit for live readiness, audience pressure, and the exact levers that make a room earn.",content:"A VYBE-native social feed for free updates, subscriber posts, and simple paid photo or video drops.",schedule:"Create live blocks, subscriber windows, private availability, and VIP nights without hunting through settings.",money:"See available earnings and request a payout whenever the processor, reserve, and tax checks allow it.",preferences:"Pricing, games, request menu, subscriptions, and trial choices live here with category tabs and focused dropdowns.",analytics:"A VYBE-native read on retention, spend velocity, and room heat."}[tab];
   const topFans=fans.slice(0,4);
   const bars=[46,62,38,76,57,84,68,92,74,88,63,79];
-  const field={width:"100%",height:38,border:`1px solid ${line}`,borderRadius:8,background:"rgba(0,0,0,.18)",color:ink,padding:"0 10px",font:"inherit",fontSize:".75rem",outline:"none"};
-  const textarea={width:"100%",minHeight:112,border:`1px solid ${line}`,borderRadius:9,background:"rgba(0,0,0,.18)",color:ink,padding:12,font:"inherit",fontSize:".78rem",lineHeight:1.5,resize:"vertical",outline:"none"};
+  const field={width:"100%",height:40,border:`1px solid ${line}`,borderRadius:8,background:"linear-gradient(180deg,rgba(13,17,24,.96),rgba(6,8,15,.98))",color:ink,padding:"0 10px",font:"inherit",fontSize:".76rem",outline:"none",colorScheme:"dark"};
+  const textarea={width:"100%",minHeight:112,border:`1px solid ${line}`,borderRadius:9,background:"linear-gradient(180deg,rgba(13,17,24,.96),rgba(6,8,15,.98))",color:ink,padding:12,font:"inherit",fontSize:".78rem",lineHeight:1.5,resize:"vertical",outline:"none"};
   const money=n=>`$${Number(n||0).toLocaleString(undefined,{maximumFractionDigits:Number(n)%1?2:0})}`;
   const updatePrice=(key,value)=>setPricing(prev=>({...prev,[key]:value}));
   const toggleFlag=key=>setToggles(prev=>({...prev,[key]:!prev[key]}));
   const toggleGame=id=>setActiveGameIds(prev=>prev.includes(id)?prev.filter(gameId=>gameId!==id):[...prev,id]);
-  const publishPost=()=>{const text=postDraft.text.trim()||`${postCanvas.mood} is staged for tonight. ${postAccess==="paid"?postCanvas.cta:"Come warm the room before we go live."}`;const paid=postAccess==="paid";setStudioPosts(prev=>[{type:postMode,text,time:"Just now",likes:0,dislikes:0,comments:0,shares:0,saves:0,access:postAccess,price:paid?Number(postDraft.price||0):0,locked:paid||postAccess==="subscribers",media:postMode,surface:postCanvas.surface,mood:postCanvas.mood,cover:postCanvas.cover},...prev]);setPostDraft({text:"",price:postDraft.price,scheduled:"Now"});};
-  const reactToPost=(index,key)=>setStudioPosts(prev=>prev.map((post,i)=>i===index?{...post,[key]:(post[key]||0)+1}:post));
+  const handlePostFiles=files=>{const next=Array.from(files||[]).map((file,i)=>({id:`file-${Date.now()}-${i}`,name:file.name,type:file.type||"",kind:(file.type||"").startsWith("video/")?"video":(file.type||"").startsWith("image/")?"photo":"file"}));setPostFiles(next);const first=next[0];if(first?.kind==="video"){setPostMode("video");setPostCanvas(prev=>({...prev,surface:"reel"}));}else if(first?.kind==="photo"){setPostMode("photo");setPostCanvas(prev=>({...prev,surface:next.length>1?"carousel":"story"}));}};
+  const publishPost=()=>{const text=postDraft.text.trim()||`${postCanvas.mood} is staged for tonight. ${postAccess==="paid"?postCanvas.cta:"Come warm the room before we go live."}`;const paid=postAccess==="paid";const mediaFromFile=postFiles[0]?.kind==="video"?"video":postFiles[0]?.kind==="photo"?"photo":postMode;setStudioPosts(prev=>[{id:`post-${Date.now()}`,type:mediaFromFile,text,time:"Just now",likes:0,dislikes:0,comments:0,shares:0,saves:0,access:postAccess,price:paid?Number(postDraft.price||0):0,locked:paid||postAccess==="subscribers",media:mediaFromFile,surface:postCanvas.surface,mood:postCanvas.mood,cover:postCanvas.cover,files:postFiles,createdAt:Date.now()},...prev]);setPostDraft({text:"",price:postDraft.price,scheduled:"Now"});setPostFiles([]);};
+  const reactToPost=(postId,key)=>{
+    if(key==="comments")return;
+    const current=reactedPosts[postId]||{};
+    const same=!!current[key];
+    const opposite=key==="likes"?"dislikes":key==="dislikes"?"likes":null;
+    const nextForPost={...current,[key]:!same};
+    if(opposite&&nextForPost[key])nextForPost[opposite]=false;
+    setReactedPosts(prev=>({...prev,[postId]:nextForPost}));
+    setStudioPosts(posts=>posts.map(post=>{
+      if(post.id!==postId)return post;
+      const next={...post,[key]:Math.max(0,(post[key]||0)+(same?-1:1))};
+      if(opposite&&current[opposite]&&!same)next[opposite]=Math.max(0,(post[opposite]||0)-1);
+      return next;
+    }));
+  };
   const addSlot=()=>{setScheduleSlots(prev=>[...prev,{...slotDraft}]);setSlotDraft({day:"Mon",time:"9:00 PM",type:"Live room",note:""});};
   const Toggle=({label,body,checked,onClick,tone=active.tone})=><button type="button" onClick={onClick} style={{width:"100%",display:"grid",gridTemplateColumns:"minmax(0,1fr) 54px",gap:12,alignItems:"center",padding:12,border:`1px solid ${checked?tone+"88":line}`,borderRadius:9,background:checked?`${tone}12`:"rgba(255,255,255,.025)",color:ink,textAlign:"left",cursor:"pointer"}}>
     <span><span style={{display:"block",fontSize:".78rem",fontWeight:1000}}>{label}</span><span style={{display:"block",...copy,fontSize:".62rem",marginTop:2}}>{body}</span></span>
@@ -2353,17 +2373,26 @@ function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
   </div>};
   const StoryRail=()=> <section style={{...panel,padding:14,overflow:"hidden"}}><div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",marginBottom:12}}><div><div style={label}>Story line</div><div style={{fontSize:".82rem",fontWeight:1000,marginTop:4}}>Fast moments fans can tap through</div></div><span style={{...copy,fontSize:".62rem"}}>24h drops</span></div><div style={{display:"grid",gridTemplateColumns:compact?"repeat(3,1fr)":"repeat(6,1fr)",gap:9}}>{["Warmup","Poll","Preview","Behind","Unlock","Live"].map((x,i)=><button key={x} type="button" style={{minHeight:compact?92:118,border:`1px solid ${i===2?"#d6b15e88":line}`,borderRadius:12,background:`linear-gradient(160deg,${["#58d7c4","#8fb5ff","#d6b15e","#ff8aa8","#b98cff","#ffbd66"][i]}1f,rgba(255,255,255,.028))`,color:ink,cursor:"pointer",padding:9,textAlign:"left",display:"flex",flexDirection:"column",justifyContent:"space-between"}}><span style={{width:28,height:28,borderRadius:999,border:`2px solid ${["#58d7c4","#8fb5ff","#d6b15e","#ff8aa8","#b98cff","#ffbd66"][i]}`,display:"grid",placeItems:"center"}}><I n={["clock","chat","eye","live","lock","spark"][i]} s={12}/></span><span style={{fontSize:".68rem",fontWeight:1000}}>{x}</span></button>)}</div></section>;
   const PostStudio=()=> {
-    const featured=studioPosts[0]||{};
+    const sortedPosts=[...studioPosts].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
     const totalLikes=studioPosts.reduce((s,x)=>s+(x.likes||0),0),totalShares=studioPosts.reduce((s,x)=>s+(x.shares||0),0),totalSaves=studioPosts.reduce((s,x)=>s+(x.saves||0),0);
     const insightRows=[["Hook strength","86%","First line is clear and visual","#58d7c4"],["Paid unlocks","$624","Projected if posted before live","#d6b15e"],["Subscriber pull","14%","Preview converts better than status","#ff8aa8"],["Share velocity",`${totalShares}`,"Fans push visual drops farther","#8fb5ff"]];
     const surfaces=[{id:"story",label:"Story",icon:"clock",body:"24h tease"},{id:"reel",label:"Reel",icon:"play",body:"motion first"},{id:"carousel",label:"Carousel",icon:"cards",body:"photo set"},{id:"vault",label:"Vault",icon:"lock",body:"paid unlock"},{id:"poll",label:"Poll",icon:"chat",body:"fan choice"}];
     return <div style={{display:"grid",gap:14}}>
       <StoryRail/>
-      <section style={{...panel,padding:compact?14:18,background:"linear-gradient(135deg,rgba(185,140,255,.1),rgba(255,138,168,.06) 46%,rgba(214,177,94,.06))"}}>
+      <section style={{...panel,padding:compact?14:18,background:"radial-gradient(circle at 12% 0%,rgba(214,177,94,.16),transparent 34%),radial-gradient(circle at 88% 20%,rgba(88,215,196,.1),transparent 30%),linear-gradient(135deg,rgba(13,17,24,.96),rgba(6,8,15,.98))"}}>
         <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"minmax(0,1fr) 320px",gap:16,alignItems:"stretch"}}>
           <div style={{display:"grid",gap:12}}>
             <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"start",flexWrap:"wrap"}}><div><div style={label}>Creator canvas</div><h2 style={{fontSize:compact?"1.28rem":"1.75rem",fontWeight:1000,lineHeight:1.05,marginTop:6}}>Build a drop people want to tap, save, unlock, and share.</h2></div><button type="button" onClick={publishPost} style={{height:42,padding:"0 16px",border:0,borderRadius:9,background:"linear-gradient(135deg,#d6b15e,#ff8aa8)",color:"#17110d",font:"inherit",fontWeight:1000,cursor:"pointer",boxShadow:"0 18px 44px rgba(214,177,94,.18)"}}><I n="plus" s={13} c="#17110d" st={{marginRight:7}}/>Publish drop</button></div>
             <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(5,1fr)",gap:8}}>{surfaces.map(item=><button key={item.id} type="button" onClick={()=>setPostCanvas(prev=>({...prev,surface:item.id}))} style={{minHeight:82,padding:10,border:`1px solid ${postCanvas.surface===item.id?active.tone+"99":line}`,borderRadius:10,background:postCanvas.surface===item.id?`${active.tone}18`:"rgba(0,0,0,.14)",color:ink,cursor:"pointer",textAlign:"left"}}><I n={item.icon} s={15} c={postCanvas.surface===item.id?active.tone:dim}/><div style={{fontSize:".72rem",fontWeight:1000,marginTop:8}}>{item.label}</div><div style={{...copy,fontSize:".58rem"}}>{item.body}</div></button>)}</div>
+            <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"minmax(0,1.2fr) minmax(260px,.8fr)",gap:10}}>
+              <label htmlFor="vybe-post-upload" style={{minHeight:96,padding:14,border:`1px dashed rgba(88,215,196,.42)`,borderRadius:12,background:"linear-gradient(135deg,rgba(88,215,196,.08),rgba(214,177,94,.045))",cursor:"pointer",display:"grid",alignContent:"center",gap:6}}>
+                <input id="vybe-post-upload" type="file" multiple accept="image/*,video/*" onChange={e=>handlePostFiles(e.target.files)} style={{display:"none"}}/>
+                <span style={{display:"flex",alignItems:"center",gap:8,fontWeight:1000,fontSize:".86rem"}}><I n="plus" s={15} c="#58d7c4"/>Upload photo or video</span>
+                <span style={{...copy,fontSize:".64rem"}}>Works with mobile galleries, desktop files, cloud providers, and camera roll file pickers through the native browser chooser.</span>
+              </label>
+              <div style={{display:"grid",gap:7}}><div style={label}>Creator tools</div><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:7}}>{[["Cover","eye"],["Teaser","play"],["Poll","chat"],["Paywall","lock"],["Boost","spark"],["Remix","refresh"]].map(([x,i])=><button key={x} type="button" style={{height:38,border:`1px solid ${line}`,borderRadius:8,background:"rgba(255,255,255,.025)",color:soft,font:"inherit",fontSize:".62rem",fontWeight:1000,cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5}}><I n={i} s={12}/>{x}</button>)}</div></div>
+            </div>
+            {postFiles.length>0&&<div style={{display:"grid",gap:7}}>{postFiles.map(file=><div key={file.id} style={{display:"grid",gridTemplateColumns:"24px minmax(0,1fr) auto",gap:8,alignItems:"center",padding:9,border:`1px solid ${line}`,borderRadius:8,background:"rgba(255,255,255,.025)"}}><I n={file.kind==="video"?"live":"eye"} s={13} c={file.kind==="video"?"#ff8aa8":"#58d7c4"}/><span style={{fontSize:".72rem",fontWeight:900,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{file.name}</span><span style={{...copy,fontSize:".58rem"}}>{file.kind}</span></div>)}</div>}
             <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1.1fr .9fr",gap:12}}>
               <div style={{display:"grid",gap:10}}><textarea value={postDraft.text} onChange={e=>setPostDraft(prev=>({...prev,text:e.target.value}))} placeholder="Write the tease, payoff, or unlock promise..." style={{...textarea,minHeight:142,fontSize:".9rem",background:"rgba(0,0,0,.24)"}}/>
                 <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"repeat(4,1fr)",gap:8}}>
@@ -2386,17 +2415,16 @@ function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
       <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"minmax(0,1fr) 340px",gap:14}}>
         <section style={{...panel,padding:18}}><div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"end",marginBottom:14}}><div><div style={label}>Feed command</div><h2 style={{fontSize:"1.08rem",fontWeight:1000,marginTop:5}}>A visual grid built for desire, clarity, and unlock intent.</h2></div><div style={{display:"flex",gap:7,flexWrap:"wrap"}}>{["All","Free","Subs","Paid"].map(x=><button key={x} type="button" style={{height:30,padding:"0 10px",border:`1px solid ${line}`,borderRadius:999,background:x==="All"?"rgba(185,140,255,.16)":"rgba(255,255,255,.025)",color:x==="All"?ink:soft,font:"inherit",fontSize:".62rem",fontWeight:1000,cursor:"pointer"}}>{x}</button>)}</div></div>
           <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1.05fr .95fr",gap:10}}>
-            {studioPosts.map((post,i)=><article key={`${post.text}-${i}`} style={{border:`1px solid ${i===0?"#d6b15e66":line}`,borderRadius:14,background:i===0?"linear-gradient(180deg,rgba(214,177,94,.07),rgba(255,255,255,.025))":"rgba(0,0,0,.16)",overflow:"hidden",gridRow:i===0&&!compact?"span 2":"auto"}}>
+            {sortedPosts.map((post,i)=><article key={post.id} style={{border:`1px solid ${i===0?"#d6b15e66":line}`,borderRadius:14,background:i===0?"linear-gradient(180deg,rgba(214,177,94,.07),rgba(255,255,255,.025))":"rgba(0,0,0,.16)",overflow:"hidden",gridRow:i===0&&!compact?"span 2":"auto"}}>
               <VisualMedia post={post} large={i===0}/>
               <div style={{padding:14}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}}><strong style={{fontSize:".8rem"}}>{p.name}</strong><span style={{...copy,fontSize:".6rem"}}>{post.time} ago</span></div><p style={{fontSize:".8rem",lineHeight:1.55,marginTop:7,color:"rgba(246,239,229,.88)"}}>{post.text}</p>
               <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:10}}>{post.access==="free"?<Tag color="#58d7c4">Free</Tag>:post.access==="subscribers"?<Tag color="#b98cff">Subscribers</Tag>:<Tag color="#d6b15e">{post.price} sparks</Tag>}<Tag color={post.media==="video"?"#ff8aa8":"#8fb5ff"}>{post.surface||post.media}</Tag></div>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr) auto",gap:5,alignItems:"center",marginTop:12}}>{[["likes","heart"],["dislikes","thumbdown"],["comments","chat"],["shares","share"],["saves","bookmark"]].map(([key,icon])=><button key={key} type="button" onClick={()=>reactToPost(i,key)} title={key} style={{height:32,border:`1px solid ${line}`,borderRadius:8,background:"rgba(255,255,255,.035)",color:soft,cursor:"pointer",font:"inherit",fontSize:".62rem",fontWeight:900,display:"inline-flex",alignItems:"center",justifyContent:"center",gap:4}}><I n={icon} s={11}/>{post[key]||0}</button>)}<button type="button" style={{height:32,padding:"0 9px",border:`1px solid ${line}`,borderRadius:8,background:"rgba(255,255,255,.035)",color:soft,cursor:"pointer",font:"inherit",fontSize:".62rem",fontWeight:900}}>Edit</button></div></div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr) auto",gap:5,alignItems:"center",marginTop:12}}>{[["likes","heart"],["dislikes","thumbdown"],["comments","chat"],["shares","share"],["saves","bookmark"]].map(([key,icon])=>{const activeReaction=!!reactedPosts[post.id]?.[key];const tone=key==="likes"?"#ff8aa8":key==="dislikes"?"#8fb5ff":key==="shares"?"#d6b15e":key==="saves"?"#58d7c4":soft;return <button key={key} type="button" onClick={()=>reactToPost(post.id,key)} title={key==="comments"?"View comments":key} style={{height:32,border:`1px solid ${activeReaction?tone+"88":line}`,borderRadius:8,background:activeReaction?`${tone}16`:"rgba(255,255,255,.035)",color:activeReaction?tone:soft,cursor:"pointer",font:"inherit",fontSize:".62rem",fontWeight:900,display:"inline-flex",alignItems:"center",justifyContent:"center",gap:4}}><I n={icon} s={11}/>{post[key]||0}</button>})}<button type="button" style={{height:32,padding:"0 9px",border:`1px solid ${line}`,borderRadius:8,background:"rgba(255,255,255,.035)",color:soft,cursor:"pointer",font:"inherit",fontSize:".62rem",fontWeight:900}}>Edit</button></div></div>
             </article>)}
           </div>
         </section>
         <aside style={{display:"grid",gap:14,alignContent:"start"}}>
           <section style={{...panel,padding:18}}><div style={label}>Release intelligence</div><div style={{display:"grid",gap:9,marginTop:13}}>{insightRows.map(([k,v,b,t])=><div key={k} style={{padding:11,borderRadius:10,border:`1px solid ${line}`,background:`linear-gradient(135deg,${t}10,rgba(255,255,255,.02))`}}><div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center"}}><span style={{fontSize:".72rem",fontWeight:1000}}>{k}</span><strong style={{color:t}}>{v}</strong></div><div style={{...copy,fontSize:".6rem",marginTop:3}}>{b}</div></div>)}</div></section>
-          <section style={{...panel,padding:18}}><div style={label}>Creative tools</div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:12}}>{[["Cover","eye"],["Teaser","play"],["Poll","chat"],["Remix","refresh"],["Paywall","lock"],["Boost","spark"]].map(([x,i])=><button key={x} type="button" style={{height:50,border:`1px solid ${line}`,borderRadius:9,background:"rgba(255,255,255,.025)",color:soft,font:"inherit",fontSize:".66rem",fontWeight:1000,cursor:"pointer",display:"grid",placeItems:"center",gap:3}}><I n={i} s={13}/>{x}</button>)}</div><div style={{...copy,marginTop:12}}>The goal is not just upload. It is packaging: cover frame, tease length, access rule, price, comments, and a remix path for the next drop.</div></section>
           <section style={{...panel,padding:18}}><div style={label}>Audience reaction</div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginTop:12}}>{[["Likes",totalLikes,"#ff8aa8"],["Shares",totalShares,"#d6b15e"],["Saves",totalSaves,"#58d7c4"]].map(([k,v,t])=><div key={k} style={{padding:10,borderRadius:9,border:`1px solid ${line}`,background:"rgba(255,255,255,.025)",textAlign:"center"}}><div style={{fontSize:".58rem",fontWeight:1000,color:dim,textTransform:"uppercase"}}>{k}</div><div style={{fontSize:"1rem",fontWeight:1000,color:t,marginTop:4}}>{v}</div></div>)}</div></section>
         </aside>
       </div>
@@ -2461,11 +2489,11 @@ function CreatorCenter({p,earn,fans,content,tab,setTab,onGoLive,onLogout}) {
             <div style={{display:"grid",gap:14}}><Readiness/><PatronList/></div>
             <div style={{gridColumn:"1 / -1",display:"grid",gridTemplateColumns:compact?"1fr":"1fr 1fr 1fr",gap:14}}><RoomCard/><section style={{...panel,padding:18}}><div style={label}>Preference health</div><div style={{...copy,marginTop:12}}>{activeGameIds.length} games active, {toggles.freeTrial?"7-day trial on":"trial waived"}, paid media {toggles.paidPosts?"enabled":"paused"}, public schedule {toggles.schedulePublic?"visible":"hidden"}.</div></section><section style={{...panel,padding:18}}><div style={label}>Next action</div><div style={{fontSize:"1rem",fontWeight:1000,marginTop:12}}>Post tonight's paid preview</div><p style={{...copy,marginTop:8}}>The studio is ready. A quick photo or video drop can warm subscribers before the room goes live.</p></section></div>
           </div>}
-          {tab==="analytics"&&<Analytics/>}
-          {tab==="content"&&<PostStudio/>}
-          {tab==="schedule"&&<Schedule/>}
-          {tab==="money"&&<Money/>}
-          {tab==="preferences"&&<Preferences/>}
+          {tab==="analytics"&&Analytics()}
+          {tab==="content"&&PostStudio()}
+          {tab==="schedule"&&Schedule()}
+          {tab==="money"&&Money()}
+          {tab==="preferences"&&Preferences()}
         </div>
       </div>
     </main>
@@ -2569,6 +2597,6 @@ export default function App(){
     <GiftSpectacleOverlay giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={advanceDemoGift}/>
     <PlatformBanner giftId={demoGift?.giftId} sender={demoGift?.sender} recipient={demoGift?.recipient} visible={!!demoGift} onDone={()=>{}}/>
     <SparkStormShell events={giftEvents} stormThreshold={3}/>
-    {giftDebug&&authed&&ok&&vw==="room"&&<GiftEffectPreviewControls onPreview={triggerDemoGift}/>}
+    {giftDebug&&authed&&ok&&vw==="room"&&<GiftEffectPreviewControls onPreview={triggerDemoGift} activeGiftId={demoGift?.giftId}/>}
   </>;
 }

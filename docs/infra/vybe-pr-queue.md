@@ -3,7 +3,7 @@
 This repo currently cannot open PRs via the Codex GitHub integration (`403 Resource not accessible by integration`).
 Use the compare links below to create PRs manually in the GitHub UI.
 
-Last updated: 2026-05-27T03:38:43-05:00
+Last updated: 2026-05-27T06:41:39-05:00
 
 ## Manual PR Steps (GitHub UI)
 
@@ -21,6 +21,7 @@ Last updated: 2026-05-27T03:38:43-05:00
 1. **Backend contract baseline into `main` (recommended first)**
    - Branch: `backend/contracts-mainline-integration-sync`
    - Why: `main` does not yet contain `backend/contracts/**` (OpenAPI + AsyncAPI + Socket.io schemas) or the runtime contract test harness.
+   - Includes: `/api/me/profile` (viewer profile update) + OpenAPI + runtime contract coverage.
 
 2. **Review doc: ChatGPT autonomous review lane**
    - Branch: `review/chatgpt-autonomous`
@@ -46,6 +47,12 @@ Last updated: 2026-05-27T03:38:43-05:00
 - Validation (2026-05-27): `cd backend && npm run check` -> PASS (18 tests)
 - Notes:
   - This branch supersedes many intermediate contract branches (`backend/*contract*`, `backend/*baseline*`, `backend/*runtime*`).
+
+### Superseded: `backend/me-profile` -> `main`
+
+Do not merge this if `backend/contracts-mainline-integration-sync` is merged first (it already contains the same endpoint + contract updates).
+
+- Compare: https://github.com/CKing722/Vybe/compare/main...backend/me-profile?expand=1
 
 ### `review/chatgpt-autonomous` -> `main`
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { GIFT_EFFECT_MAP } from "./giftEffectCatalog.js";
 import useReducedMotion from "./useReducedMotion.js";
+import useGiftCombo from "./useGiftCombo.js";
 
 /*
   SparkStormShell
@@ -28,6 +29,7 @@ export default function SparkStormShell({
   const cooldownTimer = useRef(null);
   const prevStorming = useRef(false);
   const reducedMotion = useReducedMotion();
+  const { comboActive, comboCount, comboTier } = useGiftCombo({ events, windowMs: stormWindowMs, minCombo: 2 });
 
   useEffect(() => {
     if (!events.length) return;
@@ -138,6 +140,11 @@ export default function SparkStormShell({
           from { opacity: 0; transform: translateX(-12px); }
           to   { opacity: 1; transform: translateX(0); }
         }
+        @keyframes vybe-combo-pop {
+          0%   { transform: scale(0.7); opacity: 0; }
+          60%  { transform: scale(1.18); }
+          100% { transform: scale(1); opacity: 1; }
+        }
       `}</style>
 
       <div style={headerStyle}>
@@ -145,6 +152,19 @@ export default function SparkStormShell({
           <span>&#9889;</span>
           <span>Spark Storm</span>
         </div>
+        {comboActive && (
+          <div style={{
+            padding: "2px 9px",
+            borderRadius: "10px",
+            background: comboTier === "high" ? "#FFD70022" : comboTier === "mid" ? "#FFB80022" : "#ff2d7822",
+            border: "1px solid " + (comboTier === "high" ? "#FFD70066" : comboTier === "mid" ? "#FFB80066" : "#ff2d7866"),
+            color: comboTier === "high" ? "#FFD700" : comboTier === "mid" ? "#FFB800" : "#ff2d78",
+            fontSize: "10px",
+            fontWeight: 800,
+            letterSpacing: "0.10em",
+            animation: reducedMotion ? "none" : "vybe-combo-pop 0.22s cubic-bezier(0.22,1,0.36,1) both",
+          }}>x{comboCount}</div>
+        )}
         <div style={heatBarTrackStyle}>
           <div style={heatBarFillStyle} />
         </div>

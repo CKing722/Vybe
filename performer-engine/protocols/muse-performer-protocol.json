@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MUSE-Performer Protocol v1",
+  "description": "WebSocket message format between MUSE orchestrator and Performer Runtime",
+
+  "messageTypes": {
+
+    "performer.pose": {
+      "description": "Change the performer base pose via IK blend",
+      "direction": "muse -> runtime",
+      "schema": {
+        "type": "performer.pose",
+        "pose": "standing_neutral | standing_hip | seated_relaxed | seated_forward | recline_back | recline_side | kneel_upright | kneel_forward | closeup_face | closeup_upper",
+        "blend_seconds": 2.0,
+        "priority": 1
+      }
+    },
+
+    "performer.action": {
+      "description": "Execute a named action from the motion library",
+      "direction": "muse -> runtime",
+      "schema": {
+        "type": "performer.action",
+        "action_id": "string (motion clip identifier)",
+        "intensity": 0.0,
+        "loop": false,
+        "blend_in": 0.5,
+        "blend_out": 0.5,
+        "requires_permission": "string (permission key checked at runtime)"
+      }
+    },
+
+    "performer.expression": {
+      "description": "Set facial expression blend shapes",
+      "direction": "muse -> runtime",
+      "schema": {
+        "type": "performer.expression",
+        "expression": "neutral | smile | smile_wide | surprise | laugh | moan_light | moan_heavy | wink | bite_lip | eyes_closed | focus | pleasure_light | pleasure_heavy",
+        "intensity": 0.0,
+        "blend_seconds": 0.3
+      }
+    },
+
+    "performer.voice_sync": {
+      "description": "Audio data for mouth/body sync",
+      "direction": "muse -> runtime",
+      "schema": {
+        "type": "performer.voice_sync",
+        "audio_url": "string (streaming audio endpoint)",
+        "viseme_data": "array of {time_ms, viseme, weight}",
+        "body_energy": 0.0
+      }
+    },
+
+    "performer.prop": {
+      "description": "Attach, detach, or activate a prop",
+      "direction": "muse -> runtime",
+      "schema": {
+        "type": "performer.prop",
+        "prop_id": "string",
+        "action": "attach | detach | activate | deactivate",
+        "socket": "right_hand | left_hand | custom_socket_name",
+        "requires_permission": "string"
+      }
+    },
+
+    "performer.camera": {
+      "description": "Change camera angle or behavior",
+      "direction": "muse -> runtime",
+      "schema": {
+        "type": "performer.camera",
+        "preset": "cam_wide | cam_medium | cam_closeup | cam_detail | cam_dynamic | cam_reaction",
+        "focus_point": "face | hands | full_body | prop | custom_xyz",
+        "transition_seconds": 1.0
+      }
+    },
+
+    "performer.wardrobe": {
+      "description": "Change garment visibility state",
+      "direction": "muse -> runtime",
+      "schema": {
+        "type": "performer.wardrobe",
+        "garment_id": "string",
+        "state": "on | off | partial",
+        "transition": "instant | cloth_sim",
+        "requires_permission": "string"
+      }
+    },
+
+    "performer.look_at": {
+      "description": "Direct performer gaze",
+      "direction": "muse -> runtime",
+      "schema": {
+        "type": "performer.look_at",
+        "target": "camera | away | down | up | random_drift",
+        "intensity": 0.0,
+        "blink_rate": 1.0
+      }
+    },
+
+    "performer.idle_behavior": {
+      "description": "Set ambient idle animation parameters",
+      "direction": "muse -> runtime",
+      "schema": {
+        "type": "performer.idle_behavior",
+        "breathing_rate": 1.0,
+        "sway_amount": 0.0,
+        "hair_touch": false,
+        "micro_expressions": true,
+        "energy_level": 0.0
+      }
+    },
+
+    "performer.state_report": {
+      "description": "Current performer state sent back to MUSE",
+      "direction": "runtime -> muse",
+      "schema": {
+        "type": "performer.state_report",
+        "current_pose": "string",
+        "current_action": "string | null",
+        "action_progress": 0.0,
+        "active_props": ["string"],
+        "wardrobe_state": {"garment_id": "on | off | partial"},
+        "camera_preset": "string",
+        "energy_level": 0.0,
+        "queue_depth": 0,
+        "last_permission_block": "string | null"
+      }
+    },
+
+    "performer.permission_denied": {
+      "description": "Runtime rejected an action due to missing permission",
+      "direction": "runtime -> muse",
+      "schema": {
+        "type": "performer.permission_denied",
+        "original_command": "object (the command that was blocked)",
+        "reason": "string",
+        "required_permission": "string"
+      }
+    },
+
+    "viewer.event": {
+      "description": "Viewer interaction forwarded from frontend to MUSE",
+      "direction": "frontend -> muse",
+      "schema": {
+        "type": "viewer.event",
+        "event": "chat | gift | game_action | request | enter | leave",
+        "viewer_id": "string",
+        "viewer_name": "string",
+        "data": "object (event-specific payload)"
+      }
+    },
+
+    "room.metrics": {
+      "description": "Room-level metrics for orchestrator decisions",
+      "direction": "frontend -> muse",
+      "schema": {
+        "type": "room.metrics",
+        "viewer_count": 0,
+        "chat_velocity": 0.0,
+        "active_game": "string | null",
+        "sparks_last_60s": 0,
+        "top_gifter_id": "string | null"
+      }
+    }
+  }
+}

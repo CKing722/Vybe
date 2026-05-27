@@ -5,6 +5,7 @@ import SparkStormShell from "./gifts/SparkStormShell.jsx";
 import GiftEffectPreviewControls from "./gifts/GiftEffectPreviewControls.jsx";
 import GiftHistoryFeed from "./gifts/GiftHistoryFeed.jsx";
 import VybeLuxuryPreview from "./gifts/VybeLuxuryPreview.jsx";
+import VybePerformerStream from "./components/VybePerformerStream.jsx";
 import useGiftQueue from "./gifts/useGiftQueue.js";
 import useGiftSocket from "./gifts/useGiftSocket.js";
 import { getEffectForCost } from "./gifts/giftEffectCatalog.js";
@@ -1774,14 +1775,18 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const theaterPreview=roomParams.get("theaterPreview")==="1";
   const requestedCaptionLang=roomParams.get("captionLang");
   const initialCaptionLang=CAPTION_LANGUAGES.includes(requestedCaptionLang)?requestedCaptionLang:DEFAULT_CAPTION_LANG;
+  const performerSignalingUrl=roomParams.get("signalingUrl")||roomParams.get("pixelStreamingUrl")||import.meta.env.VITE_PERFORMER_SIGNALING_URL||"ws://localhost:8888";
+  const performerMuseUrl=roomParams.get("performerMuseUrl")||roomParams.get("museUrl")||import.meta.env.VITE_PERFORMER_MUSE_URL||"ws://localhost:9000";
+  const performerPlaceholderSrc=roomParams.get("performerPlaceholder")||import.meta.env.VITE_PERFORMER_PLACEHOLDER_SRC||"";
   const [media,setMedia]=useState({paused:false,replay:false,replayLeft:0,muted:false,volume:72,volumeOpen:false,fullscreen:false,settings:settingsPreview,captions:roomParams.get("captionsPreview")==="1",captionLang:initialCaptionLang,captionMenu:roomParams.get("captionMenuPreview")==="1",quality:"1080p",layout:roomParams.get("layout")==="vertical"?"Vertical":"Wide",theater:theaterPreview});
   const [ch,setCh]=useState([{user:"VYBE",msg:`Welcome — ${perf.name} is live. You are known here.`,vip:false,id:0}]);
   const [ci,setCi]=useState("");const [chH,setChH]=useState(theaterPreview||roomParams.get("chatHidden")==="1");
   const [reqFx,setReqFx]=useState([]);const [notif,setNotif]=useState(null);const [tm,setTm]=useState(1800);
+  const [streamStatus,setStreamStatus]=useState("connecting");
   const [pendingReq,setPendingReq]=useState([]);
   const [requestPins,setRequestPins]=useState([]);
   const demoChat=roomParams.get("demoChat")==="1"||roomParams.get("vybePreview")==="room";
-  const roomRef=useRef(null);const CP=[{user:"NightOwl",msg:"Let's go"},{user:"VelvetKing",msg:"Crown incoming",vip:true},{user:"AceHigh",msg:"All in",vip:true},{user:"DiamondJay",msg:"Here we go",vip:true}];
+  const roomRef=useRef(null);const sendPerformerEventRef=useRef(null);const CP=[{user:"NightOwl",msg:"Let's go"},{user:"VelvetKing",msg:"Crown incoming",vip:true},{user:"AceHigh",msg:"All in",vip:true},{user:"DiamondJay",msg:"Here we go",vip:true}];
   useEffect(()=>{const t=setInterval(()=>setTm(p=>Math.max(0,p-1)),1000);return()=>clearInterval(t)},[]);
   useEffect(()=>{if(!demoChat)return undefined;const t=setInterval(()=>{setCh(p=>[...p.slice(-39),{...CP[Math.floor(Math.random()*4)],id:Date.now()}])},5000);return()=>clearInterval(t)},[demoChat]);
   useEffect(()=>{const level=media.muted?0:Math.max(0,Math.min(100,media.volume))/100;document.querySelectorAll("video,audio").forEach(el=>{el.volume=level;el.muted=media.muted||media.volume===0})},[media.volume,media.muted]);
@@ -1796,15 +1801,19 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const goLive=()=>{setMedia(p=>({...p,paused:false,replay:false,replayLeft:0,settings:false,volumeOpen:false}));setNotif("Returned to live");setTimeout(()=>setNotif(null),1400)};
   const startReplay=()=>{if(!perf.caps.replay){setNotif("Replay is not enabled for this room");setTimeout(()=>setNotif(null),1600);return}setPn(null);setGm(null);setMedia(p=>({...p,paused:false,replay:true,replayLeft:15,settings:false,volumeOpen:false}));setNotif("Instant replay - 15 seconds behind live");setTimeout(()=>setNotif(null),1600)};
   const toggleFullscreen=async()=>{const entering=!media.fullscreen;if(entering){setPn(null);setGm(null);setChH(true);setMedia(p=>({...p,fullscreen:true,settings:false,volumeOpen:false}));try{const el=roomRef.current||document.documentElement,req=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;if(req)await req.call(el)}catch(e){}}else{setMedia(p=>({...p,fullscreen:false,volumeOpen:false}));try{const exit=document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen;if((document.fullscreenElement||document.webkitFullscreenElement||document.msFullscreenElement)&&exit)await exit.call(document)}catch(e){}}};
+  const handlePerformerSenderReady=useCallback(fn=>{sendPerformerEventRef.current=typeof fn==="function"?fn:null},[]);
+  const forwardPerformerEvent=useCallback((event,data={})=>sendPerformerEventRef.current?.(event,data),[]);
   const tog=n=>{setPn(p=>p===n?null:n);if(n)setGm(null)};
   const sg=g=>{if(user.sparks<g.cost)return;onSC(-g.cost);
     const effectId=getEffectForCost(g.cost).id;
+    forwardPerformerEvent("gift",{gift_id:g.id,gift_name:g.name,cost:g.cost,effect_id:effectId});
     setCh(p=>[...p.slice(-39),{user:user.name,msg:`sent ${g.name}`,vip:true,id:Date.now()}]);onGiftSent&&onGiftSent(effectId);setPn(null)};
-  const sc=()=>{if(!ci.trim())return;setCh(p=>[...p.slice(-39),{user:user.name,msg:ci,vip:true,id:Date.now()}]);setCi("")};
+  const sc=()=>{const message=ci.trim();if(!message)return;forwardPerformerEvent("chat",{message});setCh(p=>[...p.slice(-39),{user:user.name,msg:message,vip:true,id:Date.now()}]);setCi("")};
   const sb=a=>{onSC(a);setNotif(`+${a} sparks earned`);setTimeout(()=>setNotif(null),1800)};
   const acceptReq=id=>{const rq=pendingReq.find(r=>r.id===id&&r.status==="pending");if(!rq)return;const now=Date.now(),item={...rq,status:"accepted",pinId:now};setPendingReq(p=>p.filter(r=>r.id!==id));setNotif(null);setRequestPins(p=>[item,...p.filter(x=>x.id!==rq.id)].slice(0,10));const fx={...rq,id:now};setReqFx(p=>[...p,fx]);setTimeout(()=>setReqFx(p=>p.filter(r=>r.id!==fx.id)),5400);setCh(p=>[...p.slice(-39),{type:"request",status:"accepted",user:rq.user,name:rq.name,sparks:rq.sparks,msg:`accepted ${rq.name}`,vip:false,id:now}])};
   const declineReq=id=>{const rq=pendingReq.find(r=>r.id===id&&r.status==="pending");if(!rq)return;const now=Date.now(),item={...rq,status:"declined",pinId:now};setPendingReq(p=>p.filter(r=>r.id!==id));setRequestPins(p=>[item,...p.filter(x=>x.id!==rq.id)].slice(0,10));if(rq.user===user.name)onSC(rq.sparks);setCh(p=>[...p.slice(-39),{type:"request",status:"declined",user:rq.user,name:rq.name,sparks:rq.sparks,msg:`${rq.name} declined`,vip:false,id:now}])};
-  const addReq=r=>{if(user.sparks<r.sparks)return;onSC(-r.sparks);const item={id:Date.now(),user:user.name,name:r.name,desc:r.desc,sparks:r.sparks,status:"pending"};setPendingReq(p=>[item,...p].slice(0,5));setPn(null)};
+  const addReq=r=>{if(user.sparks<r.sparks)return;onSC(-r.sparks);const item={id:Date.now(),user:user.name,name:r.name,desc:r.desc,sparks:r.sparks,status:"pending"};forwardPerformerEvent("request",{request_id:item.id,request_name:r.name,description:r.desc,sparks:r.sparks,status:"pending"});setPendingReq(p=>[item,...p].slice(0,5));setPn(null)};
+  const chooseGame=g=>{setGm(g);setPn(null);forwardPerformerEvent("game_action",{action:"select_game",game_id:g.id,game_name:g.name,game_type:g.type})};
   const avG=GAMES.filter(g=>perf.caps.games.includes(g.id));
   const topAcceptedReq=requestPins.filter(r=>r.status==="accepted").reduce((best,r)=>!best||r.sparks>best.sparks||(r.sparks===best.sparks&&r.pinId>best.pinId)?r:best,null);
   const latestDeclinedReq=requestPins.filter(r=>r.status==="declined").reduce((best,r)=>!best||r.pinId>best.pinId?r:best,null);
@@ -1817,33 +1826,36 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
   const roomHeat=Math.max(12,Math.min(99,Math.round(24+chatPressure+vipChatPressure+pendingSparkPressure+acceptedSparkPressure+gamePressure+heatPulse)));
   const heatBars=[.36,.52,.66,.78,.9].map((m,i)=>Math.max(18,Math.min(72,roomHeat*m+i*3)));
   const heatColors=["#00d4ff","#c6ff00","#ffab00","#ff2d78","#8b5cf6"];
-  const theaterView=media.fullscreen||media.theater;
-  const verticalLayout=media.layout==="Vertical";
-  const stageWidth=media.fullscreen?verticalLayout?"min(430px,36vw)":"min(760px,58vw)":theaterView?verticalLayout?"min(360px,34vw)":"min(680px,58vw)":verticalLayout?"min(250px,30%)":"min(300px,36%)";
-  const stageHeight=media.fullscreen?"88%":theaterView?"82%":"72%";
-  const bodyWidth=media.fullscreen?verticalLayout?190:320:theaterView?verticalLayout?168:275:160;
-  const headSize=media.fullscreen?verticalLayout?84:94:theaterView?76:64;
   const captionLang=media.captionLang==="Auto-translate"?"Auto-translated":media.captionLang.replace(" original","");
 
   return<div ref={roomRef} style={{position:"relative",width:"100%",height:"100vh",overflow:"hidden",background:"#050810"}}>
-    <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse at 45% 65%,${perf.accent}15,transparent 50%),radial-gradient(ellipse at 55% 35%,rgba(0,212,255,.06),transparent 50%),linear-gradient(180deg,#080e1c,#0a0814 50%,#0d061a)`}}>
-      <div style={{position:"absolute",bottom:0,left:theaterView&&!verticalLayout?"55%":"50%",transform:"translateX(-50%)",width:stageWidth,height:stageHeight,transition:"width .45s ease,height .45s ease,left .45s ease"}}>
-        <div style={{position:"absolute",top:"4%",left:"50%",transform:"translateX(-50%)",width:headSize,height:headSize,borderRadius:"50%",background:"radial-gradient(circle,#e8c4a8 55%,#c49070)",transition:"width .45s ease,height .45s ease"}}/>
-        <div style={{position:"absolute",bottom:"-3%",left:"50%",transform:"translateX(-50%)",width:bodyWidth,height:theaterView&&!verticalLayout?"66%":"70%",borderRadius:theaterView&&!verticalLayout?"46% 46% 24px 24px":"42% 42% 20px 20px",background:`linear-gradient(170deg,${perf.accent} 15%,var(--vi) 50%,#0a0e1a 90%)`,transition:"width .45s ease,height .45s ease,border-radius .45s ease"}}/></div>
-      {(media.paused||media.replay)&&<div className="ai" style={{position:"absolute",top:media.fullscreen?18:58,left:"50%",transform:"translateX(-50%)",zIndex:18,display:"flex",alignItems:"center",gap:12,padding:"8px 10px",borderRadius:999,border:"1px solid rgba(255,255,255,.14)",background:"linear-gradient(135deg,rgba(10,14,24,.68),rgba(7,9,16,.9))",boxShadow:"0 22px 70px rgba(0,0,0,.36)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",pointerEvents:"auto"}}>
+    <VybePerformerStream
+      signalingUrl={performerSignalingUrl}
+      museUrl={performerMuseUrl}
+      performerId={perf.id}
+      roomId={`room_${perf.id}`}
+      viewerId={user.id||user.name}
+      viewerName={user.name}
+      placeholderSrc={performerPlaceholderSrc}
+      muted={media.muted||media.volume===0}
+      onStatusChange={setStreamStatus}
+      onEventSenderReady={handlePerformerSenderReady}
+      style={{position:"absolute",inset:0,zIndex:0}}
+    />
+    <div aria-hidden="true" style={{position:"absolute",inset:0,zIndex:1,pointerEvents:"none",background:`radial-gradient(ellipse at 45% 65%,${perf.accent}12,transparent 52%),radial-gradient(ellipse at 55% 35%,rgba(0,212,255,.05),transparent 50%),linear-gradient(180deg,rgba(5,8,16,.08),rgba(5,8,16,.2) 60%,rgba(5,8,16,.52))`}}/>
+    {(media.paused||media.replay)&&<div className="ai" style={{position:"absolute",top:media.fullscreen?18:58,left:"50%",transform:"translateX(-50%)",zIndex:18,display:"flex",alignItems:"center",gap:12,padding:"8px 10px",borderRadius:999,border:"1px solid rgba(255,255,255,.14)",background:"linear-gradient(135deg,rgba(10,14,24,.68),rgba(7,9,16,.9))",boxShadow:"0 22px 70px rgba(0,0,0,.36)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",pointerEvents:"auto"}}>
         <span style={{width:8,height:8,borderRadius:8,background:media.paused?"var(--am)":"var(--cy)",boxShadow:`0 0 18px ${media.paused?"var(--am)":"var(--cy)"}`}}/>
         <div style={{minWidth:0}}><div style={{fontSize:".68rem",fontWeight:1000,letterSpacing:".08em",textTransform:"uppercase",color:media.paused?"var(--am)":"var(--cy)"}}>{media.paused?"Viewing paused":"Instant replay"}</div>
           <div style={{fontSize:".58rem",fontWeight:800,color:"rgba(255,255,255,.62)",whiteSpace:"nowrap"}}>{media.paused?"Live keeps moving for the room":`${media.replayLeft || 15}s behind live`}</div></div>
         <button type="button" onClick={media.paused?()=>setViewingPaused(false):goLive} style={{height:28,padding:"0 10px",borderRadius:14,border:"1px solid rgba(255,255,255,.14)",background:"rgba(255,255,255,.08)",color:"#fff",font:"inherit",fontSize:".58rem",fontWeight:1000,cursor:"pointer",whiteSpace:"nowrap"}}>{media.paused?"Resume":"Go Live"}</button>
       </div>}
       {reqFx.map(r=><RequestMoment key={r.id} item={r} perf={perf}/>)}
-    </div>
     {notif&&<div className="ai" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:50,padding:"7px 16px",borderRadius:9,background:notif.includes("refunded")?"rgba(255,171,0,.1)":"rgba(34,197,94,.1)",border:"1px solid "+(notif.includes("refunded")?"var(--am)":"var(--gn)"),fontWeight:800,fontSize:".82rem",color:notif.includes("refunded")?"var(--am)":"var(--gn)"}}>{notif}</div>}
     {/* Top */}
     {!media.fullscreen&&<div style={{position:"absolute",top:0,left:0,right:0,display:"flex",justifyContent:"space-between",alignItems:"start",padding:"9px 10px",zIndex:10}}>
       <G style={{padding:"6px 9px",display:"flex",alignItems:"center",gap:6}}>
         <button onClick={onBack} style={{background:"none",border:"none",color:"var(--tx)",cursor:"pointer",padding:0,display:"flex"}}><I n="back" s={14}/></button>
-        <div><div style={{display:"flex",alignItems:"center",gap:4}}><Lv/><span style={{fontWeight:800,fontSize:".8rem"}}>{perf.name}</span></div>
+        <div><div style={{display:"flex",alignItems:"center",gap:4,flexWrap:"wrap"}}><Lv/><span style={{fontWeight:800,fontSize:".8rem"}}>{perf.name}</span><span title={`Renderer ${streamStatus}`} style={{padding:"3px 7px",borderRadius:999,border:"1px solid rgba(0,212,255,.24)",background:"rgba(0,212,255,.08)",color:"var(--cy)",fontSize:".52rem",fontWeight:1000,letterSpacing:".08em",textTransform:"uppercase"}}>UE5 {streamStatus}</span></div>
           <div style={{display:"flex",gap:4,marginTop:1,fontSize:".62rem",color:"var(--mt)"}}>
             <span><I n="users" s={8} c="var(--mt)"/> {perf.viewers}</span><span>{fmt(tm)}</span></div></div></G>
       <div style={{display:"flex",gap:3}}>
@@ -1903,7 +1915,7 @@ function RM({perf,user,onBack,onSC,onWallet,onBook,onVip,onGiftSent}){
         <div style={{fontWeight:900,fontSize:".78rem"}}>VYBE game direction</div>
         <p style={{fontSize:".66rem",lineHeight:1.45,color:"var(--mt)",marginTop:3}}>Core answers are free; misses deduct sparks. Higher-value reward modes use explicit stakes or escrow, and performer-control outcomes still need acceptance.</p>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr",gap:5,overflowY:"auto",maxHeight:"calc(100% - 88px)",paddingRight:3}}>{avG.map(g=><button key={g.id} onClick={()=>{setGm(g);setPn(null)}} style={{padding:"9px 8px",borderRadius:8,border:"1px solid var(--bd)",background:"var(--cd)",textAlign:"left",cursor:"pointer"}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr",gap:5,overflowY:"auto",maxHeight:"calc(100% - 88px)",paddingRight:3}}>{avG.map(g=><button key={g.id} onClick={()=>chooseGame(g)} style={{padding:"9px 8px",borderRadius:8,border:"1px solid var(--bd)",background:"var(--cd)",textAlign:"left",cursor:"pointer"}}>
         <div style={{display:"flex",alignItems:"center",gap:3}}><I n={g.icon} s={11} c={g.color}/><span style={{fontWeight:700,fontSize:".7rem"}}>{g.name}</span></div>
         <p style={{fontSize:".6rem",color:"var(--mt)",lineHeight:1.3,marginTop:1}}>{g.desc}</p>
         <div style={{marginTop:5,fontSize:".56rem",fontWeight:900,color:"var(--am)",display:"flex",alignItems:"center",gap:2}}><I n="spark" s={8} c="var(--am)"/>{gameEconomyLine(g.type)}</div></button>)}</div></Pn>}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { Suspense, lazy, useState, useEffect, useRef, useCallback } from "react";
 import GiftSpectacleOverlay from "./gifts/GiftSpectacleOverlay.jsx";
 import PlatformBanner from "./gifts/PlatformBanner.jsx";
 import SparkStormShell from "./gifts/SparkStormShell.jsx";
@@ -8,6 +8,8 @@ import VybeLuxuryPreview from "./gifts/VybeLuxuryPreview.jsx";
 import useGiftQueue from "./gifts/useGiftQueue.js";
 import useGiftSocket from "./gifts/useGiftSocket.js";
 import { getEffectForCost } from "./gifts/giftEffectCatalog.js";
+
+const VybeForgePreview=lazy(()=>import("./forge/VybeForgePreview.jsx"));
 
 const API_BASE=(import.meta.env.VITE_API_URL||"http://localhost:4000").replace(/\/$/,"");
 async function apiJson(path,{method="GET",token,body,headers={}}={}){
@@ -2725,7 +2727,8 @@ export default function App(){
   const profilePreview=searchParams.get("vybePreview")==="profile";
   const lobbyPreview=searchParams.get("vybePreview")==="lobby";
   const musePreview=searchParams.get("vybePreview")==="muse"&&isLocalPreviewHost;
-  const previewMode=visualPreview||roomPreview||studioPreview||lobbyPreview||profilePreview||musePreview;
+  const forgePreview=searchParams.get("vybePreview")==="forge"&&isLocalPreviewHost;
+  const previewMode=visualPreview||roomPreview||studioPreview||lobbyPreview||profilePreview||musePreview||forgePreview;
   const previewView=visualPreview||roomPreview?"room":profilePreview?"profile":"lobby";
   const giftDebug=searchParams.get("giftDebug")==="1";
   const [authed,setAuthed]=useState(previewMode);const [authUser,setAuthUser]=useState(previewMode?{email:"preview@vybe.local",name:"VelvetKing",role:studioPreview?"performer":"viewer",ageVerified:true}:null);const [apiToken,setApiToken]=useState(null);
@@ -2786,6 +2789,7 @@ export default function App(){
   const handleGoLive=async()=>{try{if(apiToken&&authUser?.role==="performer"){const r=await apiJson("/api/performers/me/live",{method:"POST",token:apiToken,body:{isLive:true}});setPf(normalizeFrontendPerformer({...perfSelf,id:r.performerId||perfSelf?.id,backendId:r.performerId||perfSelf?.backendId,isLive:r.isLive??true}))}else{setPf(perfSelf)}setVw("room")}catch(error){window.alert?.(error.message||"Performer verification and paperwork must be complete before going live")}};
 
   if(musePreview)return <><style>{css}</style><MuseLocalPreview/></>;
+  if(forgePreview)return <><style>{css}</style><Suspense fallback={<div style={{minHeight:"100vh",display:"grid",placeItems:"center",background:"#07080d",color:"#f8efe9",fontFamily:"Sora,system-ui,sans-serif",fontWeight:1000}}>Loading VYBE Forge</div>}><VybeForgePreview/></Suspense></>;
   if(visualPreview)return <VybeLuxuryPreview/>;
 
   if(!previewMode&&!authed){

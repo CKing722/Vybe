@@ -351,6 +351,13 @@ function HighTierOverlay({ effect, pal, typo, sender, recipient, phase, reducedM
             <span>{effect.audienceScope === "platform" ? "platform moment" : "room moment"}</span>
             {typo.showSparkCount && <span>{effect.sparkCost.toLocaleString()} sparks</span>}
           </div>
+          <GiftPhaseProgress
+            durationMs={effect.durationMs}
+            primary={pal.primary}
+            reducedMotion={reducedMotion}
+            visible={phase !== "exit"}
+            startKey={effect.id}
+          />
         </div>
         {queueLength > 0 && (
           <div style={{
@@ -693,14 +700,53 @@ function MidTierBurst({ effect, pal, typo, sender, phase, reducedMotion, queueLe
         <div style={{ ...gemStyle, width: 54, height: 54, transformStyle: "preserve-3d" }}>
           <GiftObjectMesh kind={effect.objectKind || effect.id} pal={pal} />
         </div>
-        <div style={textWrap}>
+        <div style={{ ...textWrap, flex: 1, minWidth: 0 }}>
           <span style={senderStyle}>{sender}</span>
           <span style={nameStyle}>{effect.displayName}</span>
           {typo.showSparkCount && (
             <span style={sparkStyle}>{effect.sparkCost.toLocaleString()} sparks</span>
           )}
+          <GiftPhaseProgress
+            durationMs={effect.durationMs}
+            primary={pal.primary}
+            reducedMotion={reducedMotion}
+            visible={phase !== "exit"}
+            startKey={effect.id}
+          />
         </div>
       </div>
+    </div>
+  );
+}
+
+/* -----------------------------------------------------------------------
+   GiftPhaseProgress - thin timeline bar showing spectacle duration elapsed.
+   CSS-animated from 0->100% width over durationMs. Only visible for mid/high
+   tier gifts; skipped entirely in reduced-motion mode.
+   ----------------------------------------------------------------------- */
+function GiftPhaseProgress({ durationMs, primary, reducedMotion, visible, startKey }) {
+  if (reducedMotion || !visible || !durationMs) return null;
+  return (
+    <div style={{
+      width: "100%",
+      height: "2px",
+      background: "rgba(255,255,255,0.07)",
+      borderRadius: "1px",
+      overflow: "hidden",
+      marginTop: "8px",
+      flexShrink: 0,
+    }}>
+      <style>{`@keyframes vybe-phase-progress{from{width:0%}to{width:100%}}`}</style>
+      <div
+        key={startKey}
+        style={{
+          height: "100%",
+          width: 0,
+          background: "linear-gradient(90deg," + primary + "88," + primary + ")",
+          borderRadius: "1px",
+          animation: "vybe-phase-progress " + durationMs + "ms linear forwards",
+        }}
+      />
     </div>
   );
 }

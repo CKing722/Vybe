@@ -101,6 +101,29 @@ function emitWithAck(socket, eventName, payload, timeoutMs = 2500) {
   });
 }
 
+function waitForViewerCount(socket, expectedCount, timeoutMs = 2500) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const handler = (payload) => {
+      if (payload?.count !== expectedCount) return;
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      socket.off('viewer_count', handler);
+      resolve(payload);
+    };
+
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      socket.off('viewer_count', handler);
+      reject(new Error(`Timed out waiting for viewer_count=${expectedCount}`));
+    }, timeoutMs);
+
+    socket.on('viewer_count', handler);
+  });
+}
+
 test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banners, and storms', async () => {
   resetMemoryStore();
   resetStormState();
@@ -237,6 +260,77 @@ test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banne
     validateOrThrow(validateStormComplete, complete, 'spark_storm_complete event payload');
   } finally {
     socket.disconnect();
+    await close();
+  }
+});
+
+test('Socket.io viewer_count updates when a client disconnects without leave_room', async () => {
+  resetMemoryStore();
+  resetStormState();
+
+  const ajv = await loadSocketIoContractAjv();
+  const validateJoin = ajv.getSchema(
+    'vybe://contracts/socketio/v1/client-to-server/join_room.schema.json'
+  );
+  const validateViewerCount = ajv.getSchema(
+    'vybe://contracts/socketio/v1/server-to-client/viewer_count.schema.json'
+  );
+
+  assert.ok(validateJoin);
+  assert.ok(validateViewerCount);
+
+  const { baseUrl, socketUrl, close } = await startTestServerWithSockets();
+  const accessTokenA = await loginViewer(baseUrl);
+  const accessTokenB = await loginViewer(baseUrl);
+
+  const socketA = createClient(socketUrl, {
+    transports: ['websocket'],
+    auth: { token: accessTokenA },
+    timeout: 2000,
+    reconnection: false,
+  });
+
+  const socketB = createClient(socketUrl, {
+    transports: ['websocket'],
+    auth: { token: accessTokenB },
+    timeout: 2000,
+    reconnection: false,
+  });
+
+  try {
+    await Promise.all([
+      new Promise((resolve, reject) => {
+        socketA.once('connect', resolve);
+        socketA.once('connect_error', reject);
+      }),
+      new Promise((resolve, reject) => {
+        socketB.once('connect', resolve);
+        socketB.once('connect_error', reject);
+      }),
+    ]);
+
+    const joinPayload = { room_id: MEMORY_IDS.room };
+    validateOrThrow(validateJoin, joinPayload, 'join_room payload');
+
+    const viewerCountOnePromise = waitForViewerCount(socketA, 1);
+    const joinAckA = await emitWithAck(socketA, 'join_room', joinPayload);
+    assert.deepEqual(joinAckA, { ok: true, roomId: MEMORY_IDS.room });
+    const viewerCountOne = await viewerCountOnePromise;
+    validateOrThrow(validateViewerCount, viewerCountOne, 'viewer_count(1) payload');
+
+    const viewerCountTwoPromise = waitForViewerCount(socketA, 2);
+    const joinAckB = await emitWithAck(socketB, 'join_room', joinPayload);
+    assert.deepEqual(joinAckB, { ok: true, roomId: MEMORY_IDS.room });
+    const viewerCountTwo = await viewerCountTwoPromise;
+    validateOrThrow(validateViewerCount, viewerCountTwo, 'viewer_count(2) payload');
+
+    const viewerCountBackToOnePromise = waitForViewerCount(socketA, 1, 5000);
+    socketB.disconnect();
+    const viewerCountBackToOne = await viewerCountBackToOnePromise;
+    validateOrThrow(validateViewerCount, viewerCountBackToOne, 'viewer_count(1 after disconnect)');
+  } finally {
+    socketA.disconnect();
+    socketB.disconnect();
     await close();
   }
 });

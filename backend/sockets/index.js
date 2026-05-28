@@ -36,6 +36,17 @@ function configureSockets(httpServer, app) {
   });
 
   io.on('connection', (socket) => {
+    socket.on('disconnecting', () => {
+      socket.data.roomsToUpdate = Array.from(socket.rooms).filter((room) => room !== socket.id);
+    });
+
+    socket.on('disconnect', async () => {
+      const rooms = socket.data.roomsToUpdate || [];
+      for (const room of rooms) {
+        await emitViewerCount(room);
+      }
+    });
+
     socket.on('join_room', async ({ room_id: roomId, roomId: camelRoomId }, ack) => {
       const room = roomId || camelRoomId;
       if (!room) {

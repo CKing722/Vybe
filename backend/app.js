@@ -1,6 +1,6 @@
 const cookieParser = require('cookie-parser');
 const express = require('express');
-const { apiLimiter } = require('./middleware/rateLimiter');
+const { createApiLimiter } = require('./middleware/rateLimiter');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const { securityMiddleware } = require('./middleware/security');
 const authRoutes = require('./routes/auth');
@@ -14,6 +14,7 @@ const userRoutes = require('./routes/users');
 
 function createApp() {
   const app = express();
+  const apiLimiter = createApiLimiter();
 
   app.use(securityMiddleware());
   app.use(express.json({ limit: '1mb' }));

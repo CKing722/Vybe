@@ -140,24 +140,51 @@ function GiftCanvas({ gift, reducedMotion }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    let frame = 0;
-    let raf = 0;
 
-    function draw() {
+    const isMobile = window.innerWidth < 480;
+    const frameInterval = isMobile ? 1000 / 30 : 0;
+    let lastFrameMs = 0;
+    let startMs = 0;
+    let raf = 0;
+    let paused = false;
+
+    function draw(nowMs) {
+      if (paused) return;
+      if (!startMs) startMs = nowMs;
+      if (frameInterval > 0 && nowMs - lastFrameMs < frameInterval) {
+        raf = requestAnimationFrame(draw);
+        return;
+      }
+      lastFrameMs = nowMs;
+      const t = (nowMs - startMs) / 1000;
       const w = rect.width;
       const h = rect.height;
-      const t = frame / 60;
       ctx.clearRect(0, 0, w, h);
       drawAura(ctx, w, h, gift.tone, t);
       drawObject(ctx, w, h, gift, t);
       if (!reducedMotion) {
-        frame += 1;
         raf = requestAnimationFrame(draw);
       }
     }
 
-    draw();
-    return () => cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(draw);
+
+    function onVisibility() {
+      if (document.hidden) {
+        paused = true;
+        cancelAnimationFrame(raf);
+      } else {
+        paused = false;
+        startMs = 0;
+        raf = requestAnimationFrame(draw);
+      }
+    }
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [gift, reducedMotion]);
 
   return <canvas ref={canvasRef} style={styles.giftCanvas} aria-hidden="true" />;

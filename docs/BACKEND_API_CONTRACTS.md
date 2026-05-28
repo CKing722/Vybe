@@ -158,6 +158,41 @@ Requires auth.
 
 Returns the current viewer, spark balance, loyalty tier, and performer history.
 
+Response:
+
+```json
+{
+  "user": {
+    "id": "11111111-1111-4111-8111-111111111111",
+    "email": "viewer@vybe.local",
+    "displayName": "VelvetKing",
+    "role": "viewer",
+    "avatarUrl": null,
+    "bannerUrl": null,
+    "bio": null,
+    "isVerified": false
+  },
+  "viewer": {
+    "sparks": 10000,
+    "totalSpent": 0,
+    "gamesPlayed": 0,
+    "gamesWon": 0,
+    "winRate": 0,
+    "topStreak": 0,
+    "sparksEarned": 0,
+    "totalSessions": 0,
+    "reputationScore": 0,
+    "loyalty": {
+      "name": "Bronze",
+      "min": 0,
+      "sparkBack": 0,
+      "color": "#cd7f32"
+    }
+  },
+  "performerHistory": []
+}
+```
+
 ### `GET /api/me/achievements`
 
 Requires auth.
@@ -191,6 +226,32 @@ Query parameters:
 - `limit` (default 25, max 100)
 
 Returns a `summary` of the viewer's relationship with the performer plus a `gifts` list suitable for the "Your History" UI section.
+
+Notes:
+
+- `:performerId` accepts either a performer UUID or demo slug (e.g. `luna`).
+
+Response:
+
+```json
+{
+  "performer": {
+    "id": "22222222-2222-4222-8222-222222222222",
+    "slug": "luna",
+    "name": "Luna Voss",
+    "roomId": "33333333-3333-4333-8333-333333333333",
+    "accent": "#ff2d78"
+  },
+  "summary": {
+    "sessionsCount": 0,
+    "sparksSpent": 0,
+    "isSubscribed": false,
+    "firstInteraction": null,
+    "lastInteraction": null
+  },
+  "gifts": []
+}
+```
 
 ### `PUT /api/me/profile`
 

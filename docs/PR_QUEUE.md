@@ -28,6 +28,10 @@ Notes:
 - PR create URL: https://github.com/CKing722/Vybe/pull/new/backend/query-param-safety
 - Recommendation: merge after step (2) to avoid conflict churn.
 
+5) `backend/user-rate-limit-key` -> `main`
+- PR create URL: https://github.com/CKing722/Vybe/pull/new/backend/user-rate-limit-key
+- Recommendation: merge after step (2) to avoid conflict churn.
+
 ## Validation reminder
 
 Before merging each PR, rerun:

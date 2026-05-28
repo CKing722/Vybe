@@ -4,7 +4,7 @@ const { body, cookie } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const { env } = require('../config/env');
 const { CSRF_HEADER_NAME, issueCsrfToken, requireCsrf } = require('../middleware/csrf');
-const { loginLimiter } = require('../middleware/rateLimiter');
+const { createLoginLimiter } = require('../middleware/rateLimiter');
 const { requireAuth, signAccessToken, signRefreshToken } = require('../middleware/auth');
 const { validate } = require('../middleware/validator');
 const { loginUser, registerUser, startTwoFactorSetup, verifyTwoFactorSetup } = require('../services/authService');
@@ -16,6 +16,7 @@ const {
 const { unauthorized } = require('../utils/errors');
 
 const router = express.Router();
+const loginLimiter = createLoginLimiter();
 
 function setRefreshCookie(res, token) {
   res.cookie('vybe_refresh', token, {

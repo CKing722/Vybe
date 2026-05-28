@@ -2,7 +2,11 @@
 
 Updated: 2026-05-28
 
-This repo requires feature branches + PRs (no direct pushes to `main`). While GitHub connector PR creation is blocked and GitHub CLI (`gh`) is not available on this machine, use the manual PR creation URLs below.
+This repo requires feature branches + PRs (no direct pushes to `main`).
+
+Notes:
+- GitHub CLI (`gh`) is not available on this machine.
+- If the Codex GitHub connector can open PRs, prefer it; otherwise use the manual PR creation URLs below.
 
 ## Backend PR stack (merge order)
 
@@ -17,6 +21,12 @@ This repo requires feature branches + PRs (no direct pushes to `main`). While Gi
 - PR create URL: https://github.com/CKing722/Vybe/pull/new/backend/openapi-vertical-slice-sync
 - Preferred base **before** step (2) merges: set base branch to `backend/vertical-slice-integration`
 - Preferred base **after** step (2) merges: set base branch to `main`
+
+## Follow-up PRs (after backend stack)
+
+4) `backend/query-param-safety` -> `main`
+- PR create URL: https://github.com/CKing722/Vybe/pull/new/backend/query-param-safety
+- Recommendation: merge after step (2) to avoid conflict churn.
 
 ## Validation reminder
 

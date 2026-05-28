@@ -137,8 +137,17 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
     // trailFade=false: hard-edge particles stay opaque until nearly dead
     const hardEdge = budget.trailFade === false;
 
-    function tick() {
+    // Throttle to 30fps on mobile to reduce battery drain.
+    const frameInterval = isMobile ? 1000 / 30 : 0;
+    let lastFrameMs = 0;
+
+    function tick(nowMs) {
       if (paused) return;
+      if (frameInterval > 0 && nowMs - lastFrameMs < frameInterval) {
+        animIdRef.current = requestAnimationFrame(tick);
+        return;
+      }
+      lastFrameMs = nowMs;
       ctx.clearRect(0, 0, w, h);
       let alive = 0;
 
@@ -205,7 +214,7 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
       }
     }
 
-    tick();
+    animIdRef.current = requestAnimationFrame(tick);
 
     // Pause/resume when the browser tab is hidden to save GPU and battery.
     function onVisibilityChange() {
@@ -215,7 +224,7 @@ export default function CanvasParticleRenderer({ pal, budget, phase }) {
         cancelAnimationFrame(animIdRef.current);
       } else {
         paused = false;
-        tick();
+        animIdRef.current = requestAnimationFrame(tick);
       }
     }
     document.addEventListener("visibilitychange", onVisibilityChange);

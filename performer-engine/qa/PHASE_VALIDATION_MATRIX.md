@@ -50,10 +50,12 @@ Status: smoke-client validated locally against the runtime.
 
 ## Phase 7: Motion Library
 
-Status: specification only; blocked on animation assets.
+Status: manifest complete; blocked on animation assets.
 
 - Required: authored or captured animations for idle, talk, reactions, transitions, action clips, facial expressions, and camera-safe prop interactions.
 - Every clip must be mapped to a permission key before MUSE can request it.
+- `motion-library/motion_manifest.json` defines required poses, actions, camera presets, transition policy, and QA thresholds.
+- Manifest tests verify protocol pose/camera coverage and permission keys.
 
 ## Phase 8: Realism Iteration
 

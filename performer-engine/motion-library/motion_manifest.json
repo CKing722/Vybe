@@ -1,0 +1,65 @@
+{
+  "version": "1.0.0",
+  "renderer": "ue5_metahuman_pixel_streaming",
+  "assetStatus": "manifest_only_assets_required",
+  "poses": [
+    { "id": "standing_neutral", "assetPath": "/Game/Animations/Poses/pose_standing_neutral", "required": true },
+    { "id": "standing_hip", "assetPath": "/Game/Animations/Poses/pose_standing_hip", "required": true },
+    { "id": "seated_relaxed", "assetPath": "/Game/Animations/Poses/pose_seated_relaxed", "required": true },
+    { "id": "seated_forward", "assetPath": "/Game/Animations/Poses/pose_seated_forward", "required": true },
+    { "id": "recline_back", "assetPath": "/Game/Animations/Poses/pose_recline_back", "required": true },
+    { "id": "recline_side", "assetPath": "/Game/Animations/Poses/pose_recline_side", "required": true },
+    { "id": "kneel_upright", "assetPath": "/Game/Animations/Poses/pose_kneel_upright", "required": true },
+    { "id": "kneel_forward", "assetPath": "/Game/Animations/Poses/pose_kneel_forward", "required": true },
+    { "id": "closeup_face", "assetPath": "/Game/Animations/Poses/pose_closeup_face", "required": true },
+    { "id": "closeup_upper", "assetPath": "/Game/Animations/Poses/pose_closeup_upper", "required": true }
+  ],
+  "actions": [
+    { "id": "wave_to_room", "assetPath": "/Game/Animations/Actions/action_wave_to_room", "permission": "public", "required": true },
+    { "id": "talk_gesture", "assetPath": "/Game/Animations/Actions/action_talk_gesture", "permission": "public", "required": true },
+    { "id": "acknowledge_gift", "assetPath": "/Game/Animations/Actions/action_acknowledge_gift", "permission": "public", "required": true },
+    { "id": "react_celebrate", "assetPath": "/Game/Animations/Actions/action_react_celebrate", "permission": "public", "required": true },
+    { "id": "point_to_game", "assetPath": "/Game/Animations/Actions/action_point_to_game", "permission": "public", "required": true },
+    { "id": "lean_forward", "assetPath": "/Game/Animations/Actions/action_lean_forward", "permission": "public", "required": true },
+    { "id": "settle_forward", "assetPath": "/Game/Animations/Actions/action_settle_forward", "permission": "public", "required": true },
+    { "id": "private_pose_transition", "assetPath": "/Game/Animations/Actions/action_private_pose_transition", "permission": "private", "required": true },
+    { "id": "vip_close_camera_reaction", "assetPath": "/Game/Animations/Actions/action_vip_close_camera_reaction", "permission": "vip", "required": true },
+    { "id": "prop_hand_interaction", "assetPath": "/Game/Animations/Actions/action_prop_hand_interaction", "permission": "prop_approved", "required": true }
+  ],
+  "expressions": [
+    "neutral",
+    "smile",
+    "smile_wide",
+    "surprise",
+    "laugh",
+    "wink",
+    "bite_lip",
+    "eyes_closed",
+    "focus",
+    "pleasure_light",
+    "pleasure_heavy"
+  ],
+  "cameras": [
+    "cam_wide",
+    "cam_medium",
+    "cam_closeup",
+    "cam_detail",
+    "cam_dynamic",
+    "cam_reaction"
+  ],
+  "transitionPolicy": {
+    "type": "complete_pose_graph_required",
+    "minimumBlendSeconds": 0.25,
+    "maximumBlendSeconds": 3.0,
+    "requiredPoseToPoseTransitions": "all_pose_pairs"
+  },
+  "qaRequirements": {
+    "minimumFps": 60,
+    "maximumFirstFrameLatencyMs": 1400,
+    "maximumMouthDesyncMs": 80,
+    "requiresFingerContactReview": true,
+    "requiresHairAndClothStabilityReview": true,
+    "requiresCameraOcclusionReview": true,
+    "requiresPermissionKeyForEveryAction": true
+  }
+}

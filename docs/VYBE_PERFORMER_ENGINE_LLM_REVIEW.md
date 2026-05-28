@@ -8,6 +8,7 @@
 - The Python Performer Runtime loads a performer JSON profile, gates commands by permission/profile/prop approval, and can run in `--dry-run` mode without Unreal.
 - A UE5 project scaffold, Remote Control contract, mock Unreal WebSocket server, and MUSE smoke client now exist under `performer-engine/`.
 - The local harness has been tested through real WebSockets: MUSE smoke client -> Performer Runtime -> mock Unreal Remote Control server.
+- Phase 7 now has a motion-library manifest and realism acceptance checklist, but real UE5 animation assets are still required.
 - The Unreal/MetaHuman project remains the real visual execution layer and must be built in UE5 by a human/technical artist.
 
 ## Main Concerns To Review

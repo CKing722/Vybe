@@ -13,7 +13,8 @@ permission-gated command protocol.
 
 1. Read `CODEX_BUILD_INSTRUCTIONS.md` for the full build sequence
 2. Read `docs/ARCHITECTURE.md` for the system overview
-3. Review `protocols/muse-performer-protocol.json` for the message format
+3. Review `protocols/muse-performer-protocol.json` for the MUSE message format
+4. Review `contracts/unreal-remote-control-contract.json` for the UE5 function contract
 
 ## Directory Layout
 
@@ -23,14 +24,24 @@ docs/
   ARCHITECTURE.md              System overview and data flow
 protocols/
   muse-performer-protocol.json WebSocket message schemas
-src/
-  muse-bridge/
-    performer_runtime.py       Python bridge (MUSE <-> Unreal)
-    requirements.txt           Python dependencies
-  react-integration/
-    VybePerformerStream.jsx    React component for vybe-live
-  unreal-specs/
-    PROJECT_SETUP.md           UE5 project structure and config
+contracts/
+  unreal-remote-control-contract.json UE5 objectPath/function contract
+muse-bridge/
+  performer_runtime.py         Python bridge (MUSE <-> Unreal)
+  requirements.txt             Python dependencies
+performers/
+  luna.json                    Performer permission/profile config
+tests/
+  test_*.py                    Runtime and contract tests
+unreal-specs/
+  PROJECT_SETUP.md             UE5 project structure and config
+tools/
+  mock_unreal_remote.py        Validates runtime -> UE command envelopes
+  muse_smoke_client.py         Sends smoke commands into the runtime
+unreal-project/
+  VybePerformer.uproject       UE5 project scaffold and C++ function signatures
+qa/
+  PHASE_VALIDATION_MATRIX.md   Current phase status and blockers
 ```
 
 ## Build Order
@@ -38,5 +49,8 @@ src/
 1. Website integration (React component + placeholder video)
 2. Performer Runtime (Python WebSocket bridge)
 3. Unreal Engine 5 project (MetaHuman + Pixel Streaming)
-4. Connect all three layers
-5. Build motion library and iterate on realism
+4. Browser to UE5 Pixel Streaming validation
+5. Runtime to UE5 Remote Control validation
+6. MUSE to Runtime validation
+7. Build motion library
+8. Iterate on realism, latency, and expression quality

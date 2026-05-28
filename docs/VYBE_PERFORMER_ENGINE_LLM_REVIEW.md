@@ -6,6 +6,8 @@
 - `VybePerformerStream` is now the room background contract: UE5 Pixel Streaming video in, existing chat/gifts/games/requests overlaid on top.
 - Viewer chat, gifts, game selections, requests, enter, and leave events are forwarded as `viewer.event` messages to MUSE.
 - The Python Performer Runtime loads a performer JSON profile, gates commands by permission/profile/prop approval, and can run in `--dry-run` mode without Unreal.
+- A UE5 project scaffold, Remote Control contract, mock Unreal WebSocket server, and MUSE smoke client now exist under `performer-engine/`.
+- The local harness has been tested through real WebSockets: MUSE smoke client -> Performer Runtime -> mock Unreal Remote Control server.
 - The Unreal/MetaHuman project remains the real visual execution layer and must be built in UE5 by a human/technical artist.
 
 ## Main Concerns To Review
@@ -18,6 +20,8 @@
 6. The motion library is the biggest quality blocker: every pose transition, facial expression, prop interaction, voice viseme, gaze target, and camera move needs authored clips or Control Rig logic.
 7. The UE5 Remote Control object paths in `performer_runtime.py` must match the final Blueprint asset paths exactly.
 8. Voice sync still requires a tested viseme pipeline from TTS output into `ProcessVisemes` on the UE5 face rig.
+9. The local machine does not have UE5 installed, so editor-level validation, MetaHuman import, Blueprint exposure, Pixel Streaming launch, and animation QA are not complete.
+10. Backend MUSE-to-runtime command translation exists as a standalone client service; reviewers should decide where to invoke it in the live MUSE event/tick path once deployment topology is confirmed.
 
 ## What Not To Regress
 

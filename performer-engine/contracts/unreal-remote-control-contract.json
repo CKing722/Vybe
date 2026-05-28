@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VYBE UE5 Remote Control Contract",
+  "description": "Object paths, Blueprint functions, and parameters the Performer Runtime is allowed to send to Unreal Engine.",
+  "version": "1.0.0",
+  "objects": {
+    "/Game/Performer/AnimBP.AnimBP": {
+      "owner": "Luna_AnimBP",
+      "functions": {
+        "SetTargetPose": {
+          "parameters": {
+            "PoseName": "string",
+            "BlendTime": "float"
+          }
+        },
+        "PlayActionClip": {
+          "parameters": {
+            "ClipName": "string",
+            "Intensity": "float_0_1",
+            "Loop": "bool"
+          }
+        },
+        "SetIdleBehavior": {
+          "parameters": {
+            "BreathingRate": "float",
+            "SwayAmount": "float_0_1",
+            "Energy": "float_0_1"
+          }
+        }
+      }
+    },
+    "/Game/Performer/FaceRig.FaceRig": {
+      "owner": "Luna_FaceRig",
+      "functions": {
+        "SetExpression": {
+          "parameters": {
+            "Expression": "string",
+            "Intensity": "float_0_1",
+            "BlendTime": "float"
+          }
+        },
+        "SetLookAt": {
+          "parameters": {
+            "Target": "string",
+            "Intensity": "float_0_1"
+          }
+        },
+        "ProcessVisemes": {
+          "parameters": {
+            "AudioURL": "string",
+            "Visemes": "array",
+            "BodyEnergy": "float_0_1"
+          }
+        }
+      }
+    },
+    "/Game/Performer/PropManager.PropManager": {
+      "owner": "BP_PropManager",
+      "functions": {
+        "AttachProp": {
+          "parameters": {
+            "PropId": "string",
+            "Socket": "string"
+          }
+        },
+        "DetachProp": {
+          "parameters": {
+            "PropId": "string"
+          }
+        },
+        "ActivateProp": {
+          "parameters": {
+            "PropId": "string"
+          }
+        },
+        "DeactivateProp": {
+          "parameters": {
+            "PropId": "string"
+          }
+        }
+      }
+    },
+    "/Game/CameraDirector.CameraDirector": {
+      "owner": "BP_CameraDirector",
+      "functions": {
+        "SetPreset": {
+          "parameters": {
+            "Preset": "string",
+            "TransitionTime": "float"
+          }
+        }
+      }
+    },
+    "/Game/Performer/WardrobeManager.WardrobeManager": {
+      "owner": "BP_WardrobeManager",
+      "functions": {
+        "SetGarmentState": {
+          "parameters": {
+            "GarmentId": "string",
+            "State": "string"
+          }
+        }
+      }
+    }
+  }
+}

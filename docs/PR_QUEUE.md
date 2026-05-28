@@ -10,17 +10,20 @@ Notes:
 
 ## Backend PR stack (merge order)
 
-### Option A (recommended first slice): contracts only
+### Option A (recommended first slice): machine-readable contracts only
 
 If you want machine-readable contracts without pulling in the larger runtime-validation harness, merge this first:
 
-1A) `backend/machine-contracts` -> `main`
-- PR create URL: https://github.com/CKing722/Vybe/pull/new/backend/machine-contracts
-- Contains: `backend/contracts/openapi.yaml`, Socket.io JSON Schemas, and a schema-parse test.
+1A) `backend/machine-readable-contracts-into-main` -> `main`
+- PR create URL: https://github.com/CKing722/Vybe/pull/new/backend/machine-readable-contracts-into-main
+- Contains: `backend/contracts/openapi.yaml`, `backend/contracts/asyncapi.yaml`, `backend/contracts/socketio/v1/**`, and contract-parse tests.
+
+Deprecated:
+- `backend/machine-contracts` (older, superseded by `backend/machine-readable-contracts-into-main`)
 
 ### Option B (larger baseline): contracts + runtime validation harness
 
-If you merge this, **skip** `backend/machine-contracts` (it overlaps heavily):
+If you merge this, **skip** `backend/machine-readable-contracts-into-main` (it overlaps heavily):
 
 1) `backend/contracts-baseline-into-main` -> `main`
 - PR create URL: https://github.com/CKing722/Vybe/pull/new/backend/contracts-baseline-into-main

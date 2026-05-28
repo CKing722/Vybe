@@ -10,6 +10,18 @@ Notes:
 
 ## Backend PR stack (merge order)
 
+### Option A (recommended first slice): contracts only
+
+If you want machine-readable contracts without pulling in the larger runtime-validation harness, merge this first:
+
+1A) `backend/machine-contracts` -> `main`
+- PR create URL: https://github.com/CKing722/Vybe/pull/new/backend/machine-contracts
+- Contains: `backend/contracts/openapi.yaml`, Socket.io JSON Schemas, and a schema-parse test.
+
+### Option B (larger baseline): contracts + runtime validation harness
+
+If you merge this, **skip** `backend/machine-contracts` (it overlaps heavily):
+
 1) `backend/contracts-baseline-into-main` -> `main`
 - PR create URL: https://github.com/CKing722/Vybe/pull/new/backend/contracts-baseline-into-main
 
@@ -24,11 +36,15 @@ Notes:
 
 ## Follow-up PRs (after backend stack)
 
-4) `backend/query-param-safety` -> `main`
+4) `backend/me-achievements` -> `main`
+- PR create URL: https://github.com/CKing722/Vybe/pull/new/backend/me-achievements
+- Adds: `GET /api/me/achievements` and performer content demo endpoints.
+
+5) `backend/query-param-safety` -> `main`
 - PR create URL: https://github.com/CKing722/Vybe/pull/new/backend/query-param-safety
 - Recommendation: merge after step (2) to avoid conflict churn.
 
-5) `backend/user-rate-limit-key` -> `main`
+6) `backend/user-rate-limit-key` -> `main`
 - PR create URL: https://github.com/CKing722/Vybe/pull/new/backend/user-rate-limit-key
 - Recommendation: merge after step (2) to avoid conflict churn.
 

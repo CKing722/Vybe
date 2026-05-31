@@ -1,4 +1,4 @@
-# VYBE — Linear Project Board
+# VYBE - Linear Project Board
 
 ## Epic 1: Foundation
 - [ ] Monorepo setup (frontend + backend)
@@ -64,7 +64,7 @@
 - [ ] Real-time chat via WebSocket (send, receive, scroll)
 - [ ] Chat hide/show toggle
 - [ ] Gift panel with 7 tiers
-- [ ] Canvas gift animations (bloom → cinematic, scaled by cost)
+- [ ] Canvas gift animations (bloom -> cinematic, scaled by cost)
 - [ ] Gift sender name display (duration scaled by cost)
 - [ ] Games panel (filtered by performer)
 - [ ] Request panel (performer's custom menu)
@@ -92,20 +92,20 @@
 - [ ] Sound hooks for each tier (muted by default)
 
 ## Epic 8: Game Engines
-- [ ] Tease Trivia — multiple choice, AI questions, streak meter
-- [ ] Spin & Sin — animated wheel with segments, physics
-- [ ] Truth or Dare — card flip, binary choice
-- [ ] Hot Seat — countdown timer, elimination
-- [ ] Card Clash — head-to-head card reveal
-- [ ] Fantasy Auction — live bidding with timer
-- [ ] King of the Hill — cumulative scoring, rounds
-- [ ] Mystery Box — 6 boxes, random prizes, open animation
-- [ ] Dare Ladder — 5 rungs, climb or bank, escalating
-- [ ] Buzz Battle — reaction time, visual signal
-- [ ] All-In Jackpot — 3 lives, 10-streak = free session
+- [ ] Tease Trivia - multiple choice, AI questions, streak meter
+- [ ] Spin & Sin - animated wheel with segments, physics
+- [ ] Truth or Dare - card flip, binary choice
+- [ ] Hot Seat - countdown timer, elimination
+- [ ] Card Clash - head-to-head card reveal
+- [ ] Fantasy Auction - live bidding with timer
+- [ ] King of the Hill - cumulative scoring, rounds
+- [ ] Mystery Box - 6 boxes, random prizes, open animation
+- [ ] Dare Ladder - 5 rungs, climb or bank, escalating
+- [ ] Buzz Battle - reaction time, visual signal
+- [ ] All-In Jackpot - 3 lives, 10-streak = free session
 - [ ] Local/mock AI-style question generation; no raw provider APIs
 - [ ] Unique visual identity per game mode
-- [ ] Game result → viewer stats update
+- [ ] Game result -> viewer stats update
 
 ## Epic 9: Performer Studio
 - [ ] Sidebar navigation (Home, Content, Inbox, Store, Analytics, Settings)
@@ -121,7 +121,7 @@
 ## Epic 10: Spark Economy
 - [ ] Spark purchase flow with 6 tiers + price anchoring
 - [ ] Wallet display with balance + loyalty tier
-- [ ] Loyalty tiers (Bronze→Diamond) based on lifetime spend
+- [ ] Loyalty tiers (Bronze->Diamond) based on lifetime spend
 - [ ] Spark-back calculation per tier (0-20%)
 - [ ] Transaction history
 - [ ] Auto-reload option
@@ -147,7 +147,7 @@
 - [ ] DMCA takedown system
 
 ## Epic 13: Compliance & Legal
-- [ ] 18 USC §2257 compliance statement on all pages
+- [ ] 18 USC Sec. 2257 compliance statement on all pages
 - [ ] Performer onboarding: ID upload, model release, W-9
 - [ ] Yoti age verification integration (viewers)
 - [ ] Cookie consent banner (GDPR/CCPA)

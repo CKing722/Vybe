@@ -1,5 +1,6 @@
 const { hasDatabase, query } = require('../config/db');
 const { notFound } = require('../utils/errors');
+const { parseBoundedInt } = require('../utils/params');
 const { getMemoryState } = require('./memoryStore');
 const { loyaltyForSpend } = require('./profileService');
 
@@ -49,10 +50,11 @@ async function getSparkBalance(userId) {
 }
 
 async function listSparkTransactions(userId, { limit = 25 } = {}) {
+  const safeLimit = parseBoundedInt(limit, { defaultValue: 25, min: 1, max: 100 });
   if (!hasDatabase()) {
     return getMemoryState()
       .sparkTransactions.filter((transaction) => transaction.user_id === userId)
-      .slice(-limit)
+      .slice(-safeLimit)
       .reverse()
       .map(normalizeSparkTransaction);
   }
@@ -64,7 +66,7 @@ async function listSparkTransactions(userId, { limit = 25 } = {}) {
      WHERE user_id = $1
      ORDER BY created_at DESC
      LIMIT $2`,
-    [userId, limit]
+    [userId, safeLimit]
   );
   return rows.map(normalizeSparkTransaction);
 }

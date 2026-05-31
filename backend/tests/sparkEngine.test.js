@@ -164,6 +164,14 @@ test('demo API exposes viewer, performer, and spark contracts for frontend integ
       )
     );
 
+    const transactionsInvalidLimitResponse = await fetch(
+      `${baseUrl}/api/sparks/transactions?limit=not-a-number`,
+      { headers }
+    );
+    assert.equal(transactionsInvalidLimitResponse.status, 200);
+    const transactionsInvalidLimit = await transactionsInvalidLimitResponse.json();
+    assert.ok(Array.isArray(transactionsInvalidLimit.transactions));
+
     const bannersResponse = await fetch(`${baseUrl}/api/banners/active`);
     assert.equal(bannersResponse.status, 200);
     const banners = await bannersResponse.json();

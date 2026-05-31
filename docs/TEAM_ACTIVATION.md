@@ -25,13 +25,18 @@ Damon has approved moving from setup into active buildout. The team should opera
 ### Codex
 
 - Task: `VYBE-GHO-002: Backend - Gift Event Contract And Platform Banners`
-- Completed local artifacts:
-  - `95d8a44 Add backend gift event contract`
-  - `28f1157 Add CI workflow`
-  - `863bcfd Add frontend-ready demo API contracts`
-  - `22deda5 Document backend API contracts`
-  - `e627f6f backend: add /api/me/profile to OpenAPI contract` (branch `backend/me-profile-contract-sync`)
-- Next scope: continue backend/frontend integration contracts, auth hardening, and no-cost local adapters.
+- Recommended integration base (while PR tooling is blocked):
+  - Branch: `backend/vertical-slice-mainline-ready`
+  - Head: use `git log -1 --oneline backend/vertical-slice-mainline-ready` (includes demo HTTP + Socket.io contracts, runtime contract tests, and safety hardening)
+- Key backend artifacts (local branches/commits until GitHub PRs are unblocked):
+  - `95d8a44` Add backend gift event contract
+  - `28f1157` Add CI workflow
+  - `863bcfd` Add frontend-ready demo API contracts
+  - `22deda5` Document backend API contracts
+  - Consolidation: `backend/vertical-slice-mainline-ready` (see Linear doc `VYBE-GHO-042`)
+- Current blocker (machine-local):
+  - GitHub PR creation is blocked until `gh auth login` is completed on this machine.
+- Next scope: keep backend contracts stable for Claude integration, continue auth hardening + no-cost adapters, and open PRs once GitHub CLI auth is unblocked.
 
 ### Hermes
 

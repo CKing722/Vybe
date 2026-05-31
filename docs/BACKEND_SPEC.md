@@ -1,4 +1,4 @@
-# VYBE Backend Architecture — Codex Build Spec
+# VYBE Backend Architecture - Codex Build Spec
 
 ## Stack
 - **Runtime:** Node.js 20+
@@ -13,42 +13,42 @@
 ## Project Structure
 ```
 backend/
-├── server.js           # Express + Socket.io setup
-├── routes/
-│   ├── auth.js         # register, login, logout, refresh, 2fa
-│   ├── users.js        # profile CRUD, viewer identity
-│   ├── performers.js   # performer profiles, capabilities, schedule
-│   ├── sparks.js       # purchase, balance, transactions, sparkback
-│   ├── gifts.js        # send gift, gift history, platform banners
-│   ├── sessions.js     # book, start, end sessions
-│   ├── requests.js     # performer request menu CRUD, purchase
-│   ├── subscriptions.js # subscribe, cancel, status
-│   ├── content.js      # post, upload, purchase, feed
-│   ├── games.js        # game sessions, results, leaderboards
-│   ├── chat.js         # DM send, read, list conversations
-│   ├── community.js    # spark storms, presence points, achievements
-│   └── admin.js        # moderation, compliance, analytics
-├── middleware/
-│   ├── auth.js         # JWT verification, role checking
-│   ├── rateLimiter.js  # per-endpoint rate limits
-│   ├── validator.js    # input sanitization (express-validator)
-│   ├── security.js     # CORS, helmet, CSP headers
-│   └── upload.js       # multer + R2 upload pipeline
-├── models/             # Knex query builders per table
-├── sockets/
-│   ├── chatHandler.js  # real-time chat messages
-│   ├── giftHandler.js  # real-time gift animations + platform banners
-│   ├── gameHandler.js  # real-time game state sync
-│   └── stormHandler.js # spark storm events
-├── services/
-│   ├── sparkEngine.js  # spark transactions with balance checks
-│   ├── loyaltyEngine.js # tier calculations, sparkback rates
-│   ├── bannerService.js # platform-wide gift banners
-│   └── aiQuestions.js  # local/mock game questions; no raw provider APIs
-└── config/
-    ├── db.js           # PostgreSQL connection pool (pg)
-    ├── redis.js        # Redis client
-    └── r2.js           # Cloudflare R2 client
+|-- server.js            # Express + Socket.io setup
+|-- routes/
+|   |-- auth.js          # register, login, logout, refresh, 2fa
+|   |-- users.js         # profile CRUD, viewer identity
+|   |-- performers.js    # performer profiles, capabilities, schedule
+|   |-- sparks.js        # purchase, balance, transactions, sparkback
+|   |-- gifts.js         # send gift, gift history, platform banners
+|   |-- sessions.js      # book, start, end sessions
+|   |-- requests.js      # performer request menu CRUD, purchase
+|   |-- subscriptions.js # subscribe, cancel, status
+|   |-- content.js       # post, upload, purchase, feed
+|   |-- games.js         # game sessions, results, leaderboards
+|   |-- chat.js          # DM send, read, list conversations
+|   |-- community.js     # spark storms, presence points, achievements
+|   `-- admin.js         # moderation, compliance, analytics
+|-- middleware/
+|   |-- auth.js          # JWT verification, role checking
+|   |-- rateLimiter.js   # per-endpoint rate limits
+|   |-- validator.js     # input sanitization (express-validator)
+|   |-- security.js      # CORS, helmet, CSP headers
+|   `-- upload.js        # multer + R2 upload pipeline
+|-- models/              # Knex query builders per table
+|-- sockets/
+|   |-- chatHandler.js   # real-time chat messages
+|   |-- giftHandler.js   # real-time gift animations + platform banners
+|   |-- gameHandler.js   # real-time game state sync
+|   `-- stormHandler.js  # spark storm events
+|-- services/
+|   |-- sparkEngine.js   # spark transactions with balance checks
+|   |-- loyaltyEngine.js # tier calculations, sparkback rates
+|   |-- bannerService.js # platform-wide gift banners
+|   `-- aiQuestions.js   # local/mock game questions; no raw provider APIs
+`-- config/
+    |-- db.js            # PostgreSQL connection pool (pg)
+    |-- redis.js         # Redis client
+    `-- r2.js            # Cloudflare R2 client
 ```
 
 ## Security Requirements (Non-negotiable)
@@ -80,7 +80,7 @@ When viewer spends X sparks on a performer:
 
 ## WebSocket Events (Socket.io)
 ```
-Client → Server:
+Client -> Server:
   'join_room' { room_id }
   'leave_room' { room_id }
   'chat_message' { room_id, message }
@@ -88,10 +88,10 @@ Client → Server:
   'game_answer' { game_session_id, answer_index }
   'send_request' { performer_id, request_id }
 
-Server → Client:
+Server -> Client:
   'chat_message' { sender, message, badges, tier }
   'gift_animation' { sender, gift, animation_type, duration }
-  'platform_banner' { sender, performer, gift, sparks } — broadcast to ALL rooms
+  'platform_banner' { sender, performer, gift, sparks } - broadcast to ALL rooms
   'spark_storm_start' { target, timer }
   'spark_storm_update' { current, level }
   'spark_storm_complete' { reward_per_participant }

@@ -101,6 +101,37 @@ function emitWithAck(socket, eventName, payload, timeoutMs = 2500) {
   });
 }
 
+function waitForConnect(socket, timeoutMs = 2500) {
+  return new Promise((resolve, reject) => {
+    if (socket.connected) {
+      resolve();
+      return;
+    }
+    const timer = setTimeout(() => reject(new Error('Timed out waiting for socket connect')), timeoutMs);
+    socket.once('connect', () => {
+      clearTimeout(timer);
+      resolve();
+    });
+    socket.once('connect_error', (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
+  });
+}
+
+async function disconnectSocket(socket, timeoutMs = 1500) {
+  if (!socket) return;
+  if (socket.disconnected) return;
+
+  await Promise.race([
+    new Promise((resolve) => {
+      socket.once('disconnect', resolve);
+      socket.disconnect();
+    }),
+    new Promise((resolve) => setTimeout(resolve, timeoutMs)),
+  ]);
+}
+
 test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banners, and storms', async () => {
   resetMemoryStore();
   resetStormState();
@@ -108,6 +139,9 @@ test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banne
   const ajv = await loadSocketIoContractAjv();
   const validateJoin = ajv.getSchema(
     'vybe://contracts/socketio/v1/client-to-server/join_room.schema.json'
+  );
+  const validateLeave = ajv.getSchema(
+    'vybe://contracts/socketio/v1/client-to-server/leave_room.schema.json'
   );
   const validateChatSend = ajv.getSchema(
     'vybe://contracts/socketio/v1/client-to-server/chat_message.schema.json'
@@ -123,6 +157,9 @@ test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banne
   );
   const validatePlatformBanner = ajv.getSchema(
     'vybe://contracts/socketio/v1/server-to-client/platform_banner.schema.json'
+  );
+  const validateGiftError = ajv.getSchema(
+    'vybe://contracts/socketio/v1/server-to-client/gift_error.schema.json'
   );
   const validateStormStart = ajv.getSchema(
     'vybe://contracts/socketio/v1/server-to-client/spark_storm_start.schema.json'
@@ -141,11 +178,13 @@ test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banne
   );
 
   assert.ok(validateJoin);
+  assert.ok(validateLeave);
   assert.ok(validateChatSend);
   assert.ok(validateSendGift);
   assert.ok(validateGiftAnimation);
   assert.ok(validateChatMessage);
   assert.ok(validatePlatformBanner);
+  assert.ok(validateGiftError);
   assert.ok(validateStormStart);
   assert.ok(validateStormUpdate);
   assert.ok(validateStormComplete);
@@ -162,11 +201,15 @@ test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banne
     reconnection: false,
   });
 
+  const socket2 = createClient(socketUrl, {
+    transports: ['websocket'],
+    auth: { token: accessToken },
+    timeout: 2000,
+    reconnection: false,
+  });
+
   try {
-    await new Promise((resolve, reject) => {
-      socket.once('connect', resolve);
-      socket.once('connect_error', reject);
-    });
+    await waitForConnect(socket);
 
     const joinPayload = { room_id: MEMORY_IDS.room };
     validateOrThrow(validateJoin, joinPayload, 'join_room payload');
@@ -184,6 +227,31 @@ test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banne
     validateOrThrow(validatePerformerStatus, performerStatus, 'performer_status event payload');
     assert.equal(performerStatus.roomId, MEMORY_IDS.room);
     assert.equal(performerStatus.performerId, MEMORY_IDS.performer);
+
+    await waitForConnect(socket2);
+
+    const viewerCountTwoPromise = waitForEvent(socket, 'viewer_count');
+    const joinAck2 = await emitWithAck(socket2, 'join_room', joinPayload);
+    assert.deepEqual(joinAck2, { ok: true, roomId: MEMORY_IDS.room });
+    const viewerCountTwo = await viewerCountTwoPromise;
+    validateOrThrow(validateViewerCount, viewerCountTwo, 'viewer_count event payload');
+    assert.equal(viewerCountTwo.count, 2);
+
+    const leavePayload = { room_id: MEMORY_IDS.room };
+    validateOrThrow(validateLeave, leavePayload, 'leave_room payload');
+    const viewerCountAfterLeavePromise = waitForEvent(socket2, 'viewer_count');
+    const leaveAck = await emitWithAck(socket, 'leave_room', leavePayload);
+    assert.deepEqual(leaveAck, { ok: true, roomId: MEMORY_IDS.room });
+    const viewerCountAfterLeave = await viewerCountAfterLeavePromise;
+    validateOrThrow(validateViewerCount, viewerCountAfterLeave, 'viewer_count event payload');
+    assert.equal(viewerCountAfterLeave.count, 1);
+
+    const viewerCountAfterRejoinPromise = waitForEvent(socket2, 'viewer_count');
+    const joinAck3 = await emitWithAck(socket, 'join_room', joinPayload);
+    assert.deepEqual(joinAck3, { ok: true, roomId: MEMORY_IDS.room });
+    const viewerCountAfterRejoin = await viewerCountAfterRejoinPromise;
+    validateOrThrow(validateViewerCount, viewerCountAfterRejoin, 'viewer_count event payload');
+    assert.equal(viewerCountAfterRejoin.count, 2);
 
     const chatSendPayload = { room_id: MEMORY_IDS.room, message: 'hello from contract test' };
     validateOrThrow(validateChatSend, chatSendPayload, 'chat_message payload');
@@ -216,6 +284,13 @@ test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banne
     const banner = await bannerPromise;
     validateOrThrow(validatePlatformBanner, banner, 'platform_banner event payload');
 
+    const invalidSendPayload = { room_id: MEMORY_IDS.room, gift_type_id: 'crown' };
+    const giftErrorPromise = waitForEvent(socket, 'gift_error');
+    const invalidAck = await emitWithAck(socket, 'send_gift', invalidSendPayload);
+    assert.equal(invalidAck.ok, false);
+    const giftError = await giftErrorPromise;
+    validateOrThrow(validateGiftError, giftError, 'gift_error event payload');
+
     const startPromise = waitForEvent(socket, 'spark_storm_start', 5000);
     const updatePromise = waitForEvent(socket, 'spark_storm_update', 5000);
     for (let i = 0; i < 4; i += 1) {
@@ -236,7 +311,7 @@ test('Socket.io runtime emits contract-compliant payloads for chat, gifts, banne
     const complete = await completePromise;
     validateOrThrow(validateStormComplete, complete, 'spark_storm_complete event payload');
   } finally {
-    socket.disconnect();
+    await Promise.all([disconnectSocket(socket), disconnectSocket(socket2)]);
     await close();
   }
 });

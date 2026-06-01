@@ -137,6 +137,25 @@ After verification, `POST /api/auth/login` requires a 2FA token for accounts wit
 }
 ```
 
+## Socket.io
+
+Socket server shares the same origin as the REST API:
+
+```text
+http://localhost:4000
+```
+
+Auth (optional for non-auth events):
+
+- pass `auth: { token: "<accessToken>" }` in the Socket.io client connection, or
+- set `Authorization: Bearer <accessToken>` in the handshake headers
+
+Room membership:
+
+- Client → Server: `join_room` `{ "room_id": "<room-id>" }` (ack: `{ ok, roomId }`)
+- Client → Server: `leave_room` `{ "room_id": "<room-id>" }` (ack: `{ ok, roomId }`)
+- Server → Client (to room): `viewer_count` `{ "count": 123 }` (emitted on join/leave/disconnect)
+
 ## Viewer
 
 ### `GET /api/me`

@@ -2,6 +2,7 @@ const { Server } = require('socket.io');
 const { env } = require('../config/env');
 const { verifyAccessToken } = require('../middleware/auth');
 const { registerGiftHandler } = require('./giftHandler');
+const { registerPresenceHandler } = require('./presenceHandler');
 
 function configureSockets(httpServer, app) {
   const io = new Server(httpServer, {
@@ -28,22 +29,7 @@ function configureSockets(httpServer, app) {
   });
 
   io.on('connection', (socket) => {
-    socket.on('join_room', ({ room_id: roomId, roomId: camelRoomId }, ack) => {
-      const room = roomId || camelRoomId;
-      if (!room) {
-        if (typeof ack === 'function') ack({ ok: false, error: 'room_id is required' });
-        return;
-      }
-      socket.join(room);
-      if (typeof ack === 'function') ack({ ok: true, roomId: room });
-    });
-
-    socket.on('leave_room', ({ room_id: roomId, roomId: camelRoomId }, ack) => {
-      const room = roomId || camelRoomId;
-      if (room) socket.leave(room);
-      if (typeof ack === 'function') ack({ ok: true, roomId: room });
-    });
-
+    registerPresenceHandler(io, socket);
     registerGiftHandler(io, socket);
   });
 

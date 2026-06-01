@@ -570,7 +570,7 @@ paths:
         - name: limit
           in: query
           required: false
-          schema: { type: integer, minimum: 1, maximum: 50, default: 25 }
+          schema: { type: integer, minimum: 1, maximum: 25, default: 10 }
       responses:
         "200":
           description: Leaderboard entries
@@ -1245,23 +1245,31 @@ components:
       type: object
       properties:
         rank: { type: integer, minimum: 1 }
-        viewerId: { type: string, format: uuid }
-        displayName: { type: string }
-        avatarUrl: { type: ["string", "null"] }
-        sparksSpent: { type: integer }
-        lastInteraction: { type: ["string", "null"] }
-      required: [rank, viewerId, displayName, avatarUrl, sparksSpent, lastInteraction]
+        user:
+          $ref: "#/components/schemas/PublicUser"
+        sparksSpent: { type: integer, minimum: 0 }
+        giftsSent: { type: integer, minimum: 0 }
+      required: [rank, user, sparksSpent, giftsSent]
+
+    GameLeaderboardPerformer:
+      type: object
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        name: { type: string }
+      required: [id, slug, name]
 
     GameLeaderboardResponse:
       type: object
       properties:
-        performerId: { type: string }
-        updatedAt: { type: string }
+        performer:
+          $ref: "#/components/schemas/GameLeaderboardPerformer"
         entries:
           type: array
           items:
             $ref: "#/components/schemas/GameLeaderboardEntry"
-      required: [performerId, updatedAt, entries]
+        generatedAt: { type: string, format: date-time }
+      required: [performer, entries, generatedAt]
 
     PublicUser:
       type: object

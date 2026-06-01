@@ -282,14 +282,27 @@ These endpoints power direct messages and are backed by the memory adapter when 
 
 Requires auth.
 
-Response:
+Returns:
 
 ```json
 {
   "conversations": [
     {
-      "user": { "id": "...", "displayName": "Luna Voss", "role": "performer" },
-      "lastMessage": { "id": "...", "senderId": "...", "recipientId": "...", "message": "Hello", "isRead": false, "createdAt": "..." }
+      "user": {
+        "id": "22222222-2222-4222-8222-222222222222",
+        "displayName": "Luna Voss",
+        "role": "performer",
+        "avatarUrl": null
+      },
+      "lastMessage": {
+        "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "senderId": "22222222-2222-4222-8222-222222222222",
+        "recipientId": "11111111-1111-4111-8111-111111111111",
+        "message": "Welcome back. Want me to pick the first game, or do you want to run the board?",
+        "createdAt": "..."
+      },
+      "lastMessageAt": "...",
+      "unreadCount": 1
     }
   ]
 }
@@ -299,15 +312,7 @@ Response:
 
 Requires auth.
 
-Response:
-
-```json
-{
-  "messages": [
-    { "id": "...", "senderId": "...", "recipientId": "...", "message": "Hello", "isRead": false, "createdAt": "..." }
-  ]
-}
-```
+Returns messages with one user (accepts demo performer slug like `luna` or a UUID).
 
 ### `POST /api/chat/send`
 
@@ -316,5 +321,8 @@ Requires auth.
 Request:
 
 ```json
-{ "recipient_id": "...", "message": "Hello" }
+{
+  "recipient_id": "luna",
+  "message": "Put me on the leaderboard."
+}
 ```

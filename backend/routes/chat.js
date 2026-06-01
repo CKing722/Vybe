@@ -1,26 +1,21 @@
 const express = require('express');
-const { body, param, query } = require('express-validator');
+const { body, param } = require('express-validator');
 const { requireAuth } = require('../middleware/auth');
 const { validate } = require('../middleware/validator');
-const { listConversations, listDirectMessages, sendDirectMessage } = require('../services/chatService');
+const { listConversations, listMessagesWithUser, sendChatMessage } = require('../services/chatService');
 
 const router = express.Router();
 
-const conversationsValidation = validate([
-  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('limit must be 1-100').toInt(),
-]);
-
-const messagesValidation = validate([
-  param('userId').isUUID().withMessage('userId must be a UUID'),
-  query('limit').optional().isInt({ min: 1, max: 200 }).withMessage('limit must be 1-200').toInt(),
-]);
-
 const sendValidation = validate([
   body('recipient_id')
-    .customSanitizer((value, { req }) => value ?? req.body.recipientId)
-    .isUUID()
-    .withMessage('recipient_id must be a UUID'),
+    .customSanitizer((value, { req }) => value ?? req.body.recipientId ?? req.body.userId)
+    .isString()
+    .withMessage('recipient_id must be a string')
+    .trim()
+    .notEmpty()
+    .withMessage('recipient_id is required'),
   body('message')
+    .customSanitizer((value, { req }) => value ?? req.body.body ?? req.body.text)
     .isString()
     .withMessage('message must be a string')
     .trim()
@@ -28,21 +23,32 @@ const sendValidation = validate([
     .withMessage('message must be 1-500 characters'),
 ]);
 
-router.get('/conversations', requireAuth, conversationsValidation, async (req, res, next) => {
+router.get('/conversations', requireAuth, async (req, res, next) => {
   try {
-    const conversations = await listConversations(req.user.sub, { limit: req.query.limit });
+    const conversations = await listConversations(req.user.sub, {
+      limit: Math.min(100, Number(req.query.limit || 25)),
+    });
     res.status(200).json({ conversations });
   } catch (error) {
     next(error);
   }
 });
 
-router.get('/:userId', requireAuth, messagesValidation, async (req, res, next) => {
+const userValidation = validate([
+  param('userId')
+    .isString()
+    .withMessage('userId must be a string')
+    .trim()
+    .notEmpty()
+    .withMessage('userId is required'),
+]);
+
+router.get('/:userId', requireAuth, userValidation, async (req, res, next) => {
   try {
-    const messages = await listDirectMessages(req.user.sub, req.params.userId, {
-      limit: req.query.limit,
+    const result = await listMessagesWithUser(req.user.sub, req.params.userId, {
+      limit: Math.min(250, Number(req.query.limit || 50)),
     });
-    res.status(200).json({ messages });
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -50,16 +56,15 @@ router.get('/:userId', requireAuth, messagesValidation, async (req, res, next) =
 
 router.post('/send', requireAuth, sendValidation, async (req, res, next) => {
   try {
-    const message = await sendDirectMessage({
+    const result = await sendChatMessage({
       senderId: req.user.sub,
       recipientId: req.body.recipient_id,
       message: req.body.message,
     });
-    res.status(201).json({ message });
+    res.status(201).json(result);
   } catch (error) {
     next(error);
   }
 });
 
 module.exports = router;
-

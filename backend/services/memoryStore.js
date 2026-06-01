@@ -230,10 +230,19 @@ function createInitialState() {
     performerDirectory: DEMO_PERFORMERS.map((performer) => ({ ...performer })),
     giftTypes: GIFT_TYPES.map((gift) => ({ ...gift })),
     giftsSent: [],
-    directMessages: [],
     sparkTransactions: [],
     banners: [],
     viewerPerformerHistory: new Map(),
+    chatMessages: [
+      {
+        id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        sender_id: MEMORY_IDS.performer,
+        recipient_id: MEMORY_IDS.viewer,
+        message: 'Welcome back. Want me to pick the first game, or do you want to run the board?',
+        created_at: nowIso(),
+      },
+    ],
+    chatReadAt: new Map(),
   };
 }
 
@@ -254,9 +263,9 @@ function snapshotMemoryStore() {
     viewerProfiles: Array.from(state.viewerProfiles.values()),
     performerDirectory: [...state.performerDirectory],
     giftsSent: [...state.giftsSent],
-    directMessages: [...state.directMessages],
     sparkTransactions: [...state.sparkTransactions],
     banners: [...state.banners],
+    chatMessages: [...(state.chatMessages || [])],
   };
 }
 

@@ -98,6 +98,7 @@ Server → Client:
   'game_state' { question, timer, scores }
   'viewer_count' { count }
   'performer_status' { is_live }
+  'leaderboard_update' { performer, entries, viewerEntry }
 ```
 
 ## Key API Endpoints

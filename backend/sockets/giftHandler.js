@@ -30,6 +30,10 @@ function registerGiftHandler(io, socket) {
         io.to(result.giftSent.roomId).emit(event.type, event.payload);
       }
 
+      if (result.leaderboard) {
+        io.to(result.giftSent.roomId).emit('leaderboard_update', result.leaderboard);
+      }
+
       if (typeof ack === 'function') {
         ack({ ok: true, result });
       }

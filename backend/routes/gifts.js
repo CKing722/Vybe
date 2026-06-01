@@ -27,6 +27,10 @@ function emitGiftEvents(io, result) {
   for (const event of stormEvents) {
     io.to(roomId).emit(event.type, event.payload);
   }
+
+  if (result.leaderboard) {
+    io.to(roomId).emit('leaderboard_update', result.leaderboard);
+  }
 }
 
 router.get('/types', async (req, res, next) => {

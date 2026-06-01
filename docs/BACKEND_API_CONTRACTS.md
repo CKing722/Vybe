@@ -242,11 +242,13 @@ Response includes:
 - updated `balance`
 - `animation` payload for the room
 - `banner` payload for 500+ spark platform-wide gifts
+- `leaderboard` snapshot for the performer (top spenders + sender rank when available)
 
 Socket events:
 
 - `gift_animation`
 - `platform_banner`
+- `leaderboard_update`
 - `spark_storm_start`
 - `spark_storm_update`
 - `spark_storm_complete`

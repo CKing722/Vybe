@@ -48,6 +48,10 @@ test('leaderboard endpoint returns ranked spark spend per performer', async () =
       }),
     });
     assert.equal(sendResponse.status, 201);
+    const giftPayload = await sendResponse.json();
+    assert.equal(giftPayload.leaderboard.entries.length, 1);
+    assert.equal(giftPayload.leaderboard.entries[0].sparksSpent, 500);
+    assert.equal(giftPayload.leaderboard.viewerEntry.rank, 1);
 
     const leaderboardResponse = await fetch(`${baseUrl}/api/games/leaderboard/luna?limit=10`, {
       headers,

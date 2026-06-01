@@ -2,6 +2,13 @@ const { hasDatabase, query } = require('../config/db');
 const { notFound } = require('../utils/errors');
 const { getMemoryState } = require('./memoryStore');
 
+async function runQuery(client, text, params) {
+  if (client) {
+    return client.query(text, params);
+  }
+  return query(text, params);
+}
+
 function resolveMemoryPerformer(identifier) {
   const state = getMemoryState();
   const performer = state.performerDirectory.find(
@@ -74,8 +81,9 @@ async function leaderboardFromMemory(performerIdentifier, { limit, viewerId } = 
   };
 }
 
-async function leaderboardFromDatabase(performerId, { limit, viewerId } = {}) {
-  const performerResult = await query(
+async function leaderboardFromDatabase(performerId, { limit, viewerId, client } = {}) {
+  const performerResult = await runQuery(
+    client,
     `SELECT u.id, u.display_name
      FROM users u
      WHERE u.id::text = $1 AND u.role = 'performer' AND u.is_active = TRUE`,
@@ -86,7 +94,8 @@ async function leaderboardFromDatabase(performerId, { limit, viewerId } = {}) {
     throw notFound('Performer not found');
   }
 
-  const { rows } = await query(
+  const { rows } = await runQuery(
+    client,
     `SELECT vph.viewer_id, u.display_name, vph.sparks_spent, vph.last_interaction
      FROM viewer_performer_history vph
      JOIN users u ON u.id = vph.viewer_id
@@ -106,7 +115,8 @@ async function leaderboardFromDatabase(performerId, { limit, viewerId } = {}) {
 
   let viewerEntry = null;
   if (viewerId) {
-    const { rows: viewerRows } = await query(
+    const { rows: viewerRows } = await runQuery(
+      client,
       `SELECT viewer_id, display_name, sparks_spent, rank FROM (
         SELECT vph.viewer_id,
                u.display_name,
@@ -136,7 +146,10 @@ async function leaderboardFromDatabase(performerId, { limit, viewerId } = {}) {
   };
 }
 
-async function getPerformerLeaderboard(performerIdentifier, { limit = 10, viewerId = null } = {}) {
+async function getPerformerLeaderboard(
+  performerIdentifier,
+  { limit = 10, viewerId = null, client = null } = {}
+) {
   const safeLimit = Math.max(1, Math.min(50, Number(limit) || 10));
 
   if (!hasDatabase()) {
@@ -147,7 +160,11 @@ async function getPerformerLeaderboard(performerIdentifier, { limit = 10, viewer
     throw notFound('Performer not found');
   }
 
-  return leaderboardFromDatabase(String(performerIdentifier), { limit: safeLimit, viewerId });
+  return leaderboardFromDatabase(String(performerIdentifier), {
+    limit: safeLimit,
+    viewerId,
+    client,
+  });
 }
 
 module.exports = {

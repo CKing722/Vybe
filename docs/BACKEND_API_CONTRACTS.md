@@ -273,3 +273,41 @@ Request:
   "count": 5
 }
 ```
+
+Notes:
+
+- `theme` is optional (1–64 chars). `game_type` is accepted as an alias for backwards compatibility.
+- `count` is optional (default `5`, min `1`, max `10`).
+
+Response:
+
+```json
+{
+  "provider": "local",
+  "paidProviderUsed": false,
+  "rawProviderApisEnabled": false,
+  "questions": [
+    {
+      "q": "Which room detail sets the strongest mood before a private session starts?",
+      "opts": ["Lighting", "Volume", "Camera angle", "Opening line"],
+      "ans": 0
+    }
+  ]
+}
+```
+
+Validation failure (`400`) (details are omitted in production):
+
+```json
+{
+  "error": {
+    "code": "bad_request",
+    "message": "Request validation failed",
+    "details": {
+      "fields": [
+        { "field": "count", "message": "count must be an integer between 1 and 10" }
+      ]
+    }
+  }
+}
+```

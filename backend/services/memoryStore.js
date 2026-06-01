@@ -255,7 +255,7 @@ function createInitialState() {
         id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         sender_id: MEMORY_IDS.performer,
         recipient_id: MEMORY_IDS.viewer,
-        message: "Welcome back. Want me to pick the first game, or do you want to run the board?",
+        message: 'Welcome back. Want me to pick the first game, or do you want to run the board?',
         created_at: createdAt,
       },
     ],

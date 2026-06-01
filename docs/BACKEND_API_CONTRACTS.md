@@ -486,6 +486,7 @@ Response:
 
 ## Chat (DM)
 
+These endpoints power direct messages and are backed by the memory adapter when `DATABASE_URL` is unset.
 ### `GET /api/chat/conversations`
 
 Requires auth.

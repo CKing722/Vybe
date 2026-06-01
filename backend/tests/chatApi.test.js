@@ -17,15 +17,20 @@ async function login(baseUrl) {
   return { headers: { authorization: `Bearer ${payload.accessToken}` } };
 }
 
-test('chat API lists conversations, fetches message history, and sends messages', async () => {
-  resetMemoryStore();
-
+async function startServer() {
   const app = createApp();
   const server = http.createServer(app);
 
   await new Promise((resolve) => server.listen(0, resolve));
   const { port } = server.address();
   const baseUrl = `http://127.0.0.1:${port}`;
+
+  return { baseUrl, server };
+}
+
+test('chat API lists conversations, fetches message history, and sends messages', async () => {
+  resetMemoryStore();
+  const { baseUrl, server } = await startServer();
 
   try {
     const { headers } = await login(baseUrl);
@@ -65,3 +70,14 @@ test('chat API lists conversations, fetches message history, and sends messages'
   }
 });
 
+test('chat DM endpoints require auth', async () => {
+  resetMemoryStore();
+  const { baseUrl, server } = await startServer();
+
+  try {
+    const response = await fetch(`${baseUrl}/api/chat/conversations`);
+    assert.equal(response.status, 401);
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+  }
+});

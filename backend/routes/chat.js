@@ -68,4 +68,3 @@ router.post('/send', requireAuth, sendValidation, async (req, res, next) => {
 });
 
 module.exports = router;
-

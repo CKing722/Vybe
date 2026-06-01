@@ -45,10 +45,12 @@ function ensureChatState(state) {
   if (!state.chatReadAt) state.chatReadAt = new Map();
 }
 
-async function listConversations(userId, { limit = 25 } = {}) {
+async function listConversations(userId, options = {}) {
   if (hasDatabase()) {
     throw serviceUnavailable('Chat is not enabled for database mode yet');
   }
+
+  const limit = Number(options.limit || 25);
 
   const state = getMemoryState();
   ensureChatState(state);
@@ -91,10 +93,12 @@ async function listConversations(userId, { limit = 25 } = {}) {
   return results.slice(0, Math.max(1, Math.min(100, Number(limit) || 25)));
 }
 
-async function listMessagesWithUser(userId, otherIdentifier, { limit = 50 } = {}) {
+async function listMessagesWithUser(userId, otherIdentifier, options = {}) {
   if (hasDatabase()) {
     throw serviceUnavailable('Chat is not enabled for database mode yet');
   }
+
+  const limit = Number(options.limit || 50);
 
   const otherId = resolveUserIdOrThrow(otherIdentifier);
   const state = getMemoryState();
@@ -149,4 +153,3 @@ module.exports = {
   sendChatMessage,
   normalizeMessage,
 };
-

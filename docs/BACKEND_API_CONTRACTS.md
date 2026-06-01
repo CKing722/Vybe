@@ -273,3 +273,48 @@ Request:
   "count": 5
 }
 ```
+
+## Chat (DM)
+
+These endpoints power direct messages and are backed by the memory adapter when `DATABASE_URL` is unset.
+
+### `GET /api/chat/conversations`
+
+Requires auth.
+
+Response:
+
+```json
+{
+  "conversations": [
+    {
+      "user": { "id": "...", "displayName": "Luna Voss", "role": "performer" },
+      "lastMessage": { "id": "...", "senderId": "...", "recipientId": "...", "message": "Hello", "isRead": false, "createdAt": "..." }
+    }
+  ]
+}
+```
+
+### `GET /api/chat/:userId`
+
+Requires auth.
+
+Response:
+
+```json
+{
+  "messages": [
+    { "id": "...", "senderId": "...", "recipientId": "...", "message": "Hello", "isRead": false, "createdAt": "..." }
+  ]
+}
+```
+
+### `POST /api/chat/send`
+
+Requires auth.
+
+Request:
+
+```json
+{ "recipient_id": "...", "message": "Hello" }
+```

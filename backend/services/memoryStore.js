@@ -230,6 +230,7 @@ function createInitialState() {
     performerDirectory: DEMO_PERFORMERS.map((performer) => ({ ...performer })),
     giftTypes: GIFT_TYPES.map((gift) => ({ ...gift })),
     giftsSent: [],
+    directMessages: [],
     sparkTransactions: [],
     banners: [],
     viewerPerformerHistory: new Map(),
@@ -253,6 +254,7 @@ function snapshotMemoryStore() {
     viewerProfiles: Array.from(state.viewerProfiles.values()),
     performerDirectory: [...state.performerDirectory],
     giftsSent: [...state.giftsSent],
+    directMessages: [...state.directMessages],
     sparkTransactions: [...state.sparkTransactions],
     banners: [...state.banners],
   };

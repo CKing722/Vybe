@@ -1,5 +1,7 @@
 const express = require('express');
 const { getPerformer, listPerformers } = require('../services/performerService');
+const { listPerformerFeed } = require('../services/performerFeedService');
+const { listPerformerRequests } = require('../services/performerRequestService');
 
 const router = express.Router();
 
@@ -12,6 +14,28 @@ router.get('/', async (req, res, next) => {
       sort: req.query.sort,
     });
     res.status(200).json({ performers });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/feed', async (req, res, next) => {
+  try {
+    const performer = await getPerformer(req.params.id);
+    const feed = await listPerformerFeed(performer, {
+      limit: req.query.limit,
+    });
+    res.status(200).json({ feed });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/requests', async (req, res, next) => {
+  try {
+    const performer = await getPerformer(req.params.id);
+    const requests = await listPerformerRequests(performer);
+    res.status(200).json({ requests });
   } catch (error) {
     next(error);
   }

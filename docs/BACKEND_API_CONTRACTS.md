@@ -273,3 +273,47 @@ Request:
   "count": 5
 }
 ```
+
+### `GET /api/games/leaderboard/:performerId`
+
+Returns the current top spenders for a performer (derived from `viewer_performer_history` when PostgreSQL is configured, otherwise from the in-memory demo adapter).
+
+Query parameters:
+
+- `limit` (default 10, max 50)
+
+Example:
+
+```text
+GET /api/games/leaderboard/luna?limit=10
+```
+
+Response:
+
+```json
+{
+  "performer": {
+    "id": "22222222-2222-4222-8222-222222222222",
+    "slug": "luna",
+    "name": "Luna Voss"
+  },
+  "entries": [
+    {
+      "rank": 1,
+      "viewer": {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "displayName": "VelvetKing"
+      },
+      "sparksSpent": 500
+    }
+  ],
+  "viewerEntry": {
+    "rank": 1,
+    "viewer": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "displayName": "VelvetKing"
+    },
+    "sparksSpent": 500
+  }
+}
+```

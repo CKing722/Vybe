@@ -193,6 +193,8 @@ Returns one performer with caps, requests, posts, schedule, stats, and room id.
 
 Returns the performer's request menu items.
 
+Returns `404 not_found` when the performer identifier is unknown.
+
 Response:
 
 ```json
@@ -215,6 +217,8 @@ Returns the performer's profile feed.
 Query parameters:
 
 - `limit` (default 20, max 50)
+
+Returns `404 not_found` when the performer identifier is unknown.
 
 Response:
 

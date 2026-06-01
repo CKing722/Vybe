@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const http = require('node:http');
 const test = require('node:test');
 const { createApp } = require('../app');
+const { listPerformerFeed } = require('../services/performerFeedService');
 const { resetMemoryStore } = require('../services/memoryStore');
 
 async function withServer(handler) {
@@ -58,3 +59,35 @@ test('performer feed endpoints return 404 for unknown performers', async () => {
   });
 });
 
+test('performer request endpoints return 404 for unknown performers', async () => {
+  resetMemoryStore();
+
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/performers/unknown/requests`);
+    assert.equal(response.status, 404);
+    const body = await response.json();
+    assert.equal(body.error.code, 'not_found');
+  });
+});
+
+test('performer feed service clamps limits and generates stable demo ids', async () => {
+  const performer = {
+    id: 'demo-performer',
+    posts: Array.from({ length: 60 }, (_, index) => ({
+      type: 'text',
+      text: `post-${index}`,
+      createdAt: `2026-01-01T00:00:${String(index).padStart(2, '0')}Z`,
+    })),
+  };
+
+  const clamped = await listPerformerFeed(performer, { limit: 999 });
+  assert.equal(clamped.length, 50);
+  assert.equal(clamped[0].id, 'demo-demo-performer-post-0');
+  assert.equal(clamped[0].performerId, 'demo-performer');
+
+  const defaulted = await listPerformerFeed(performer, { limit: 'not-a-number' });
+  assert.equal(defaulted.length, 20);
+
+  const floored = await listPerformerFeed(performer, { limit: 0 });
+  assert.equal(floored.length, 1);
+});

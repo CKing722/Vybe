@@ -449,8 +449,8 @@ Response:
   "rawProviderApisEnabled": false,
   "questions": [
     {
-      "q": "What makes a Spark Storm feel communal?",
-      "opts": ["Shared progress", "Hidden scores", "Muted chat", "Static UI"],
+      "q": "Which room detail sets the strongest mood before a private session starts?",
+      "opts": ["Lighting", "Volume", "Camera angle", "Opening line"],
       "ans": 0
     }
   ]
@@ -461,32 +461,42 @@ Response:
 
 ### `GET /api/games/leaderboard/:performerId`
 
+Memory adapter supports demo performer slug (e.g. `luna`). Database mode expects the performer UUID.
+
 Query parameters:
 
-- `limit` (default 25, max 50)
+- `limit` (default 10, max 25)
 
 Response:
 
 ```json
 {
-  "performerId": "22222222-2222-4222-8222-222222222222",
-  "updatedAt": "2026-05-27T00:00:00.000Z",
+  "performer": {
+    "id": "22222222-2222-4222-8222-222222222222",
+    "slug": "luna",
+    "name": "Luna Voss"
+  },
   "entries": [
     {
       "rank": 1,
-      "viewerId": "11111111-1111-4111-8111-111111111111",
-      "displayName": "VelvetKing",
-      "avatarUrl": null,
-      "sparksSpent": 8650,
-      "lastInteraction": "2026-05-26T04:20:00.000Z"
+      "user": {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "displayName": "VelvetKing",
+        "role": "viewer",
+        "avatarUrl": null
+      },
+      "sparksSpent": 505,
+      "giftsSent": 2
     }
-  ]
+  ],
+  "generatedAt": "..."
 }
 ```
 
 ## Chat (DM)
 
 These endpoints power direct messages and are backed by the memory adapter when `DATABASE_URL` is unset.
+
 ### `GET /api/chat/conversations`
 
 Requires auth.

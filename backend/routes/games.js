@@ -3,6 +3,7 @@ const { body } = require('express-validator');
 const { optionalAuth } = require('../middleware/auth');
 const { validate } = require('../middleware/validator');
 const { generateGameQuestions } = require('../services/aiQuestions');
+const { getGamesLeaderboard } = require('../services/gameLeaderboardService');
 
 const router = express.Router();
 
@@ -28,6 +29,15 @@ router.post('/questions', optionalAuth, questionsValidation, async (req, res, ne
       count: req.body.count ?? 5,
     });
     res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/leaderboard/:performerId', optionalAuth, async (req, res, next) => {
+  try {
+    const leaderboard = await getGamesLeaderboard(req.params.performerId, { limit: req.query.limit });
+    res.status(200).json(leaderboard);
   } catch (error) {
     next(error);
   }

@@ -273,3 +273,56 @@ Request:
   "count": 5
 }
 ```
+
+Response:
+
+```json
+{
+  "provider": "local",
+  "paidProviderUsed": false,
+  "rawProviderApisEnabled": false,
+  "questions": [
+    {
+      "q": "Which room detail sets the strongest mood before a private session starts?",
+      "opts": ["Lighting", "Volume", "Camera angle", "Opening line"],
+      "ans": 0
+    }
+  ]
+}
+```
+
+## Game Leaderboard
+
+### `GET /api/games/leaderboard/:performerId`
+
+Memory adapter supports demo performer slug (e.g. `luna`). Database mode expects the performer UUID.
+
+Query parameters:
+
+- `limit` (default 10, max 25)
+
+Response:
+
+```json
+{
+  "performer": {
+    "id": "22222222-2222-4222-8222-222222222222",
+    "slug": "luna",
+    "name": "Luna Voss"
+  },
+  "entries": [
+    {
+      "rank": 1,
+      "user": {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "displayName": "VelvetKing",
+        "role": "viewer",
+        "avatarUrl": null
+      },
+      "sparksSpent": 505,
+      "giftsSent": 2
+    }
+  ],
+  "generatedAt": "..."
+}
+```

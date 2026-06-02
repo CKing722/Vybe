@@ -2,6 +2,7 @@ const { hasDatabase, withTransaction } = require('../config/db');
 const { badRequest, conflict, notFound } = require('../utils/errors');
 const { createPlatformBanner } = require('./bannerService');
 const { getGiftType } = require('./giftCatalog');
+const { getPerformerLeaderboard } = require('./leaderboardService');
 const { getMemoryState, randomId } = require('./memoryStore');
 
 function giftAnimationPayload({ gift, senderName, giftId }) {
@@ -123,6 +124,11 @@ async function sendGiftInMemory({ senderId, performerId, giftTypeId, roomId }) {
     gift,
   });
 
+  const leaderboard = await getPerformerLeaderboard(performerId, {
+    limit: 10,
+    viewerId: senderId,
+  });
+
   return {
     giftSent: {
       id: giftSent.id,
@@ -144,6 +150,7 @@ async function sendGiftInMemory({ senderId, performerId, giftTypeId, roomId }) {
       giftId: giftSent.id,
     }),
     banner,
+    leaderboard,
   };
 }
 
@@ -240,6 +247,12 @@ async function sendGiftWithDatabase(client, { senderId, performerId, giftTypeId,
     gift,
   });
 
+  const leaderboard = await getPerformerLeaderboard(performerId, {
+    limit: 10,
+    viewerId: senderId,
+    client,
+  });
+
   return {
     giftSent: {
       id: giftSent.id,
@@ -261,6 +274,7 @@ async function sendGiftWithDatabase(client, { senderId, performerId, giftTypeId,
       giftId: giftSent.id,
     }),
     banner,
+    leaderboard,
   };
 }
 

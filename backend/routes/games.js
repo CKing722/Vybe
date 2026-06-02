@@ -1,5 +1,5 @@
 const express = require('express');
-const { body } = require('express-validator');
+const { body, param, query } = require('express-validator');
 const { optionalAuth } = require('../middleware/auth');
 const { validate } = require('../middleware/validator');
 const { generateGameQuestions } = require('../services/aiQuestions');
@@ -22,6 +22,20 @@ const questionsValidation = validate([
     .toInt(),
 ]);
 
+const leaderboardValidation = validate([
+  param('performerId')
+    .isString()
+    .withMessage('performerId must be a string')
+    .trim()
+    .notEmpty()
+    .withMessage('performerId is required'),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 25 })
+    .withMessage('limit must be an integer between 1 and 25')
+    .toInt(),
+]);
+
 router.post('/questions', optionalAuth, questionsValidation, async (req, res, next) => {
   try {
     const result = await generateGameQuestions({
@@ -34,7 +48,7 @@ router.post('/questions', optionalAuth, questionsValidation, async (req, res, ne
   }
 });
 
-router.get('/leaderboard/:performerId', optionalAuth, async (req, res, next) => {
+router.get('/leaderboard/:performerId', optionalAuth, leaderboardValidation, async (req, res, next) => {
   try {
     const leaderboard = await getGamesLeaderboard(req.params.performerId, { limit: req.query.limit });
     res.status(200).json(leaderboard);
